@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\components\SVG;
 use app\models\Project;
 use Yii;
 use app\models\Version;
@@ -30,6 +31,37 @@ class VersionController extends DefaultController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'project' => Project::findOne(['id' => $project_id])
+        ]);
+    }
+    
+    public function actionGraph()
+    {
+        $data = [
+            25,
+            25,
+            23,
+            21,
+            18,
+            15,
+            14,
+            13,
+            9,
+            9,
+            9,
+            9,
+            9,
+            1,
+            0
+        ];
+
+        $svg = SVG::generate($data);
+
+        return $this->render('graph', [
+            'graphs' => [
+                $svg->getIdeal(),
+                $svg->getCoords(),
+            ], 
+            'scales' => $svg->getScales(),
         ]);
     }
 
