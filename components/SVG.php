@@ -129,7 +129,7 @@ final class SVG
 	{
 		$idealCoords[] = [
 			'line' => [
-				'y1' => ($this->getDivide(self::SVG_Y)['step']*100/$this->getDivide(self::SVG_Y)['max']) . '%',
+				'y1' => 100-($this->data[0]*100/$this->getDivide(self::SVG_Y)['max']) . '%',
 				'y2' => '100%',
 				'x1' => '0%',
 				'x2' => '100%',
