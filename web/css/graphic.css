@@ -1,0 +1,44 @@
+div.graphic {
+  min-width: 300px;
+  min-height: 300px;
+  width: auto;
+  height: auto;
+  position: relative; }
+
+div.graphic > div.scaleY {
+  height: 97%;
+  display: inline-block;
+  padding-top: 20px;
+  position: absolute; }
+
+div.graphic > div.scaleY > div {
+  height: 100%;
+  position: relative; }
+
+div.graphic > div.scaleY > div > * {
+  position: absolute;
+  width: 100%;
+  text-align: right; }
+
+div.graphic > div.scaleX {
+  padding-left: 10px;
+  padding-right: 10px;
+  width: 98%;
+  height: 2%;
+  position: absolute;
+  left: 20px;
+  bottom: 0; }
+
+div.graphic > div.scaleX > div {
+  position: relative;
+  width: 100%; }
+
+div.graphic > div.scaleX > div > * {
+  position: absolute; }
+
+div.graphic > svg {
+  padding: 10px;
+  position: absolute;
+  left: 20px; }
+
+/*# sourceMappingURL=graphic.css.map */

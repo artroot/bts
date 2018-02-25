@@ -29,23 +29,18 @@ phpunit.phar
 tests/_output/*
 tests/_support/_generated
 
-
-
 .bowerrc
-werrc
-LICENSE.md
+.sass-cache/
 assets/
 codeception.yml
 commands/
 composer.json
 composer.lock
+config/db.php
 mail/
 requirements.php
 runtime/
 tests/
-web/
 widgets/
 yii
 yii.bat
-
-config/db.php
