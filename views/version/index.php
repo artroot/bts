@@ -11,18 +11,28 @@
 	/* @var $dataProvider yii\data\ActiveDataProvider */
 
 	$this->title = 'Versions';
-	$this->params['breadcrumbs'][] = $project->name;
-	$this->params['breadcrumbs'][] = $this->title;
+	/*$this->params['breadcrumbs'][] = $project->name;
+	$this->params['breadcrumbs'][] = $this->title;*/
 ?>
 <div class="version-index">
+	<h1><?= Html::img(Url::toRoute(
+			['project/get', 'id' => $project->id]),
+			['width' => 48, 'class' => 'img-circle', 'style' => 'display: inline-block; padding-left: 4px;']) ?>
+		<?= Html::encode($project->name) ?>
+		<span style="float: right;">
+			<?= Html::a('', ['project/update', 'id' => $project->id], ['class' => 'btn btn-default glyphicon glyphicon-pencil']) ?>
+		</span>
+	</h1>
 
-	<h1><?= Html::encode($this->title) ?></h1>
+	<div class="row">
+	<div class="col-md-3">
+		<?= \Yii::$app->view->renderFile('@app/views/project/left_nav.php',['project' => $project]) ?>
+	</div>
+	<div class="col-md-9">
 	<?php Pjax::begin(); ?>
+	<h1><?= Html::encode($this->title) ?><?= Html::a('Create Version', ['create'], ['class' => 'btn btn-success', 'style' => 'float:right;']) ?>
+	</h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
-	<p>
-		<?= Html::a('Create Version', ['create'], ['class' => 'btn btn-success']) ?>
-	</p>
 
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -41,8 +51,6 @@
 		],
 	]); ?>
 	<?php Pjax::end(); ?>
-</div>
-
 <?php
 
 	$data = [
@@ -67,3 +75,7 @@
 		],
 		'scales' => $svg->getScales(),
 	]);
+?>
+	</div>
+	</div>
+</div>

@@ -3,14 +3,18 @@
 namespace app\controllers;
 
 use app\controllers\DefaultController;
+use app\models\Version;
+use app\models\VersionSearch;
 use Yii;
 use app\models\Project;
 use app\models\ProjectSearch;
+use yii\base\View;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\Response;
 use yii\web\UploadedFile;
+use yii\web\ViewAction;
 
 /**
  * ProjectController implements the CRUD actions for Project model.
@@ -47,10 +51,25 @@ class ProjectController extends DefaultController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($id, $action = 'versions')
     {
+        switch ($action){
+            case 'versions':
+                $searchModel = new VersionSearch();
+                $searchModel->project_id = $id;
+                $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+                $data = \Yii::$app->view->renderFile('@app/views/version/index.php', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                    'project' => Project::findOne(['id' => $id])
+                ]);
+                break;
+        }
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'data' => $data
         ]);
     }
 

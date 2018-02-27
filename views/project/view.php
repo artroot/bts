@@ -1,9 +1,11 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\DetailView;
+    use yii\helpers\Url;
+    use yii\widgets\DetailView;
+    use yii\widgets\Pjax;
 
-/* @var $this yii\web\View */
+    /* @var $this yii\web\View */
 /* @var $model app\models\Project */
 
 $this->title = $model->name;
@@ -12,27 +14,16 @@ $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="project-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::img(Url::toRoute(
+            ['project/get', 'id' => $model->id]),
+            ['width' => 48, 'class' => 'img-circle', 'style' => 'display: inline-block; padding-left: 4px;']) ?> <?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <div class="row">
+        <?php Pjax::begin(); ?>
+        <div class="col-md-3">
+        </div>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'team_id',
-            'description',
-        ],
-    ]) ?>
-
+        <div class="col-md-9"><?= $data ?></div>
+        <?php Pjax::end(); ?>
+    </div>
 </div>
