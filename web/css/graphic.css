@@ -3,7 +3,8 @@ div.graphic {
   min-height: 300px;
   width: auto;
   height: auto;
-  position: relative; }
+  position: relative;
+  margin: 20px; }
 
 div.graphic > div.scaleY {
   height: 97%;

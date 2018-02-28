@@ -1,0 +1,21 @@
+
+
+@media (max-width: 767px){
+  .left-nav {
+    transition: 0.3s;
+    background-color: white;
+    width: 200px;
+    position: absolute;
+    left: -200px;
+  }
+
+  .right-container {
+    transition: 0.3s;
+    position: relative;
+  }
+
+  .shell {
+    position: relative;
+    overflow: hidden;
+  }
+}

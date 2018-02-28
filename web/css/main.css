@@ -4,7 +4,8 @@ div.graphic {
   min-height: 300px;
   width: auto;
   height: auto;
-  position: relative; }
+  position: relative;
+  margin: 20px; }
 
 div.graphic > div.scaleY {
   height: 97%;
@@ -41,5 +42,21 @@ div.graphic > svg {
   padding: 10px;
   position: absolute;
   left: 20px; }
+
+@media (max-width: 767px) {
+  .left-nav {
+    transition: 0.3s;
+    background-color: white;
+    width: 200px;
+    position: absolute;
+    left: -200px; }
+
+  .right-container {
+    transition: 0.3s;
+    position: relative; }
+
+  .shell {
+    position: relative;
+    overflow: hidden; } }
 
 /*# sourceMappingURL=main.css.map */

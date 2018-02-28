@@ -14,7 +14,7 @@
 	/*$this->params['breadcrumbs'][] = $project->name;
 	$this->params['breadcrumbs'][] = $this->title;*/
 ?>
-<div class="version-index">
+<div class="version-index shell">
 	<h1><?= Html::img(Url::toRoute(
 			['project/get', 'id' => $project->id]),
 			['width' => 48, 'class' => 'img-circle', 'style' => 'display: inline-block; padding-left: 4px;']) ?>
@@ -25,10 +25,10 @@
 	</h1>
 
 	<div class="row">
-	<div class="col-md-3">
+	<div class="col-md-3 left-nav hidden-xs">
 		<?= \Yii::$app->view->renderFile('@app/views/project/left_nav.php',['project' => $project]) ?>
 	</div>
-	<div class="col-md-9">
+	<div class="col-md-9 right-container col-xs-12">
 	<?php Pjax::begin(); ?>
 	<h1><?= Html::encode($this->title) ?><?= Html::a('Create Version', ['create'], ['class' => 'btn btn-success', 'style' => 'float:right;']) ?>
 	</h1>
@@ -76,6 +76,10 @@
 		'scales' => $svg->getScales(),
 	]);
 ?>
+		<br>
+		<br>
 	</div>
 	</div>
 </div>
+
+
