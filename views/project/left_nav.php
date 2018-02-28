@@ -12,6 +12,7 @@
 	$items = [
 		'version' => 'Versions',
 		'task' => 'Tasks',
+		'team' => 'Team',
 	];
 
 ?>

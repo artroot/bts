@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Project;
 use Yii;
 use app\models\Task;
 use app\models\TaskSearch;
@@ -19,7 +20,7 @@ class TaskController extends DefaultController
      * Lists all Task models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($project_id)
     {
         $searchModel = new TaskSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -27,6 +28,7 @@ class TaskController extends DefaultController
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'project' => Project::findOne(['id' => $project_id])
         ]);
     }
 
