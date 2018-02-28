@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Project;
 use Yii;
 use app\models\Team;
 use app\models\TeamSearch;
@@ -19,14 +20,16 @@ class TeamController extends DefaultController
      * Lists all Team models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($project_id)
     {
         $searchModel = new TeamSearch();
+        $searchModel->id = Project::findOne(['id' => $project_id])->team_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'project' => Project::findOne(['id' => $project_id])
         ]);
     }
 
