@@ -1,34 +1,38 @@
-var rightContainer = $('.right-container').on('touchstart', function (e) {
-    var start = e.originalEvent.touches[0].pageX;
+$('body').on('touchstart', function (e) {
+    start = e.originalEvent.touches[0].pageX;
+
     var leftNav = $('.left-nav').removeClass('hidden-xs');
-    rightContainer.css('margin-left', '0');
+    var rightContainer = $('.right-container');
+    var touchLeft = true;
+    var touchRight = true;
     $(this).on('touchmove', function (e) {
         var move = e.originalEvent.touches[0].pageX;
+        var moveleft = move-start;
+        var moveright = start-move;
+
         if(move > start){
-            if((move-start)*2 >= 100){
-                leftNav.css('left', '-15px');
-                rightContainer.css('position', 'relative').css('margin-left', '200px');
-            }else{
-                if(leftNav.position().left < -150) {
-                    leftNav.css('left', '-200px');
-                    rightContainer.css('margin-left', '0');
-                }
-                else {
-                    leftNav.css('left', '-15px');
-                    rightContainer.css('margin-left', '200px');
-                }
+            if (rightContainer.offset().left >= 0 && rightContainer.offset().left < 200 && moveleft <= 200){
+
+                leftNav.css('left', (-200)+moveleft + 'px');
+                rightContainer.css('position', 'relative').css('margin-left', moveleft + 'px');
+
+                touchLeft = true;
             }
         }else{
+            if (rightContainer.offset().left <= 200 && rightContainer.offset().left > 0 && moveright <= 200){
+
+                leftNav.css('left', (-15)-moveright+'px');
+                rightContainer.css('position', 'relative').css('margin-left', (200)-moveright+'px');
+
+                touchRight = true;
+            }
+        }
+    }).on('touchend', function (e) {
+        if (rightContainer.offset().left < 180) {
             leftNav.css('left', '-200px');
             rightContainer.css('margin-left', '0');
         }
-    });
-    $(this).on('touchend', function (e) {
-        if (leftNav.position().left < (-100)) {
-            leftNav.css('left', '-200px');
-            rightContainer.css('margin-left', '0');
-        }
-        else {
+        else if (rightContainer.offset().left > 20){
             leftNav.css('left', '-15px');
             rightContainer.css('margin-left', '200px');
         }
