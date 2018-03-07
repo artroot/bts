@@ -1,12 +1,15 @@
-.left-nav {
-  transition: 0.3s;
-  background-color: white; }
+@media (max-width: 767px) {
+  .left-nav {
+    background-color: white;
+    width: 200px;
+    position: absolute;
+    left: -200px; }
 
-.right-container {
-  transition: 0.3s; }
+  .right-container {
+    position: relative; }
 
-.shell {
-  position: relative;
-  overflow: hidden; }
+  .shell {
+    position: relative;
+    overflow: hidden; } }
 
 /*# sourceMappingURL=left-nav.css.map */
