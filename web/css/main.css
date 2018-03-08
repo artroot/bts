@@ -56,5 +56,20 @@ div.graphic > svg {
   .shell {
     position: relative;
     overflow: hidden; } }
+.btn-logout {
+  display: block;
+  padding: 3px 20px;
+  clear: both;
+  font-weight: normal;
+  line-height: 1.42857143;
+  color: #333;
+  white-space: nowrap;
+  background-color: transparent;
+  width: 100%;
+  border-radius: 0;
+  text-align: unset; }
+
+.btn-logout:hover {
+  background-color: #eee; }
 
 /*# sourceMappingURL=main.css.map */

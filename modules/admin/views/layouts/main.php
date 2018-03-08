@@ -29,6 +29,8 @@ AppAsset::register($this);
 
 <div class="wrap">
     <?php
+
+
         NavBar::begin([
             'brandLabel' => Yii::$app->name . ' admin',
             'brandUrl' => Yii::$app->homeUrl,
@@ -45,16 +47,30 @@ AppAsset::register($this);
             $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
             $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
         } else {
-            $menuItems[] = '<li>'
+            $menuItems[] = [
+                'label' => '<span class="glyphicon glyphicon-user"></span> ' . Yii::$app->user->identity->username,
+                'items' => [
+                    '<li>'
+                    . Html::beginForm(['/site/logout'], 'post')
+                    . Html::submitButton(
+                        'Logout',
+                        ['class' => 'btn btn-logout']
+                    )
+                    . Html::endForm()
+                    . '</li>',
+                    '<li>' . Html::a('Settings', ['settings/main']) . '</li>'
+                ]
+            ];/*'<li>'
                 . Html::beginForm(['/site/logout'], 'post')
                 . Html::submitButton(
                     'Logout (' . Yii::$app->user->identity->username . ')',
                     ['class' => 'btn btn-link logout']
                 )
                 . Html::endForm()
-                . '</li>';
+                . '</li>';*/
         }
         echo Nav::widget([
+            'encodeLabels' => false,
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => $menuItems,
         ]);

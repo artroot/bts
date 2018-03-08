@@ -41,7 +41,7 @@ use yii\widgets\ActiveForm;
             <svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
                 <g>
                     <title>Layer 1</title>
-                    <rect stroke="#555555" id="svg_4" height="17.372192" width="30.557562" y="7.563863" x="0.721219" stroke-width="1.5" fill="#999999"/>
+                    <rect stroke="#555555" id="svg_4" height="17.372192" width="30.557562" y="7.563863" x="0.721219" stroke-width="1.5" fill="#fff0"/>
                     <line stroke="#555555" stroke-linecap="null" stroke-linejoin="null" id="svg_6" y2="10.688358" x2="14.889952" y1="10.688358" x1="6.121921" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none"/>
                     <line stroke="#555555" stroke-linecap="null" stroke-linejoin="null" id="svg_9" y2="10.688358" x2="19.223836" y1="10.688358" x1="16.517326" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none"/>
                     <line stroke="#555555" stroke-linecap="null" stroke-linejoin="null" id="svg_10" y2="10.688358" x2="25.507531" y1="10.688358" x1="20.863833" fill-opacity="null" stroke-opacity="null" stroke-width="1.5" fill="none"/>
