@@ -44,7 +44,7 @@ class Users extends \yii\db\ActiveRecord
             [['usertype_id', 'status'], 'integer'],
             [['password_hash', 'password_reset_token', 'auth_key'], 'string'],
             [['status'], 'required'],
-            [['created_at', 'updated_at'], 'safe'],
+            [['created_at', 'updated_at', 'telegram_key'], 'safe'],
             [['username', 'password', 'email'], 'string', 'max' => 255],
             [['usertype_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usertype::className(), 'targetAttribute' => ['usertype_id' => 'id']],
         ];
@@ -67,6 +67,7 @@ class Users extends \yii\db\ActiveRecord
             'status' => 'Status',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'telegram_key' => 'Telegram Key',
         ];
     }
 

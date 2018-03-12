@@ -12,7 +12,7 @@ use yii\widgets\Pjax;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="row">
-    <?php Pjax::begin(['id' => 'settings']); ?>
+    <?php Pjax::begin(['id' => 'settings','enablePushState' => false]); ?>
         <div class="col-md-3 left-nav hidden-xs">
             <div class="list-group">
                 <?= Html::a('Main', ['settings/main'], ['class' => sprintf('list-group-item %s', $active == 'main' ? 'active' : ''), 'data-pjax'=>1]) ?>

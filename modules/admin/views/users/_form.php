@@ -10,7 +10,8 @@ use yii\widgets\ActiveForm;
 
 <div class="users-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin(['id' => 'userForm', 'action' =>['/admin/users/update?id=' . $model->id]]); ?>
+    <h4 id="mainSettings">Main</h4>
 
     <?= $form->field($model, 'usertype_id')->textInput() ?>
 
@@ -18,20 +19,18 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'password')->passwordInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'password_hash')->textarea(['rows' => 6]) ?>
-
-    <?= $form->field($model, 'password_reset_token')->textarea(['rows' => 6]) ?>
-
     <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
-    <?= $form->field($model, 'auth_key')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'status')->textInput() ?>
 
-    <?= $form->field($model, 'created_at')->textInput() ?>
+    <h4 id="notifySettings">Notifications</h4>
 
-    <?= $form->field($model, 'updated_at')->textInput() ?>
+    <?= $form->field($model, 'telegram_key')->textInput() ?>
 
+
+    <?php if (@$msg): ?>
+        <div class="alert alert-success" role="alert"><?= $msg ?></div>
+    <?php endif; ?>
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

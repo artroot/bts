@@ -5,14 +5,16 @@
 
 use app\widgets\Alert;
     use app\models\Project;
+    use yii\bootstrap\Modal;
     use yii\helpers\Html;
 use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
     use yii\helpers\Url;
     use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+    use yii\widgets\Pjax;
 
-AppAsset::register($this);
+    AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -58,29 +60,35 @@ AppAsset::register($this);
                 'items' => $projectDropdownItems()
             ],
             ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/site/about']],
+            ['label' => 'About', 'url' => ['/task/new']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
         ];
         if (Yii::$app->user->isGuest) {
             $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
             $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
         } else {
-            $menuItems[] = '<li>'
-                . Html::beginForm(['/site/logout'], 'post')
-                . Html::submitButton(
-                    'Logout (' . Yii::$app->user->identity->username . ')',
-                    ['class' => 'btn btn-link logout']
-                )
-                . Html::endForm()
-                . '</li>';
+            $menuItems[] = [
+                'label' => '<span class="glyphicon glyphicon-user"></span> ' . Yii::$app->user->identity->username,
+                'items' => [
+                    '<li>'
+                    . Html::beginForm(['/site/logout'], 'post')
+                    . Html::submitButton(
+                        'Logout',
+                        ['class' => 'btn btn-logout']
+                    )
+                    . Html::endForm()
+                    . '</li>',
+                    '<li>' . Html::a('Settings',['settings/index'], ['data-pjax' => 'userSettings', 'class' => 'user-settings']) . '</li>'
+                ]
+            ];
         }
         echo Nav::widget([
+            'encodeLabels' => false,
             'options' => ['class' => 'navbar-nav navbar-right'],
             'items' => $menuItems,
         ]);
         NavBar::end();
     ?>
-
     <div class="container-fluid" style="margin-top: 52px;">
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
@@ -88,6 +96,12 @@ AppAsset::register($this);
         <?= Alert::widget() ?>
         <?= $content ?>
     </div>
+
+    <?php Pjax::begin(['enablePushState' => false, 'id' => 'userSettings', 'linkSelector'=>'a.user-settings']); ?>
+
+
+    <?php Pjax::end(); ?>
+
 </div>
 
 <?php $this->endBody() ?>

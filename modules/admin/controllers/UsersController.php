@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use app\modules\admin\models\Telegram;
 use Yii;
 use app\models\Users;
 use app\models\UsersSearch;
@@ -71,12 +72,20 @@ class UsersController extends DefaultController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        $old = $model->telegram_key;
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            if ($old != $model->telegram_key and !empty($model->telegram_key)){
+                Telegram::sendMessage(base64_decode($model->telegram_key), 'Your bot has been successfully activated!');
+                Telegram::sendMessage(base64_decode($model->telegram_key),
+                    'Show all projects list - /projectList');
+            }
+            return $this->renderPartial('update', [
+                'model' => $model,
+                'msg' => 'Success!',
+            ]);
         }
 
-        return $this->render('update', [
+        return $this->renderPartial('update', [
             'model' => $model,
         ]);
     }
