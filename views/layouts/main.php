@@ -78,7 +78,10 @@ use app\assets\AppAsset;
                     )
                     . Html::endForm()
                     . '</li>',
-                    '<li>' . Html::a('Settings',['settings/index'], ['data-pjax' => 'userSettings', 'class' => 'user-settings']) . '</li>'
+                    '<li>' . Html::a('Profile',['settings/index'], ['data-pjax' => 'userSettings', 'class' => 'user-settings']) . '</li>'.
+                    (@Yii::$app->user->identity->usertype_id == 1 ?
+                        '<li>' . Html::a('Settings',['/admin/settings']) . '</li>'
+                        : '')
                 ]
             ];
         }
