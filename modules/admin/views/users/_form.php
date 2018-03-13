@@ -1,6 +1,8 @@
 <?php
 
-use yii\helpers\Html;
+    use app\models\Usertype;
+    use yii\helpers\ArrayHelper;
+    use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -13,7 +15,8 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(['id' => 'userForm', 'action' =>['/admin/users/update?id=' . $model->id]]); ?>
     <h4 id="mainSettings">Main</h4>
 
-    <?= $form->field($model, 'usertype_id')->textInput() ?>
+
+    <?= $form->field($model, 'usertype_id')->dropDownList(ArrayHelper::map(Usertype::find()->all(), 'id', 'name')) ?>
 
     <?= $form->field($model, 'username')->textInput(['maxlength' => true]) ?>
 

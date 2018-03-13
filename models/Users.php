@@ -62,7 +62,7 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'usertype_id' => 'Usertype ID',
+            'usertype_id' => 'Group',
             'username' => 'Username',
             'new_password' => 'New Password',
             'conf_password' => 'Confirm Password',
