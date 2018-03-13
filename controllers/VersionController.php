@@ -3,7 +3,9 @@
 namespace app\controllers;
 
 use app\components\SVG;
+use app\modules\admin\models\Telegram;
 use app\models\Project;
+use app\models\Users;
 use Yii;
 use app\models\Version;
 use app\models\VersionSearch;
@@ -83,11 +85,18 @@ class VersionController extends DefaultController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($project_id)
     {
         $model = new Version();
 
+        $model->project_id = $project_id;
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->sendToTelegram(sprintf('User %s create new varsion %s in project: %s',
+                Yii::$app->user->identity->username,
+                $model->name,
+                Project::findOne(['id' => $model->project_id])->name
+                ));
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
@@ -130,6 +139,13 @@ class VersionController extends DefaultController
         return $this->redirect(['index']);
     }
 
+    public function sendToTelegram($message)
+    {
+        foreach (Users::find()->all() as $users){
+            if (!empty($users->telegram_key)) Telegram::sendMessage(base64_decode($users->telegram_key), $message);
+        }
+    }
+    
     /**
      * Finds the Version model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

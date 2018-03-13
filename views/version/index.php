@@ -30,7 +30,7 @@
 	</div>
 	<div class="col-md-9 right-container col-xs-12">
 	<?php Pjax::begin(); ?>
-	<h1><?= Html::encode($this->title) ?><?= Html::a('Create Version', ['create'], ['class' => 'btn btn-success', 'style' => 'float:right;']) ?>
+	<h1><?= Html::encode($this->title) ?><?= Html::a('Create Version', ['create', 'project_id' => $project->id], ['class' => 'btn btn-success', 'style' => 'float:right;']) ?>
 	</h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
