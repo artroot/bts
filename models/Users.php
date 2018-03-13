@@ -27,6 +27,9 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
+    public $new_password;
+    public $conf_password;
+
     /**
      * @inheritdoc
      */
@@ -42,10 +45,12 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             [['usertype_id', 'status'], 'integer'],
-            [['password_hash', 'password_reset_token', 'auth_key'], 'string'],
+            [['password_hash', 'password_reset_token', 'auth_key', 'new_password', 'conf_password'], 'string'],
             [['status'], 'required'],
+            [['new_password', 'conf_password'], 'required', 'on'=>'insert'],
+            ['conf_password', 'compare', 'compareAttribute' => 'new_password', 'skipOnEmpty' => false, 'message'=>"Passwords don't match"],
             [['created_at', 'updated_at', 'telegram_key'], 'safe'],
-            [['username', 'password', 'email'], 'string', 'max' => 255],
+            [['username', 'email'], 'string', 'max' => 255],
             [['usertype_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usertype::className(), 'targetAttribute' => ['usertype_id' => 'id']],
         ];
     }
@@ -59,7 +64,8 @@ class Users extends \yii\db\ActiveRecord
             'id' => 'ID',
             'usertype_id' => 'Usertype ID',
             'username' => 'Username',
-            'password' => 'Password',
+            'new_password' => 'New Password',
+            'conf_password' => 'Confirm Password',
             'password_hash' => 'Password Hash',
             'password_reset_token' => 'Password Reset Token',
             'email' => 'Email',
@@ -70,6 +76,7 @@ class Users extends \yii\db\ActiveRecord
             'telegram_key' => 'Telegram Key',
         ];
     }
+
 
     /**
      * @return \yii\db\ActiveQuery

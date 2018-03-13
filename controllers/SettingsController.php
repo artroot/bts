@@ -8,6 +8,7 @@
 
 	namespace app\controllers;
 
+use app\models\User;
 use app\models\Users;
 use Yii;
 

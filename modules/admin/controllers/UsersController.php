@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\User;
 use app\modules\admin\models\Telegram;
 use Yii;
 use app\models\Users;
@@ -15,7 +16,7 @@ use yii\filters\VerbFilter;
  */
 class UsersController extends DefaultController
 {
-  
+
     /**
      * Lists all Users models.
      * @return mixed
@@ -72,17 +73,27 @@ class UsersController extends DefaultController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        //$model = User::findOne(['id' => $id]);
         $old = $model->telegram_key;
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            if ($old != $model->telegram_key and !empty($model->telegram_key)){
-                Telegram::sendMessage(base64_decode($model->telegram_key), 'Your bot has been successfully activated!');
-                Telegram::sendMessage(base64_decode($model->telegram_key),
-                    'Show all projects list - /projectList');
+
+        if ($model->load(Yii::$app->request->post())){
+            //$model->changePass();
+            //$model->setPassword($model->password);
+            //$model->generateAuthKey();
+            $model->password_hash = Yii::$app->security->generatePasswordHash($model->new_password);
+
+            if ($model->save()) {
+                if ($old != $model->telegram_key and !empty($model->telegram_key)){
+                    Telegram::sendMessage(base64_decode($model->telegram_key), 'Your bot has been successfully activated!');
+                    Telegram::sendMessage(base64_decode($model->telegram_key),
+                        'Show all projects list - /projectList');
+                }
+                return $this->renderPartial('update', [
+                    'model' => $model,
+                    'msg' => 'Success!',
+                ]);
             }
-            return $this->renderPartial('update', [
-                'model' => $model,
-                'msg' => 'Success!',
-            ]);
+
         }
 
         return $this->renderPartial('update', [
