@@ -14,23 +14,12 @@
 	/*$this->params['breadcrumbs'][] = $project->name;
 	$this->params['breadcrumbs'][] = $this->title;*/
 ?>
-<div class="version-index shell">
-	<h1><?= Html::img(Url::toRoute(
-			['project/get', 'id' => $project->id]),
-			['width' => 48, 'class' => 'img-circle', 'style' => 'display: inline-block; padding-left: 4px;']) ?>
-		<?= Html::encode($project->name) ?>
-		<span style="float: right;">
-			<?= Html::a('', ['project/update', 'id' => $project->id], ['class' => 'btn btn-default glyphicon glyphicon-pencil']) ?>
-		</span>
-	</h1>
+<div class="version-index">
+	<h1><?= Html::encode($this->title) ?>
 
-	<div class="row">
-	<div class="col-md-3 left-nav hidden-xs">
-		<?= \Yii::$app->view->renderFile('@app/views/project/left_nav.php',['project' => $project]) ?>
-	</div>
-	<div class="col-md-9 right-container col-xs-12">
-	<?php Pjax::begin(); ?>
-	<h1><?= Html::encode($this->title) ?><?= Html::a('Create Version', ['create', 'project_id' => $project->id], ['class' => 'btn btn-success', 'style' => 'float:right;']) ?>
+		<?= Html::a('Create Version',
+				['version/create', 'project_id' => $project->id],
+				['class' => 'btn btn-success version-actions', 'style' => 'float:right;', 'data-pjax' => 'versions']) ?>
 	</h1>
 	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
@@ -50,7 +39,6 @@
 			['class' => 'yii\grid\ActionColumn'],
 		],
 	]); ?>
-	<?php Pjax::end(); ?>
 <?php
 
 	$data = [
@@ -78,8 +66,11 @@
 ?>
 		<br>
 		<br>
-	</div>
-	</div>
+
 </div>
+
+<?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'a.version-actions']); ?>
+
+<?php Pjax::end(); ?>
 
 

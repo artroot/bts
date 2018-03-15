@@ -76,7 +76,7 @@ class VersionController extends DefaultController
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->render('update', [
+        return $this->renderPartial('update', [
             'model' => $model,
         ]);
     }

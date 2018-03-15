@@ -25,7 +25,7 @@ class TaskController extends DefaultController
         $searchModel = new TaskSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
+        return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'project' => Project::findOne(['id' => $project_id])
@@ -59,6 +59,19 @@ class TaskController extends DefaultController
         }
 
         return $this->render('create', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionNew()
+    {
+        $model = new Task();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
+        return $this->renderAjax('new', [
             'model' => $model,
         ]);
     }

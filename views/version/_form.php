@@ -10,8 +10,8 @@ use yii\widgets\ActiveForm;
 
 <div class="version-form">
 
-    <?php $form = ActiveForm::begin(); ?>
-    
+    <?php $form = ActiveForm::begin(['id' => 'versionForm']); ?>
+
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 

@@ -51,9 +51,25 @@ class ProjectController extends DefaultController
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id, $action = 'versions')
+    public function actionView($id)
     {
-        switch ($action){
+        $model = $this->findModel($id);
+
+        $searchModel = new VersionSearch();
+        $searchModel->project_id = $id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        
+        return $this->render('view', [
+            'model' => $model,
+            'main' => $this->renderPartial('@app/views/version/index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+                'project' => $model
+            ]),
+        ]);
+
+        
+        /*switch ($action){
             case 'versions':
                 $searchModel = new VersionSearch();
                 $searchModel->project_id = $id;
@@ -70,7 +86,7 @@ class ProjectController extends DefaultController
         return $this->render('view', [
             'model' => $this->findModel($id),
             'data' => $data
-        ]);
+        ]);*/
     }
 
     /**

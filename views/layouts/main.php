@@ -46,7 +46,7 @@ use app\assets\AppAsset;
                 $projectsList[] = '<li>' . Html::img(Url::toRoute(
                         ['project/get', 'id' => $project->id]),
                         ['width' => 24, 'class' => 'img-circle', 'style' => 'display: inline-block; padding-left: 4px;']) .
-                Html::a($project->name, ['version/index', 'project_id' => $project->id], ['style' => 'display: inline-block;']) . '</li>';
+                Html::a($project->name, ['project/view', 'id' => $project->id], ['style' => 'display: inline-block;']) . '</li>';
             }
             $projectsList[] = '<li class="divider"></li>';
             $projectsList[] = ['label' => 'Create project', 'url' => Url::toRoute('project/create')];
@@ -101,8 +101,6 @@ use app\assets\AppAsset;
     </div>
 
     <?php Pjax::begin(['enablePushState' => false, 'id' => 'userSettings', 'linkSelector'=>'a.user-settings']); ?>
-
-
     <?php Pjax::end(); ?>
 
 </div>

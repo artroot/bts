@@ -26,7 +26,7 @@ class TeamController extends DefaultController
         $searchModel->id = Project::findOne(['id' => $project_id])->team_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
+        return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'project' => Project::findOne(['id' => $project_id])

@@ -9,6 +9,7 @@ use app\models\Users;
 use Yii;
 use app\models\Version;
 use app\models\VersionSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -29,7 +30,7 @@ class VersionController extends DefaultController
         $searchModel->project_id = $project_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
+        return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'project' => Project::findOne(['id' => $project_id])
@@ -97,11 +98,14 @@ class VersionController extends DefaultController
                 $model->name,
                 Project::findOne(['id' => $model->project_id])->name
                 ));
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['project/view', 'id' => $model->project_id]);
         }
 
-        return $this->render('create', [
-            'model' => $model,
+        return $this->renderAjax('create', [
+            //'model' => $model,
+            'versionForm' => $this->renderPartial('_form', [
+                'model' => $model,
+            ])
         ]);
     }
 
@@ -136,7 +140,7 @@ class VersionController extends DefaultController
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(Url::canonical());
     }
 
     public function sendToTelegram($message)
