@@ -16,7 +16,7 @@
     /* @var $this yii\web\View */
     /* @var $model app\models\Version */
 
-    $this->title = sprintf('Version %s', $model->name);
+    $this->title = sprintf('%s %s',\app\models\Project::findOne(['id' => $model->project_id])->name,  $model->name);
     $this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
     $this->params['breadcrumbs'][] = $this->title;
 ?>
