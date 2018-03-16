@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -66,7 +67,7 @@ class VersionSearch extends Version
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])
-            ->andFilterWhere(['like', 'description', $this->description]);
+            ->andFilterWhere(['like', 'description', $this->description])->orderBy(['id' => SORT_DESC]);
 
         return $dataProvider;
     }

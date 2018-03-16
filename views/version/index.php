@@ -27,16 +27,16 @@
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'columns' => [
-			['class' => 'yii\grid\SerialColumn'],
+
 
 			//'id',
 			// 'project_id',
 			'name',
-			//'create_date',
+			'create_date',
 			'finish_date',
 			'description:ntext',
-
-			['class' => 'yii\grid\ActionColumn'],
+			
+			['class' => 'yii\grid\ActionColumn', 'template' => '{update} {delete}'],
 		],
 	]); ?>
 <?php
