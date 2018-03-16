@@ -43,6 +43,9 @@ div.graphic > svg {
   position: absolute;
   left: 20px; }
 
+.svg-icon {
+  vertical-align: middle; }
+
 @media (max-width: 767px) {
   .left-nav {
     background-color: white;

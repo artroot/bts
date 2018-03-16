@@ -2,33 +2,43 @@
 
     use yii\bootstrap\Modal;
     use yii\helpers\Html;
+    use yii\widgets\Pjax;
 
-/* @var $this yii\web\View */
-/* @var $model app\models\Version */
+    Pjax::widget([
+        'id' => 'versionFormContainer',  // response goes in this element
+        'enablePushState' => false,
+        'enableReplaceState' => false,
+        'formSelector' => '#versionForm',// this form is submitted on change
+        'submitEvent' => 'submit',
+    ]);
 
-$this->title = 'Update Version: {nameAttribute}';
-$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+
+    /* @var $this yii\web\View */
+    /* @var $model app\models\Version */
+
+    $this->title = sprintf('Version %s', $model->name);
+    $this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
+    $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="version-update">
 
     <?php
         Modal::begin([
-            'header' => '<h1>'. Html::encode($this->title) .'</h1>',
+            'header' => '<h3>'. $model->getStatusIcon() . ' ' . Html::encode($this->title) .'</h3>',
             'id' => 'versionFormModal',
             'size' => 'modal-lg',
             'clientOptions' => ['backdrop' => 'static', 'keyboard' => FALSE]
         ]); ?>
 
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
+    <div id="versionFormContainer">
+        <?= @$versionForm ?>
+    </div>
 
     <?php Modal::end(); ?>
 
     <script>
         $('#versionFormModal').modal('show');
     </script>
+
 
 </div>

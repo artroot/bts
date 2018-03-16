@@ -31,12 +31,27 @@
 
 			//'id',
 			// 'project_id',
+			//'status',
+			[
+				'label' => 'status',
+				'content' => function($data){
+					return $data->getStatusIcon();
+				}
+			],
 			'name',
 			'create_date',
 			'finish_date',
 			'description:ntext',
-			
-			['class' => 'yii\grid\ActionColumn', 'template' => '{update} {delete}'],
+
+			['class' => 'yii\grid\ActionColumn',
+				'buttons' => [
+				'update' => function ($url, $model) {
+					return Html::a(
+						'<span class="glyphicon glyphicon-pencil"></span>',
+						['version/update', 'id' => $model->id],
+						['class' => 'version-actions', 'data-pjax' => 'versions']);
+				},
+			], 'template' => '{update} {delete}'],
 		],
 	]); ?>
 <?php

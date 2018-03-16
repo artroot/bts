@@ -121,11 +121,19 @@ class VersionController extends DefaultController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            $this->sendToTelegram(sprintf('User %s update version %s in project: %s',
+                Yii::$app->user->identity->username,
+                $model->name,
+                Project::findOne(['id' => $model->project_id])->name
+            ));
+            return $this->redirect(['project/view', 'id' => $model->project_id]);
         }
 
-        return $this->render('update', [
+        return $this->renderAjax('update', [
             'model' => $model,
+            'versionForm' => $this->renderPartial('_form', [
+                'model' => $model,
+            ])
         ]);
     }
 
