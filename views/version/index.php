@@ -26,6 +26,7 @@
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'class' => 'table-condensed',
 		'columns' => [
 
 
@@ -33,12 +34,20 @@
 			// 'project_id',
 			//'status',
 			[
-				'label' => 'status',
+				'label' => 'Status',
 				'content' => function($data){
 					return $data->getStatusIcon();
 				}
 			],
-			'name',
+			[
+				'attribute'=>'name',
+				'label'=>'Name',
+				'format'=>'raw',
+				'content'=>function($data){
+					return Html::a($data->name, ['version/view', 'id' => $data->id]);
+				},
+				'filter' => $searchModel
+			],
 			'create_date',
 			'finish_date',
 			'description:ntext',

@@ -2,6 +2,8 @@
 
 namespace app\controllers;
 
+use app\models\Users;
+use app\modules\admin\models\Telegram;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -26,7 +28,8 @@ class DefaultController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'view', 'update', 'delete', 'create', 'get', 'graph', 'signup'],
+                        'actions' => ['logout', 'index', 'view', 'update', 'delete', 'create', 'get', 'graph', 'signup',
+                        'new'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -43,6 +46,13 @@ class DefaultController extends Controller
                 ],
             ],
         ];
+    }
+
+    public function sendToTelegram($message)
+    {
+        foreach (Users::find()->all() as $users){
+            if (!empty($users->telegram_key)) Telegram::sendMessage(base64_decode($users->telegram_key), $message);
+        }
     }
 
 }

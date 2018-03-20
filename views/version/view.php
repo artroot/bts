@@ -1,40 +1,68 @@
 <?php
 
-use yii\helpers\Html;
+    use app\models\Project;
+    use app\models\Task;
+    use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Version */
 
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = Project::findOne(['id' => $model->project_id])->name . ' ' . $model->name;
+/*$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
+$this->params['breadcrumbs'][] = $this->title;*/
+
+    $allTask = Task::find()->where(['version_id' => $model->id])->count();
+    $doneTask = Task::find()->where(['version_id' => $model->id])->andWhere(['taskstatus_id' => 1])->count();
+    $todoTask = Task::find()->where(['version_id' => $model->id])->andWhere(['taskstatus_id' => 2])->count();
+    $inProgressTask = Task::find()->where(['version_id' => $model->id])->andWhere(['taskstatus_id' => 3])->count();
+
 ?>
 <div class="version-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h3><?= $model->getStatusIcon() ?> <?= Html::encode($this->title) ?> <span class="label label-warning text-uppercase" style="    font-size: x-small;
+    vertical-align: middle;"><?= $model->status ? 'released' : 'unreleased' ?></span></h3>
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
+    <div>
+        <div class="progress">
+            <div class="progress-bar progress-bar-success" style="width: <?= $allTask ? $doneTask*100/$allTask : 0 ?>%">
+                <!--<span class="sr-only">35% Complete (success)</span>-->
+            </div>
+            <div class="progress-bar progress-bar-warning" style="width: <?= $allTask ? $inProgressTask*100/$allTask : 0 ?>%">
+                <!--<span class="sr-only">20% Complete (warning)</span>-->
+            </div>
+            <div class="progress-bar progress-bar-info" style="width: <?= $allTask ? $todoTask*100/$allTask : 0 ?>%">
+                <!--<span class="sr-only">10% Complete (danger)</span>-->
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-sm-2 col-xs-2">
+                <div style="display: table;">
+                    <div style="display: table-cell;"><h1><?= $allTask ?></h1></div>
+                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues in version</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-2">
+                <div style="display: table;">
+                    <div style="display: table-cell;"><h1 style="color: #5cb85c;"><?= $doneTask ?></h1></div>
+                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues done</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-2">
+                <div style="display: table;">
+                    <div style="display: table-cell;"><h1 style="color: #f0ad4e;"><?= $inProgressTask ?></h1></div>
+                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues in progress</div>
+                </div>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-2">
+                <div style="display: table;">
+                    <div style="display: table-cell;"><h1 style="color: #5bc0de;"><?= $todoTask ?></h1></div>
+                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues todo</div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'project_id',
-            'name',
-            'description:ntext',
-            'create_date',
-            'finish_date',
-        ],
-    ]) ?>
+    <?= $task ?>
 
 </div>

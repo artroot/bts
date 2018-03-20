@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\SVG;
+use app\models\TaskSearch;
 use app\modules\admin\models\Telegram;
 use app\models\Project;
 use app\models\Users;
@@ -76,8 +77,16 @@ class VersionController extends DefaultController
      */
     public function actionView($id)
     {
+        $searchModel = new TaskSearch();
+        $searchModel->version_id = $id;
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'task' => $this->renderPartial('@app/views/task/index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider
+            ])
         ]);
     }
 
@@ -151,12 +160,7 @@ class VersionController extends DefaultController
         return $this->redirect(Url::canonical());
     }
 
-    public function sendToTelegram($message)
-    {
-        foreach (Users::find()->all() as $users){
-            if (!empty($users->telegram_key)) Telegram::sendMessage(base64_decode($users->telegram_key), $message);
-        }
-    }
+
     
     /**
      * Finds the Version model based on its primary key value.

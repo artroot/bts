@@ -44,9 +44,9 @@ class Task extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['create_date', 'finish_date', 'plan_date'], 'safe'],
             [['tasktype_id', 'taskpriority_id', 'taskstatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parenttask_id', 'relatedtask_id'], 'integer'],
-            [['performer_id'], 'required'],
+            [['owner_id'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['performer_id'], 'unique'],
+            /*[['performer_id'], 'unique'],*/
         ];
     }
 
@@ -74,5 +74,13 @@ class Task extends \yii\db\ActiveRecord
             'parenttask_id' => 'Parenttask ID',
             'relatedtask_id' => 'Relatedtask ID',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVersion()
+    {
+        return $this->hasOne(Version::className(), ['id' => 'version_id']);
     }
 }

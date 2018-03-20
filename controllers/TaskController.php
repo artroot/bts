@@ -20,7 +20,7 @@ class TaskController extends DefaultController
      * Lists all Task models.
      * @return mixed
      */
-    public function actionIndex($project_id)
+    public function actionIndex($project_id = false)
     {
         $searchModel = new TaskSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -28,7 +28,7 @@ class TaskController extends DefaultController
         return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'project' => Project::findOne(['id' => $project_id])
+            'project' => $project_id ? Project::findOne(['id' => $project_id]) : []
         ]);
     }
 
@@ -55,6 +55,11 @@ class TaskController extends DefaultController
         $model = new Task();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->sendToTelegram(sprintf('User %s create new task %s in project: %s',
+                Yii::$app->user->identity->username,
+                $model->name,
+                Project::findOne(['id' => $model->getVersion()->project_id])->name
+            ));
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
