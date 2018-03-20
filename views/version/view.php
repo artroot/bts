@@ -36,28 +36,28 @@ $this->params['breadcrumbs'][] = $this->title;*/
             </div>
         </div>
         <div class="row">
-            <div class="col-md-2 col-sm-2 col-xs-2">
-                <div style="display: table;">
-                    <div style="display: table-cell;"><h1><?= $allTask ?></h1></div>
-                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues in version</div>
+            <div class="col-md-2 col-sm-2 col-xs-3">
+                <div class="version-dashboard">
+                    <h1><?= $allTask ?></h1>
+                    <div>Issues in version</div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-2 col-xs-2">
-                <div style="display: table;">
-                    <div style="display: table-cell;"><h1 style="color: #5cb85c;"><?= $doneTask ?></h1></div>
-                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues done</div>
+            <div class="col-md-2 col-sm-2 col-xs-3">
+                <div class="version-dashboard">
+                    <h1 style="color: #5cb85c;"><?= $doneTask ?></h1>
+                    <div>Issues done</div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-2 col-xs-2">
-                <div style="display: table;">
-                    <div style="display: table-cell;"><h1 style="color: #f0ad4e;"><?= $inProgressTask ?></h1></div>
-                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues in progress</div>
+            <div class="col-md-2 col-sm-2 col-xs-3">
+                <div class="version-dashboard">
+                    <h1 style="color: #f0ad4e;"><?= $inProgressTask ?></h1>
+                    <div>Issues in progress</div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-2 col-xs-2">
-                <div style="display: table;">
-                    <div style="display: table-cell;"><h1 style="color: #5bc0de;"><?= $todoTask ?></h1></div>
-                    <div style="display: inline-block;padding-left:  10px;padding-right:  10px;">Issues todo</div>
+            <div class="col-md-2 col-sm-2 col-xs-3">
+                <div class="version-dashboard">
+                    <h1 style="color: #5bc0de;"><?= $todoTask ?></h1>
+                    <div>Issues todo</div>
                 </div>
             </div>
         </div>
