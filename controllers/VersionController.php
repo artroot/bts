@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\components\SVG;
-use app\models\TaskSearch;
+use app\models\IssueSearch;
 use app\modules\admin\models\Telegram;
 use app\models\Project;
 use app\models\Users;
@@ -77,13 +77,13 @@ class VersionController extends DefaultController
      */
     public function actionView($id)
     {
-        $searchModel = new TaskSearch();
+        $searchModel = new IssueSearch();
         $searchModel->version_id = $id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('view', [
             'model' => $this->findModel($id),
-            'task' => $this->renderPartial('@app/views/task/index', [
+            'issue' => $this->renderPartial('@app/views/issue/index', [
                 'searchModel' => $searchModel,
                 'dataProvider' => $dataProvider
             ])

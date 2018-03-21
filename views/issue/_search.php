@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\TaskSearch */
+/* @var $model app\models\IssueSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="task-search">
+<div class="issue-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -30,11 +30,11 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'plan_date') ?>
 
-    <?php // echo $form->field($model, 'tasktype_id') ?>
+    <?php // echo $form->field($model, 'issuetype_id') ?>
 
-    <?php // echo $form->field($model, 'taskpriority_id') ?>
+    <?php // echo $form->field($model, 'issuepriority_id') ?>
 
-    <?php // echo $form->field($model, 'taskstatus_id') ?>
+    <?php // echo $form->field($model, 'issuestatus_id') ?>
 
     <?php // echo $form->field($model, 'sprint_id') ?>
 
@@ -48,9 +48,9 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'owner_id') ?>
 
-    <?php // echo $form->field($model, 'parenttask_id') ?>
+    <?php // echo $form->field($model, 'parentissue_id') ?>
 
-    <?php // echo $form->field($model, 'relatedtask_id') ?>
+    <?php // echo $form->field($model, 'relatedissue_id') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

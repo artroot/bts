@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Task */
+/* @var $model app\models\Issue */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="task-form">
+<div class="issue-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
@@ -22,11 +22,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'plan_date')->textInput() ?>
 
-    <?= $form->field($model, 'tasktype_id')->textInput() ?>
+    <?= $form->field($model, 'issuetype_id')->textInput() ?>
 
-    <?= $form->field($model, 'taskpriority_id')->textInput() ?>
+    <?= $form->field($model, 'issuepriority_id')->textInput() ?>
 
-    <?= $form->field($model, 'taskstatus_id')->textInput() ?>
+    <?= $form->field($model, 'issuestatus_id')->textInput() ?>
 
     <?= $form->field($model, 'sprint_id')->textInput() ?>
 
@@ -40,9 +40,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'owner_id')->textInput() ?>
 
-    <?= $form->field($model, 'parenttask_id')->textInput() ?>
+    <?= $form->field($model, 'parentissue_id')->textInput() ?>
 
-    <?= $form->field($model, 'relatedtask_id')->textInput() ?>
+    <?= $form->field($model, 'relatedissue_id')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

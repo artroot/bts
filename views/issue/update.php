@@ -2,15 +2,15 @@
 
 use yii\helpers\Html;
 
-
 /* @var $this yii\web\View */
-/* @var $model app\models\Task */
+/* @var $model app\models\Issue */
 
-$this->title = 'Create Task';
+$this->title = 'Update Issue: {nameAttribute}';
 $this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
+$this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="task-create">
+<div class="task-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

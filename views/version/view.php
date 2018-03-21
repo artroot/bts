@@ -1,7 +1,7 @@
 <?php
 
     use app\models\Project;
-    use app\models\Task;
+    use app\models\Issue;
     use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -12,10 +12,10 @@ $this->title = Project::findOne(['id' => $model->project_id])->name . ' ' . $mod
 /*$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;*/
 
-    $allTask = Task::find()->where(['version_id' => $model->id])->count();
-    $doneTask = Task::find()->where(['version_id' => $model->id])->andWhere(['taskstatus_id' => 1])->count();
-    $todoTask = Task::find()->where(['version_id' => $model->id])->andWhere(['taskstatus_id' => 2])->count();
-    $inProgressTask = Task::find()->where(['version_id' => $model->id])->andWhere(['taskstatus_id' => 3])->count();
+    $allIssue = Issue::find()->where(['version_id' => $model->id])->count();
+    $doneIssue = Issue::find()->where(['version_id' => $model->id])->andWhere(['issuestatus_id' => 1])->count();
+    $todoIssue = Issue::find()->where(['version_id' => $model->id])->andWhere(['issuestatus_id' => 2])->count();
+    $inProgressIssue = Issue::find()->where(['version_id' => $model->id])->andWhere(['issuestatus_id' => 3])->count();
 
 ?>
 <div class="version-view">
@@ -25,44 +25,41 @@ $this->params['breadcrumbs'][] = $this->title;*/
 
     <div>
         <div class="progress">
-            <div class="progress-bar progress-bar-success" style="width: <?= $allTask ? $doneTask*100/$allTask : 0 ?>%">
-                <!--<span class="sr-only">35% Complete (success)</span>-->
+            <div class="progress-bar progress-bar-success" style="width: <?= $allIssue ? $doneIssue*100/$allIssue : 0 ?>%">
             </div>
-            <div class="progress-bar progress-bar-warning" style="width: <?= $allTask ? $inProgressTask*100/$allTask : 0 ?>%">
-                <!--<span class="sr-only">20% Complete (warning)</span>-->
+            <div class="progress-bar progress-bar-warning" style="width: <?= $allIssue ? $inProgressIssue*100/$allIssue : 0 ?>%">
             </div>
-            <div class="progress-bar progress-bar-info" style="width: <?= $allTask ? $todoTask*100/$allTask : 0 ?>%">
-                <!--<span class="sr-only">10% Complete (danger)</span>-->
+            <div class="progress-bar progress-bar-info" style="width: <?= $allIssue ? $todoIssue*100/$allIssue : 0 ?>%">
             </div>
         </div>
         <div class="row">
             <div class="col-md-2 col-sm-2 col-xs-3">
                 <div class="version-dashboard">
-                    <h1><?= $allTask ?></h1>
+                    <h1><?= $allIssue ?></h1>
                     <div>Issues in version</div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-2 col-xs-3">
                 <div class="version-dashboard">
-                    <h1 style="color: #5cb85c;"><?= $doneTask ?></h1>
+                    <h1 style="color: #5cb85c;"><?= $doneIssue ?></h1>
                     <div>Issues done</div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-2 col-xs-3">
                 <div class="version-dashboard">
-                    <h1 style="color: #f0ad4e;"><?= $inProgressTask ?></h1>
+                    <h1 style="color: #f0ad4e;"><?= $inProgressIssue ?></h1>
                     <div>Issues in progress</div>
                 </div>
             </div>
             <div class="col-md-2 col-sm-2 col-xs-3">
                 <div class="version-dashboard">
-                    <h1 style="color: #5bc0de;"><?= $todoTask ?></h1>
+                    <h1 style="color: #5bc0de;"><?= $todoIssue ?></h1>
                     <div>Issues todo</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <?= $task ?>
+    <?= $issue ?>
 
 </div>

@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "task".
+ * This is the model class for table "issue".
  *
  * @property int $id
  * @property string $name
@@ -13,26 +13,26 @@ use Yii;
  * @property string $create_date
  * @property string $finish_date
  * @property string $plan_date
- * @property int $tasktype_id
- * @property int $taskpriority_id
- * @property int $taskstatus_id
+ * @property int $issuetype_id
+ * @property int $issuepriority_id
+ * @property int $issuestatus_id
  * @property int $sprint_id
  * @property int $version_id
  * @property int $resolved_version_id
  * @property int $detected_version_id
  * @property int $performer_id
  * @property int $owner_id
- * @property int $parenttask_id
- * @property int $relatedtask_id
+ * @property int $parentissue_id
+ * @property int $relatedissue_id
  */
-class Task extends \yii\db\ActiveRecord
+class Issue extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'task';
+        return 'issue';
     }
 
     /**
@@ -43,7 +43,7 @@ class Task extends \yii\db\ActiveRecord
         return [
             [['description'], 'string'],
             [['create_date', 'finish_date', 'plan_date'], 'safe'],
-            [['tasktype_id', 'taskpriority_id', 'taskstatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parenttask_id', 'relatedtask_id'], 'integer'],
+            [['issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
             [['owner_id'], 'required'],
             [['name'], 'string', 'max' => 255],
             /*[['performer_id'], 'unique'],*/
@@ -62,17 +62,17 @@ class Task extends \yii\db\ActiveRecord
             'create_date' => 'Create Date',
             'finish_date' => 'Finish Date',
             'plan_date' => 'Plan Date',
-            'tasktype_id' => 'Tasktype ID',
-            'taskpriority_id' => 'Taskpriority ID',
-            'taskstatus_id' => 'Taskstatus ID',
+            'issuetype_id' => 'Issuetype ID',
+            'issuepriority_id' => 'Issuepriority ID',
+            'issuestatus_id' => 'Issuestatus ID',
             'sprint_id' => 'Sprint ID',
             'version_id' => 'Version ID',
             'resolved_version_id' => 'Resolved Version ID',
             'detected_version_id' => 'Detected Version ID',
             'performer_id' => 'Performer ID',
             'owner_id' => 'Owner ID',
-            'parenttask_id' => 'Parenttask ID',
-            'relatedtask_id' => 'Relatedtask ID',
+            'parentissue_id' => 'ParentIssue ID',
+            'relatedissue_id' => 'RelatedIssue ID',
         ];
     }
 

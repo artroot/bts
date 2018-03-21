@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Task;
+use app\models\Issue;
 
 /**
- * TaskSearch represents the model behind the search form of `app\models\Task`.
+ * IssueSearch represents the model behind the search form of `app\models\Issue`.
  */
-class TaskSearch extends Task
+class IssueSearch extends Issue
 {
     /**
      * @inheritdoc
@@ -18,7 +18,7 @@ class TaskSearch extends Task
     public function rules()
     {
         return [
-            [['id', 'tasktype_id', 'taskpriority_id', 'taskstatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parenttask_id', 'relatedtask_id'], 'integer'],
+            [['id', 'issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
             [['name', 'description', 'create_date', 'finish_date', 'plan_date'], 'safe'],
         ];
     }
@@ -41,7 +41,7 @@ class TaskSearch extends Task
      */
     public function search($params)
     {
-        $query = Task::find();
+        $query = Issue::find();
 
         // add conditions that should always apply here
 
@@ -63,17 +63,17 @@ class TaskSearch extends Task
             'create_date' => $this->create_date,
             'finish_date' => $this->finish_date,
             'plan_date' => $this->plan_date,
-            'tasktype_id' => $this->tasktype_id,
-            'taskpriority_id' => $this->taskpriority_id,
-            'taskstatus_id' => $this->taskstatus_id,
+            'issuetype_id' => $this->issuetype_id,
+            'issuepriority_id' => $this->issuepriority_id,
+            'issuestatus_id' => $this->issuestatus_id,
             'sprint_id' => $this->sprint_id,
             'version_id' => $this->version_id,
             'resolved_version_id' => $this->resolved_version_id,
             'detected_version_id' => $this->detected_version_id,
             'performer_id' => $this->performer_id,
             'owner_id' => $this->owner_id,
-            'parenttask_id' => $this->parenttask_id,
-            'relatedtask_id' => $this->relatedtask_id,
+            'parentissue_id' => $this->parentissue_id,
+            'relatedissue_id' => $this->relatedissue_id,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

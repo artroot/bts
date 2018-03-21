@@ -5,15 +5,15 @@ use yii\grid\GridView;
     use yii\helpers\Url;
     use yii\widgets\Pjax;
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\TaskSearch */
+/* @var $searchModel app\models\IssueSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Tasks';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Issues';
+/*$this->params['breadcrumbs'][] = $this->title;*/
 ?>
-<div class="task-index">
+<div class="issue-index">
 
-    <h1><?= Html::encode($this->title) ?> <?= Html::a('Create Task', ['create'], ['class' => 'btn btn-success', 'style' => 'float: right;']) ?></h1>
+    <h1><?= Html::encode($this->title) ?> <?= Html::a('Create Issue', ['create'], ['class' => 'btn btn-success', 'style' => 'float: right;']) ?></h1>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -26,17 +26,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'create_date',
             'finish_date',
             //'plan_date',
-            //'tasktype_id',
-            //'taskpriority_id',
-            //'taskstatus_id',
+            //'issuetype_id',
+            //'issuepriority_id',
+            //'issuestatus_id',
             //'sprint_id',
             //'version_id',
             //'resolved_version_id',
             //'detected_version_id',
             //'performer_id',
             //'owner_id',
-            //'parenttask_id',
-            //'relatedtask_id',
+            //'parentissue_id',
+            //'relatedissue_id',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],
