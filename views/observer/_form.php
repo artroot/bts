@@ -4,15 +4,15 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Taskviewer */
+/* @var $model app\models\Observer */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="taskviewer-form">
+<div class="observer-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'task_id')->textInput() ?>
+    <?= $form->field($model, 'issue_id')->textInput() ?>
 
     <?= $form->field($model, 'user_id')->textInput() ?>
 

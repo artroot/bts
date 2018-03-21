@@ -3,25 +3,25 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Taskviewer;
-use app\models\TaskviewerSearch;
+use app\models\Observer;
+use app\models\ObserverSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TaskviewerController implements the CRUD actions for Taskviewer model.
+ * ObserverController implements the CRUD actions for Observer model.
  */
-class TaskviewerController extends DefaultController
+class ObserverController extends DefaultController
 {
     
     /**
-     * Lists all Taskviewer models.
+     * Lists all Observer models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TaskviewerSearch();
+        $searchModel = new ObserverSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -31,7 +31,7 @@ class TaskviewerController extends DefaultController
     }
 
     /**
-     * Displays a single Taskviewer model.
+     * Displays a single Observer model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -44,13 +44,13 @@ class TaskviewerController extends DefaultController
     }
 
     /**
-     * Creates a new Taskviewer model.
+     * Creates a new Observer model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Taskviewer();
+        $model = new Observer();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -62,7 +62,7 @@ class TaskviewerController extends DefaultController
     }
 
     /**
-     * Updates an existing Taskviewer model.
+     * Updates an existing Observer model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -82,7 +82,7 @@ class TaskviewerController extends DefaultController
     }
 
     /**
-     * Deletes an existing Taskviewer model.
+     * Deletes an existing Observer model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -96,15 +96,15 @@ class TaskviewerController extends DefaultController
     }
 
     /**
-     * Finds the Taskviewer model based on its primary key value.
+     * Finds the Observer model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Taskviewer the loaded model
+     * @return Observer the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Taskviewer::findOne($id)) !== null) {
+        if (($model = Observer::findOne($id)) !== null) {
             return $model;
         }
 

@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\TaskviewerSearch */
+/* @var $model app\models\ObserverSearch */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="taskviewer-search">
+<div class="observer-search">
 
     <?php $form = ActiveForm::begin([
         'action' => ['index'],
@@ -20,7 +20,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'id') ?>
 
-    <?= $form->field($model, 'task_id') ?>
+    <?= $form->field($model, 'issue_id') ?>
 
     <?= $form->field($model, 'user_id') ?>
 

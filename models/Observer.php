@@ -5,23 +5,23 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "taskviewer".
+ * This is the model class for table "observer".
  *
  * @property int $id
- * @property int $task_id
+ * @property int $issue_id
  * @property int $user_id
  *
- * @property Task $task
+ * @property Issue $issue
  * @property User $user
  */
-class Taskviewer extends \yii\db\ActiveRecord
+class Observer extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'taskviewer';
+        return 'observer';
     }
 
     /**
@@ -30,8 +30,8 @@ class Taskviewer extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['task_id', 'user_id'], 'integer'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
+            [['issue_id', 'user_id'], 'integer'],
+            [['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
@@ -43,7 +43,7 @@ class Taskviewer extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'task_id' => 'Task ID',
+            'issue_id' => 'Issue ID',
             'user_id' => 'User ID',
         ];
     }
@@ -51,9 +51,9 @@ class Taskviewer extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTask()
+    public function getIssue()
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
+        return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
     }
 
     /**

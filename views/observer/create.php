@@ -4,13 +4,13 @@ use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Taskviewer */
+/* @var $model app\models\Observer */
 
-$this->title = 'Create Taskviewer';
-$this->params['breadcrumbs'][] = ['label' => 'Taskviewers', 'url' => ['index']];
+$this->title = 'Create Observer';
+$this->params['breadcrumbs'][] = ['label' => 'Observers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="taskviewer-create">
+<div class="observer-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

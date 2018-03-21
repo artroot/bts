@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Taskviewer;
+use app\models\Observer;
 
 /**
- * TaskviewerSearch represents the model behind the search form of `app\models\Taskviewer`.
+ * ObserverSearch represents the model behind the search form of `app\models\Observer`.
  */
-class TaskviewerSearch extends Taskviewer
+class ObserverSearch extends Observer
 {
     /**
      * @inheritdoc
@@ -18,7 +18,7 @@ class TaskviewerSearch extends Taskviewer
     public function rules()
     {
         return [
-            [['id', 'task_id', 'user_id'], 'integer'],
+            [['id', 'issue_id', 'user_id'], 'integer'],
         ];
     }
 
@@ -40,7 +40,7 @@ class TaskviewerSearch extends Taskviewer
      */
     public function search($params)
     {
-        $query = Taskviewer::find();
+        $query = Observer::find();
 
         // add conditions that should always apply here
 
@@ -59,7 +59,7 @@ class TaskviewerSearch extends Taskviewer
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'task_id' => $this->task_id,
+            'issue_id' => $this->issue_id,
             'user_id' => $this->user_id,
         ]);
 

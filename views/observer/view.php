@@ -4,13 +4,13 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Taskviewer */
+/* @var $model app\models\Observer */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Taskviewers', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Observers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="taskviewer-view">
+<div class="observer-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -29,7 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'task_id',
+            'issue_id',
             'user_id',
         ],
     ]) ?>

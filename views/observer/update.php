@@ -3,14 +3,14 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Taskviewer */
+/* @var $model app\models\Observer */
 
-$this->title = 'Update Taskviewer: {nameAttribute}';
-$this->params['breadcrumbs'][] = ['label' => 'Taskviewers', 'url' => ['index']];
+$this->title = 'Update Observer: {nameAttribute}';
+$this->params['breadcrumbs'][] = ['label' => 'Observers', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->id, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="taskviewer-update">
+<div class="observer-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
