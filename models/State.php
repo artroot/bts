@@ -24,6 +24,7 @@
 		public $id;
 		public $label;
 		public $finished = false;
+		public $color = '#000000';
 
 		private function __construct($state)
 		{
@@ -32,18 +33,21 @@
 					$this->id = $state;
 					$this->label = self::$states[$state];
 					$this->finished = false;
+					$this->color = '#5bc0de';
 					return $this;
 					break;
 				case 1:
 					$this->id = $state;
 					$this->label = self::$states[$state];
 					$this->finished = false;
+					$this->color = '#f0ad4e';
 					return $this;
 					break;
 				case 2:
 					$this->id = $state;
 					$this->label = self::$states[$state];
 					$this->finished = true;
+					$this->color = '#5cb85c';
 					return $this;
 					break;
 				default :

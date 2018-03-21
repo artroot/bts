@@ -15,10 +15,25 @@ $this->title = Project::findOne(['id' => $model->project_id])->name . ' ' . $mod
 /*$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;*/
 
+    $states = [
+        0 => [
+            'count' => Issue::getDone(['version_id' => $model->id])->count(),
+            'state' => State::getState(State::DONE)
+        ],
+        1 => [
+            'count' => Issue::getTodo(['version_id' => $model->id])->count(),
+            'state' => State::getState(State::TODO)
+        ],
+        2 => [
+            'count' => Issue::getInProgress(['version_id' => $model->id])->count(),
+            'state' => State::getState(State::IN_PROGRESS)
+        ],
+    ];
+
     $allIssue = Issue::find()->where(['version_id' => $model->id])->count();
-    $doneIssue = Issue::getDone(['version_id' => $model->id])->count();
-    $todoIssue = Issue::getTodo(['version_id' => $model->id])->count();
-    $inProgressIssue = Issue::getInProgress(['version_id' => $model->id])->count();
+    //$doneIssue = Issue::getDone(['version_id' => $model->id])->count();
+    //$todoIssue = Issue::getTodo(['version_id' => $model->id])->count();
+    //$inProgressIssue = Issue::getInProgress(['version_id' => $model->id])->count();
 ?>
 <div class="version-view">
 
@@ -27,12 +42,9 @@ $this->params['breadcrumbs'][] = $this->title;*/
 
     <div>
         <div class="progress">
-            <div class="progress-bar progress-bar-success" style="width: <?= $allIssue ? $doneIssue*100/$allIssue : 0 ?>%">
-            </div>
-            <div class="progress-bar progress-bar-warning" style="width: <?= $allIssue ? $inProgressIssue*100/$allIssue : 0 ?>%">
-            </div>
-            <div class="progress-bar progress-bar-info" style="width: <?= $allIssue ? $todoIssue*100/$allIssue : 0 ?>%">
-            </div>
+            <?php foreach ($states as $state): ?>
+            <div class="progress-bar" style="background-color: <?= $state['state']->color ?>; width: <?= $allIssue ? $state['count']*100/$allIssue : 0 ?>%"></div>
+            <?php endforeach; ?>
         </div>
         <div class="row">
             <div class="col-md-2 col-sm-2 col-xs-3">
@@ -41,24 +53,14 @@ $this->params['breadcrumbs'][] = $this->title;*/
                     <div>Issues in version</div>
                 </div>
             </div>
-            <div class="col-md-2 col-sm-2 col-xs-3">
-                <div class="version-dashboard">
-                    <h1 style="color: #5cb85c;"><?= $doneIssue ?></h1>
-                    <div>Issues done</div>
+            <?php foreach ($states as $state): ?>
+                <div class="col-md-2 col-sm-2 col-xs-3">
+                    <div class="version-dashboard">
+                        <h1 style="color: <?= $state['state']->color ?>;"><?= $state['count'] ?></h1>
+                        <div>Issues <?= $state['state']->label ?></div>
+                    </div>
                 </div>
-            </div>
-            <div class="col-md-2 col-sm-2 col-xs-3">
-                <div class="version-dashboard">
-                    <h1 style="color: #f0ad4e;"><?= $inProgressIssue ?></h1>
-                    <div>Issues in progress</div>
-                </div>
-            </div>
-            <div class="col-md-2 col-sm-2 col-xs-3">
-                <div class="version-dashboard">
-                    <h1 style="color: #5bc0de;"><?= $todoIssue ?></h1>
-                    <div>Issues todo</div>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 
