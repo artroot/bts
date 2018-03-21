@@ -4,7 +4,7 @@ namespace app\controllers;
 
 use app\modules\admin\models\Telegram;
 use app\models\Project;
-use app\models\Task;
+use app\models\Issue;
 use app\models\Users;
 use app\models\Version;
 use Yii;
@@ -77,7 +77,7 @@ class TelegramController extends Controller
             $text = '';
             if (Users::findOne(['telegram_key' => base64_encode($chat_id)])){
                 foreach (Version::findAll(['project_id' => $res[1]]) as $version){
-                    $text .=  $version->name . "\r\n" .  'Tasks active(' . Task::find()->where(['version_id' => $version->id])->count() . ')' .  "\r\n";
+                    $text .=  $version->name . "\r\n" .  'Issues active(' . Issue::find()->where(['version_id' => $version->id])->count() . ')' .  "\r\n";
                 }
                 Telegram::sendMessage($chat_id, $text);
             }
