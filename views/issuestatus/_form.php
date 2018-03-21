@@ -1,6 +1,7 @@
 <?php
 
-use yii\helpers\Html;
+    use app\models\State;
+    use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
@@ -14,7 +15,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'finally')->textInput() ?>
+    <?= $form->field($model, 'state_id')->dropDownList(State::getStates()) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

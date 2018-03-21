@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $name
- * @property int $finally
+ * @property int $state_id
  *
  * @property Issue[] $issues
  */
@@ -29,8 +29,8 @@ class Issuestatus extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['finally'], 'required'],
-            [['finally'], 'integer'],
+            [['state_id'], 'required'],
+            [['state_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -43,7 +43,7 @@ class Issuestatus extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'finally' => 'Finally',
+            'state_id' => 'State',
         ];
     }
 

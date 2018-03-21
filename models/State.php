@@ -1,0 +1,66 @@
+<?php
+	/**
+	 * Created by PhpStorm.
+	 * User: art
+	 * Date: 3/21/2018
+	 * Time: 2:55 PM
+	 */
+
+	namespace app\models;
+
+
+	class State
+	{
+		const DONE = 2;
+		const IN_PROGRESS = 1;
+		const TODO = 0;
+
+		public static $instance;
+		private static $states = [
+			'Todo',
+			'In progress',
+			'Done',
+		];
+		public $id;
+		public $label;
+		public $finished = false;
+
+		private function __construct($state)
+		{
+			switch ($state){
+				case 0:
+					$this->id = $state;
+					$this->label = self::$states[$state];
+					$this->finished = false;
+					return $this;
+					break;
+				case 1:
+					$this->id = $state;
+					$this->label = self::$states[$state];
+					$this->finished = false;
+					return $this;
+					break;
+				case 2:
+					$this->id = $state;
+					$this->label = self::$states[$state];
+					$this->finished = true;
+					return $this;
+					break;
+				default :
+					return $this;
+					break;
+			}
+		}
+
+		public static function getState($state = false):State
+		{
+			static::$instance = new self($state);
+			return static::$instance;
+		}
+
+		public static function getStates()
+		{
+			return self::$states;
+		}
+
+	}

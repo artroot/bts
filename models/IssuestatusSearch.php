@@ -18,7 +18,7 @@ class IssuestatusSearch extends Issuestatus
     public function rules()
     {
         return [
-            [['id', 'finally'], 'integer'],
+            [['id', 'state_id'], 'integer'],
             [['name'], 'safe'],
         ];
     }
@@ -60,7 +60,7 @@ class IssuestatusSearch extends Issuestatus
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'finally' => $this->finally,
+            'state_id' => $this->state_id,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name]);

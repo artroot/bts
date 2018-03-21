@@ -1,7 +1,10 @@
 <?php
 
+    use app\models\Issuestatus;
     use app\models\Project;
     use app\models\Issue;
+    use app\models\State;
+    use yii\helpers\ArrayHelper;
     use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -13,10 +16,9 @@ $this->title = Project::findOne(['id' => $model->project_id])->name . ' ' . $mod
 $this->params['breadcrumbs'][] = $this->title;*/
 
     $allIssue = Issue::find()->where(['version_id' => $model->id])->count();
-    $doneIssue = Issue::find()->where(['version_id' => $model->id])->andWhere(['issuestatus_id' => 1])->count();
-    $todoIssue = Issue::find()->where(['version_id' => $model->id])->andWhere(['issuestatus_id' => 2])->count();
-    $inProgressIssue = Issue::find()->where(['version_id' => $model->id])->andWhere(['issuestatus_id' => 3])->count();
-
+    $doneIssue = Issue::getDone(['version_id' => $model->id])->count();
+    $todoIssue = Issue::getTodo(['version_id' => $model->id])->count();
+    $inProgressIssue = Issue::getInProgress(['version_id' => $model->id])->count();
 ?>
 <div class="version-view">
 

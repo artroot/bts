@@ -3,6 +3,9 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
+use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "issue".
@@ -82,5 +85,32 @@ class Issue extends \yii\db\ActiveRecord
     public function getVersion()
     {
         return $this->hasOne(Version::className(), ['id' => 'version_id']);
+    }
+
+    /**
+     * @param array $condition
+     * @return Query
+     */
+    public static function getDone($condition):Query
+    {
+        return (new self())->find()->where($condition)->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => State::getState(State::DONE)->id]), 'id', 'id')]);
+    }
+
+    /**
+     * @param array $condition
+     * @return Query
+     */
+    public static function getTodo($condition):Query
+    {
+        return (new self())->find()->where($condition)->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => State::getState(State::TODO)->id]), 'id', 'id')]);
+    }
+
+    /**
+     * @param array $condition
+     * @return Query
+     */
+    public static function getInProgress($condition):Query
+    {
+        return (new self())->find()->where($condition)->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => State::getState(State::IN_PROGRESS)->id]), 'id', 'id')]);
     }
 }
