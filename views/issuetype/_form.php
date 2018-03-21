@@ -4,11 +4,11 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Tasktype */
+/* @var $model app\models\Issuetype */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="tasktype-form">
+<div class="issuetype-form">
 
     <?php $form = ActiveForm::begin(); ?>
 

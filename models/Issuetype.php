@@ -5,21 +5,21 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "tasktype".
+ * This is the model class for table "issuetype".
  *
  * @property int $id
  * @property string $name
  *
- * @property Task[] $tasks
+ * @property Issue[] $issues
  */
-class Tasktype extends \yii\db\ActiveRecord
+class Issuetype extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'tasktype';
+        return 'issuetype';
     }
 
     /**
@@ -46,8 +46,8 @@ class Tasktype extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks()
+    public function getIssues()
     {
-        return $this->hasMany(Task::className(), ['tasktype_id' => 'id']);
+        return $this->hasMany(Issue::className(), ['issuetype_id' => 'id']);
     }
 }

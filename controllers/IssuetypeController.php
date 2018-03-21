@@ -3,25 +3,25 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Tasktype;
-use app\models\TasktypeSearch;
+use app\models\Issuetype;
+use app\models\IssuetypeSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TasktypeController implements the CRUD actions for Tasktype model.
+ * IssuetypeController implements the CRUD actions for Issuetype model.
  */
-class TasktypeController extends DefaultController
+class IssuetypeController extends DefaultController
 {
     
     /**
-     * Lists all Tasktype models.
+     * Lists all Issuetype models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TasktypeSearch();
+        $searchModel = new IssuetypeSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -31,7 +31,7 @@ class TasktypeController extends DefaultController
     }
 
     /**
-     * Displays a single Tasktype model.
+     * Displays a single Issuetype model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -44,13 +44,13 @@ class TasktypeController extends DefaultController
     }
 
     /**
-     * Creates a new Tasktype model.
+     * Creates a new Issuetype model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Tasktype();
+        $model = new Issuetype();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -62,7 +62,7 @@ class TasktypeController extends DefaultController
     }
 
     /**
-     * Updates an existing Tasktype model.
+     * Updates an existing Issuetype model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -82,7 +82,7 @@ class TasktypeController extends DefaultController
     }
 
     /**
-     * Deletes an existing Tasktype model.
+     * Deletes an existing Issuetype model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -96,15 +96,15 @@ class TasktypeController extends DefaultController
     }
 
     /**
-     * Finds the Tasktype model based on its primary key value.
+     * Finds the Issuetype model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Tasktype the loaded model
+     * @return Issuetype the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Tasktype::findOne($id)) !== null) {
+        if (($model = Issuetype::findOne($id)) !== null) {
             return $model;
         }
 

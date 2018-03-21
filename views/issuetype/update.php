@@ -3,14 +3,14 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Tasktype */
+/* @var $model app\models\Issuetype */
 
-$this->title = 'Update Tasktype: {nameAttribute}';
-$this->params['breadcrumbs'][] = ['label' => 'Tasktypes', 'url' => ['index']];
+$this->title = 'Update Issuetype: {nameAttribute}';
+$this->params['breadcrumbs'][] = ['label' => 'Issuetypes', 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = 'Update';
 ?>
-<div class="tasktype-update">
+<div class="issuetype-update">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

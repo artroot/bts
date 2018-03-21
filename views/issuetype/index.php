@@ -4,20 +4,20 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\TasktypeSearch */
+/* @var $searchModel app\models\IssuetypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Tasktypes';
+$this->title = 'Issuetypes';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="tasktype-index">
+<div class="issuetype-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
     <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Tasktype', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Issuetype', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

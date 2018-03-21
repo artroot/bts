@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Tasktype;
+use app\models\Issuetype;
 
 /**
- * TasktypeSearch represents the model behind the search form of `app\models\Tasktype`.
+ * IssuetypeSearch represents the model behind the search form of `app\models\Issuetype`.
  */
-class TasktypeSearch extends Tasktype
+class IssuetypeSearch extends Issuetype
 {
     /**
      * @inheritdoc
@@ -41,7 +41,7 @@ class TasktypeSearch extends Tasktype
      */
     public function search($params)
     {
-        $query = Tasktype::find();
+        $query = Issuetype::find();
 
         // add conditions that should always apply here
 
