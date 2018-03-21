@@ -3,25 +3,25 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Taskstatus;
-use app\models\TaskstatusSearch;
+use app\models\Issuestatus;
+use app\models\IssuestatusSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TaskstatusController implements the CRUD actions for Taskstatus model.
+ * IssuestatusController implements the CRUD actions for Issuestatus model.
  */
-class TaskstatusController extends DefaultController
+class IssuestatusController extends DefaultController
 {
 
     /**
-     * Lists all Taskstatus models.
+     * Lists all Issuestatus models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TaskstatusSearch();
+        $searchModel = new IssuestatusSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -31,7 +31,7 @@ class TaskstatusController extends DefaultController
     }
 
     /**
-     * Displays a single Taskstatus model.
+     * Displays a single Issuestatus model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -44,13 +44,13 @@ class TaskstatusController extends DefaultController
     }
 
     /**
-     * Creates a new Taskstatus model.
+     * Creates a new Issuestatus model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Taskstatus();
+        $model = new Issuestatus();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->id]);
@@ -62,7 +62,7 @@ class TaskstatusController extends DefaultController
     }
 
     /**
-     * Updates an existing Taskstatus model.
+     * Updates an existing Issuestatus model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -82,7 +82,7 @@ class TaskstatusController extends DefaultController
     }
 
     /**
-     * Deletes an existing Taskstatus model.
+     * Deletes an existing Issuestatus model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -96,15 +96,15 @@ class TaskstatusController extends DefaultController
     }
 
     /**
-     * Finds the Taskstatus model based on its primary key value.
+     * Finds the Issuestatus model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Taskstatus the loaded model
+     * @return Issuestatus the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Taskstatus::findOne($id)) !== null) {
+        if (($model = Issuestatus::findOne($id)) !== null) {
             return $model;
         }
 

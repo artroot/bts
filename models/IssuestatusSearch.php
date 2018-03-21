@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Taskstatus;
+use app\models\Issuestatus;
 
 /**
- * TaskstatusSearch represents the model behind the search form of `app\models\Taskstatus`.
+ * IssuestatusSearch represents the model behind the search form of `app\models\Issuestatus`.
  */
-class TaskstatusSearch extends Taskstatus
+class IssuestatusSearch extends Issuestatus
 {
     /**
      * @inheritdoc
@@ -41,7 +41,7 @@ class TaskstatusSearch extends Taskstatus
      */
     public function search($params)
     {
-        $query = Taskstatus::find();
+        $query = Issuestatus::find();
 
         // add conditions that should always apply here
 
