@@ -4,13 +4,13 @@ use yii\helpers\Html;
 
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Taskpriority */
+/* @var $model app\models\Issuepriority */
 
-$this->title = 'Create Taskpriority';
-$this->params['breadcrumbs'][] = ['label' => 'Taskpriorities', 'url' => ['index']];
+$this->title = 'Create Issuepriority';
+$this->params['breadcrumbs'][] = ['label' => 'Issuepriorities', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="taskpriority-create">
+<div class="issuepriority-create">
 
     <h1><?= Html::encode($this->title) ?></h1>
 

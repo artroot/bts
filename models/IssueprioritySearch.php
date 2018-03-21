@@ -5,12 +5,12 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Taskpriority;
+use app\models\Issuepriority;
 
 /**
- * TaskprioritySearch represents the model behind the search form of `app\models\Taskpriority`.
+ * IssueprioritySearch represents the model behind the search form of `app\models\Issuepriority`.
  */
-class TaskprioritySearch extends Taskpriority
+class IssueprioritySearch extends Issuepriority
 {
     /**
      * @inheritdoc
@@ -41,7 +41,7 @@ class TaskprioritySearch extends Taskpriority
      */
     public function search($params)
     {
-        $query = Taskpriority::find();
+        $query = Issuepriority::find();
 
         // add conditions that should always apply here
 

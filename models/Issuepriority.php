@@ -5,22 +5,22 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "taskpriority".
+ * This is the model class for table "issuepriority".
  *
  * @property int $id
  * @property string $name
  * @property int $level
  *
- * @property Task[] $tasks
+ * @property Issue[] $issues
  */
-class Taskpriority extends \yii\db\ActiveRecord
+class Issuepriority extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'taskpriority';
+        return 'issuepriority';
     }
 
     /**
@@ -50,8 +50,8 @@ class Taskpriority extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks()
+    public function getIssues()
     {
-        return $this->hasMany(Task::className(), ['taskpriority_id' => 'id']);
+        return $this->hasMany(Issue::className(), ['issuepriority_id' => 'id']);
     }
 }
