@@ -2,10 +2,12 @@
 
 namespace app\controllers;
 
+use app\models\Issuestatus;
 use app\models\Project;
 use Yii;
 use app\models\Issue;
 use app\models\IssueSearch;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -20,10 +22,13 @@ class IssueController extends DefaultController
      * Lists all Issue models.
      * @return mixed
      */
-    public function actionIndex($project_id = false)
+    public function actionIndex($project_id = false, $state = false)
     {
         $searchModel = new IssueSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        if ($state !== false){
+            $dataProvider->query->where(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
+        }
 
         return $this->renderPartial('index', [
             'searchModel' => $searchModel,

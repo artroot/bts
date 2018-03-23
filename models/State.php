@@ -24,30 +24,30 @@
 		public $id;
 		public $label;
 		public $finished = false;
-		public $color = '#000000';
+		public $class = '#000000';
 
 		private function __construct($state)
 		{
 			switch ($state){
-				case 0:
+				case self::TODO:
 					$this->id = $state;
 					$this->label = self::$states[$state];
 					$this->finished = false;
-					$this->color = '#5bc0de';
+					$this->class = 'tab-todo';
 					return $this;
 					break;
-				case 1:
+				case self::IN_PROGRESS:
 					$this->id = $state;
 					$this->label = self::$states[$state];
 					$this->finished = false;
-					$this->color = '#f0ad4e';
+					$this->class = 'tab-in-progress';
 					return $this;
 					break;
-				case 2:
+				case self::DONE:
 					$this->id = $state;
 					$this->label = self::$states[$state];
 					$this->finished = true;
-					$this->color = '#5cb85c';
+					$this->class = 'tab-done';
 					return $this;
 					break;
 				default :
