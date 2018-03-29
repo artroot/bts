@@ -50,7 +50,7 @@ $this->params['breadcrumbs'][] = $this->title;*/
         </div>
         <div class="row issue-tab">
             <div class="col-md-2 col-sm-2 col-xs-3 active">
-                <a class="version-dashboard" data-pjax="issueList" href="<?= Url::to('/issue/index') ?>">
+                <a class="version-dashboard" data-pjax="issueList" href="<?= Url::to(['/issue/index', 'project_id' => $model->project_id, 'version_id' => $model->id]) ?>">
                     <h1><?= $allIssue ?></h1>
                     <div>Issues in version</div>
                 </a>
@@ -58,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;*/
             <?php foreach ($states as $state): ?>
                 <?php if ($state['count'] > 0): ?>
                 <div class="col-md-2 col-sm-2 col-xs-3 <?= $state['state']->class ?>">
-                    <a class="version-dashboard" data-pjax="issueList" href="<?= Url::to(['/issue/index', 'state' => $state['state']->id]) ?>">
+                    <a class="version-dashboard" data-pjax="issueList" href="<?= Url::to(['/issue/index', 'state' => $state['state']->id, 'project_id' => $model->project_id, 'version_id' => $model->id]) ?>">
                         <h1><?= $state['count'] ?></h1>
                         <div>Issues <?= $state['state']->label ?></div>
                     </a>

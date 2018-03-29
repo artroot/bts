@@ -3,7 +3,8 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-use app\widgets\Alert;
+    use app\models\Version;
+    use app\widgets\Alert;
     use app\models\Project;
     use yii\bootstrap\Modal;
     use yii\helpers\Html;
@@ -57,12 +58,47 @@ use app\assets\AppAsset;
         $menuItems = [
             [
                 'label' => 'Projects',
-                'items' => $projectDropdownItems()
-            ],
+                'items' => @$projectDropdownItems()
+            ]
+        ];
+
+        //if (@$model instanceof Version) {
+        $query = [];
+        if (Yii::$app->controller->id == 'version' and isset(Yii::$app->controller->actionParams['id'])){
+            $query = ['project_id' => Version::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id];
+        }elseif (Yii::$app->controller->id == 'project' and isset(Yii::$app->controller->actionParams['id'])){
+            $query = ['project_id' => Yii::$app->controller->actionParams['id']];
+        }
+            $versionDropdownItems = function ($query, $versionsList = []) {
+                if (empty($query)) return false;
+
+                foreach (Version::find()->where($query)->orderBy(['id' => SORT_DESC])->limit(6)->all() as $version) {
+                    $versionsList[] = '<li>' .
+                        Html::a($version->getStatusIcon() .  ' ' . $version->name, ['version/view', 'id' => $version->id], ['style' => 'display: inline-block;']) . '</li>';
+                }
+                $versionsList[] = '<li class="divider"></li>';
+                $versionsList[] = '<li>' .
+                    Html::a('More...', ['project/view', 'id' => $query['project_id']], ['style' => 'display: inline-block;']) . '</li>';
+                $versionsList[] = ['label' => 'Create version', 'url' => Url::toRoute('version/create')];
+
+                return [
+                    'label' => 'Version',
+                    'items' => $versionsList
+                ];
+            };
+        //}
+
+        if (!empty(@$query)) $menuItems[] = @$versionDropdownItems($query);
+
+        $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
+        $menuItems[] = ['label' => 'About', 'url' => ['/task/new']];
+        $menuItems[] = ['label' => 'Contact', 'url' => ['/site/contact']];
+
+        /*$menuItems[] = [
             ['label' => 'Home', 'url' => ['/site/index']],
             ['label' => 'About', 'url' => ['/task/new']],
             ['label' => 'Contact', 'url' => ['/site/contact']],
-        ];
+        ];*/
         if (Yii::$app->user->isGuest) {
             $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
             $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];

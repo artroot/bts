@@ -22,13 +22,14 @@ class IssueController extends DefaultController
      * Lists all Issue models.
      * @return mixed
      */
-    public function actionIndex($project_id = false, $state = false)
+    public function actionIndex($project_id = false, $state = false, $version_id = false)
     {
         $searchModel = new IssueSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-        if ($state !== false){
-            $dataProvider->query->where(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
-        }
+            if ($project_id !== false) $dataProvider->query->where(['project_id' => $project_id]);
+            if ($version_id !== false) $dataProvider->query->where(['version_id' => $version_id]);
+            if ($state !== false) $dataProvider->query->where(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
+
 
         return $this->renderPartial('index', [
             'searchModel' => $searchModel,
