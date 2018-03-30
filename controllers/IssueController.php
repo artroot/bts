@@ -69,6 +69,9 @@ class IssueController extends DefaultController
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
+        $model->issuestatus_id = 2;
+        $model->project_id = Project::find()->one()->id;
+
         return $this->render('create', [
             'model' => $model,
         ]);

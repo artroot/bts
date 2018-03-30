@@ -56,6 +56,14 @@ use app\assets\AppAsset;
         };
 
         $menuItems = [
+            '<li>' . Html::a('Create issue', ['issue/create'], ['class' => 'btn btn-default']) . '</li>',
+            /*[
+                'label' => 'Create issue',
+                'options' => [
+                   ''
+                ],
+                'url' => Url::toRoute('issue/create')
+            ],*/
             [
                 'label' => 'Projects',
                 'items' => @$projectDropdownItems()
@@ -90,9 +98,9 @@ use app\assets\AppAsset;
 
         if (!empty(@$query)) $menuItems[] = @$versionDropdownItems($query);
 
-        $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
+       /* $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
         $menuItems[] = ['label' => 'About', 'url' => ['/task/new']];
-        $menuItems[] = ['label' => 'Contact', 'url' => ['/site/contact']];
+        $menuItems[] = ['label' => 'Contact', 'url' => ['/site/contact']];*/
 
         /*$menuItems[] = [
             ['label' => 'Home', 'url' => ['/site/index']],

@@ -34,7 +34,6 @@ tests/_support/_generated
 assets/
 codeception.yml
 commands/
-composer.json
 composer.lock
 config/db.php
 mail/

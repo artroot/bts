@@ -27,6 +27,7 @@ use yii\helpers\ArrayHelper;
  * @property int $owner_id
  * @property int $parentissue_id
  * @property int $relatedissue_id
+ * @property int $project_id
  */
 class Issue extends \yii\db\ActiveRecord
 {
@@ -47,7 +48,7 @@ class Issue extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['create_date', 'finish_date', 'plan_date'], 'safe'],
             [['issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
-            [['owner_id'], 'required'],
+            [['owner_id', 'project_id'], 'required'],
             [['name'], 'string', 'max' => 255],
             /*[['performer_id'], 'unique'],*/
         ];
@@ -60,22 +61,23 @@ class Issue extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Subject',
             'description' => 'Description',
             'create_date' => 'Create Date',
             'finish_date' => 'Finish Date',
-            'plan_date' => 'Plan Date',
-            'issuetype_id' => 'Issuetype ID',
-            'issuepriority_id' => 'Issuepriority ID',
-            'issuestatus_id' => 'Issuestatus ID',
-            'sprint_id' => 'Sprint ID',
-            'version_id' => 'Version ID',
-            'resolved_version_id' => 'Resolved Version ID',
-            'detected_version_id' => 'Detected Version ID',
-            'performer_id' => 'Performer ID',
+            'plan_date' => 'Term',
+            'issuetype_id' => 'Type',
+            'issuepriority_id' => 'Priority',
+            'issuestatus_id' => 'State',
+            'sprint_id' => 'Sprint',
+            'version_id' => 'Version',
+            'resolved_version_id' => 'Resolved Version',
+            'detected_version_id' => 'Detected Version',
+            'performer_id' => 'Performer',
             'owner_id' => 'Owner ID',
             'parentissue_id' => 'ParentIssue ID',
             'relatedissue_id' => 'RelatedIssue ID',
+            'project_id' => 'Project',
         ];
     }
 
