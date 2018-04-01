@@ -1,21 +1,29 @@
 <?php
 
 use yii\helpers\Html;
+    use yii\widgets\Pjax;
 
-/* @var $this yii\web\View */
+    /* @var $this yii\web\View */
 /* @var $model app\models\Issue */
 
-$this->title = 'Update Issue: {nameAttribute}';
-$this->params['breadcrumbs'][] = ['label' => 'Tasks', 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
-$this->params['breadcrumbs'][] = 'Update';
+$this->title = 'Update Issue';
 ?>
-<div class="task-update">
+<div class="issue-update" id="issueUpForm">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
+    <?= $this->render('_update_form', [
         'model' => $model,
+        'action' => $action
     ]) ?>
 
 </div>
+
+<?php
+    Pjax::widget([
+        'id' => 'issueUpForm',  // response goes in this element
+        'enablePushState' => false,
+        'enableReplaceState' => false,
+        'formSelector' => '#issueForm',// this form is submitted on change
+        'submitEvent' => 'change',
+    ]);
+
+?>

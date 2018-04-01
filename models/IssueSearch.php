@@ -18,7 +18,7 @@ class IssueSearch extends Issue
     public function rules()
     {
         return [
-            [['id', 'issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
+            [['id', 'project_id', 'issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
             [['name', 'description', 'create_date', 'finish_date', 'plan_date'], 'safe'],
         ];
     }
@@ -72,6 +72,7 @@ class IssueSearch extends Issue
             'detected_version_id' => $this->detected_version_id,
             'performer_id' => $this->performer_id,
             'owner_id' => $this->owner_id,
+            'project_id' => $this->project_id,
             'parentissue_id' => $this->parentissue_id,
             'relatedissue_id' => $this->relatedissue_id,
         ]);

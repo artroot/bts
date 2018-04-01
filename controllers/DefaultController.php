@@ -28,7 +28,7 @@ class DefaultController extends Controller
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'view', 'update', 'delete', 'create', 'get', 'graph', 'signup',
+                        'actions' => ['logout', 'index', 'view', 'update', 'delete', 'create', 'get', 'graph', 'signup', 'draft',
                         'new'],
                         'allow' => true,
                         'roles' => ['@'],

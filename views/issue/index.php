@@ -38,7 +38,15 @@ $this->title = 'Issues';
             //'parentissue_id',
             //'relatedissue_id',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'update' => function ($url, $model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-pencil"></span>',
+                            ['issue/update', 'id' => $model->id]
+                        );
+                    },
+                ], 'template' => '{update} {delete}'],
         ],
     ]); ?>
     

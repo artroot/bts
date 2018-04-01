@@ -19,20 +19,20 @@ $this->params['breadcrumbs'][] = $this->title;*/
 
     $states = [
         0 => [
-            'count' => Issue::getDone(['version_id' => $model->id])->count(),
+            'count' => Issue::getDone(['resolved_version_id' => $model->id])->count(),
             'state' => State::getState(State::DONE)
         ],
         1 => [
-            'count' => Issue::getTodo(['version_id' => $model->id])->count(),
+            'count' => Issue::getTodo(['resolved_version_id' => $model->id])->count(),
             'state' => State::getState(State::TODO)
         ],
         2 => [
-            'count' => Issue::getInProgress(['version_id' => $model->id])->count(),
+            'count' => Issue::getInProgress(['resolved_version_id' => $model->id])->count(),
             'state' => State::getState(State::IN_PROGRESS)
         ],
     ];
 
-    $allIssue = Issue::find()->where(['version_id' => $model->id])->count();
+    $allIssue = Issue::find()->where(['resolved_version_id' => $model->id])->count();
     //$doneIssue = Issue::getDone(['version_id' => $model->id])->count();
     //$todoIssue = Issue::getTodo(['version_id' => $model->id])->count();
     //$inProgressIssue = Issue::getInProgress(['version_id' => $model->id])->count();

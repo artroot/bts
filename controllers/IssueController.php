@@ -27,7 +27,7 @@ class IssueController extends DefaultController
         $searchModel = new IssueSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
             if ($project_id !== false) $dataProvider->query->where(['project_id' => $project_id]);
-            if ($version_id !== false) $dataProvider->query->where(['version_id' => $version_id]);
+            if ($version_id !== false) $dataProvider->query->where(['resolved_version_id' => $version_id]);
             if ($state !== false) $dataProvider->query->where(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
 
 
@@ -60,13 +60,15 @@ class IssueController extends DefaultController
     {
         $model = new Issue();
 
+        $model->owner_id = Yii::$app->user->identity->id;
+
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $this->sendToTelegram(sprintf('User %s create new issue %s in project: %s',
                 Yii::$app->user->identity->username,
                 $model->name,
-                Project::findOne(['id' => $model->getVersion()->project_id])->name
+                Project::findOne(['id' => $model->project_id])->name
             ));
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         $model->issuestatus_id = 2;
@@ -74,7 +76,25 @@ class IssueController extends DefaultController
 
         return $this->render('create', [
             'model' => $model,
+            'action' => '/issue/draft'
         ]);
+    }
+
+    /**
+     * Creates a new Issue model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return mixed
+     */
+    public function actionDraft()
+    {
+        $model = new Issue();
+
+        if ($model->load(Yii::$app->request->post())) {
+            return $this->renderPartial('_form', [
+                'model' => $model,
+                'action' => '/issue/draft'
+            ]);
+        }
     }
 
     public function actionNew()
@@ -99,15 +119,24 @@ class IssueController extends DefaultController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
+            $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
+            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+                $this->sendToTelegram(sprintf('User %s update issue %s in project: %s',
+                    Yii::$app->user->identity->username,
+                    $model->name,
+                    Project::findOne(['id' => $model->project_id])->name
+                ));
+                return $this->renderPartial('_update_form', [
+                    'model' => $model,
+                    'action' => '/issue/update?id=' . $id
+                ]);
+            }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+            return $this->render('update', [
+                'model' => $model,
+                'action' => '/issue/update?id=' . $id
+            ]);
     }
 
     /**

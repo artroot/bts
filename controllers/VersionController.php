@@ -78,7 +78,7 @@ class VersionController extends DefaultController
     public function actionView($id)
     {
         $searchModel = new IssueSearch();
-        $searchModel->version_id = $id;
+        $searchModel->resolved_version_id = $id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('view', [

@@ -23,9 +23,17 @@
 
     <div class="row">
         <div class="col-md-8">
-            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-            <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+            <span id="issue-name-s" style="display: none;">
+                <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            </span>
+            <h3><?= $model->name ?> <a class="glyphicon glyphicon-edit btn btn-default" onclick="$(this).parent().hide('fast'); $('#issue-name-s').show('fast');"></a></h3>
+
+            <span id="issue-description-s" style="display: none;">
+                <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+            </span>
+            <p><a class="glyphicon glyphicon-edit btn btn-default" onclick="$(this).parent().hide('fast'); $('#issue-description-s').show('fast');"></a>
+            <p><?= nl2br($model->description) ?></p></p>
 
         </div>
         <div class="col-md-4">

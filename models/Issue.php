@@ -29,8 +29,9 @@ use yii\helpers\ArrayHelper;
  * @property int $relatedissue_id
  * @property int $project_id
  */
-class Issue extends \yii\db\ActiveRecord
+class Issue extends ActiveRecord
 {
+
     /**
      * @inheritdoc
      */
@@ -47,10 +48,9 @@ class Issue extends \yii\db\ActiveRecord
         return [
             [['description'], 'string'],
             [['create_date', 'finish_date', 'plan_date'], 'safe'],
-            [['issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
+            [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
             [['owner_id', 'project_id'], 'required'],
-            [['name'], 'string', 'max' => 255],
-            /*[['performer_id'], 'unique'],*/
+            [['name'], 'string', 'max' => 255]
         ];
     }
 
@@ -86,7 +86,7 @@ class Issue extends \yii\db\ActiveRecord
      */
     public function getVersion()
     {
-        return $this->hasOne(Version::className(), ['id' => 'version_id']);
+        return $this->hasOne(Version::className(), ['id' => 'resolved_version_id']);
     }
 
     /**
