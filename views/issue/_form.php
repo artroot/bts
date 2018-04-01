@@ -51,7 +51,7 @@
                 Sprint::find()->all(), 'id', 'name'),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
 
-            <?= $form->field($model, 'plan_date', $template)->input('datetime-local') ?>
+            <?= $form->field($model, 'deadline', $template)->input('datetime-local') ?>
             </table>
         </div>
     </div>

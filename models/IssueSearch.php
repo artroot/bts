@@ -19,7 +19,7 @@ class IssueSearch extends Issue
     {
         return [
             [['id', 'project_id', 'issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
-            [['name', 'description', 'create_date', 'finish_date', 'plan_date'], 'safe'],
+            [['name', 'description', 'create_date', 'finish_date', 'deadline'], 'safe'],
         ];
     }
 
@@ -62,7 +62,7 @@ class IssueSearch extends Issue
             'id' => $this->id,
             'create_date' => $this->create_date,
             'finish_date' => $this->finish_date,
-            'plan_date' => $this->plan_date,
+            'deadline' => $this->deadline,
             'issuetype_id' => $this->issuetype_id,
             'issuepriority_id' => $this->issuepriority_id,
             'issuestatus_id' => $this->issuestatus_id,

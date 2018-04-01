@@ -15,7 +15,7 @@ use yii\helpers\ArrayHelper;
  * @property string $description
  * @property string $create_date
  * @property string $finish_date
- * @property string $plan_date
+ * @property string $deadline
  * @property int $issuetype_id
  * @property int $issuepriority_id
  * @property int $issuestatus_id
@@ -47,7 +47,7 @@ class Issue extends ActiveRecord
     {
         return [
             [['description'], 'string'],
-            [['create_date', 'finish_date', 'plan_date'], 'safe'],
+            [['create_date', 'finish_date', 'deadline'], 'safe'],
             [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
             [['owner_id', 'project_id'], 'required'],
             [['name'], 'string', 'max' => 255]
@@ -65,7 +65,7 @@ class Issue extends ActiveRecord
             'description' => 'Description',
             'create_date' => 'Create Date',
             'finish_date' => 'Finish Date',
-            'plan_date' => 'Term',
+            'deadline' => 'Deadline',
             'issuetype_id' => 'Type',
             'issuepriority_id' => 'Priority',
             'issuestatus_id' => 'State',
