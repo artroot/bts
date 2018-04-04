@@ -23,11 +23,23 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'new_password')->passwordInput(['maxlength' => true]) ?>
     <?= $form->field($model, 'conf_password')->passwordInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'email')->textInput(['maxlength' => true]) ?>
-
     <h4 id="notifySettings">Notifications</h4>
 
-    <?= $form->field($model, 'telegram_key')->textInput() ?>
+    <div class="thumbnail">
+
+        <?= $form->field($model, 'mail_notify')->checkbox(['value' => 1, 'onchange' => 'if($(this).prop(\'checked\')){$(\'#users-email\').prop(\'disabled\', false);}else{$(\'#users-email\').prop(\'disabled\', true);}']) ?>
+
+        <?= $form->field($model, 'email')->textInput(['maxlength' => true, 'disabled' => ($model->mail_notify ? false : true)]) ?>
+
+    </div>
+
+    <div class="thumbnail">
+
+        <?= $form->field($model, 'telegram_notify')->checkbox(['value' => 1, 'onchange' => 'if($(this).prop(\'checked\')){$(\'#users-telegram_key\').prop(\'disabled\', false);}else{$(\'#users-telegram_key\').prop(\'disabled\', true);}']) ?>
+
+        <?= $form->field($model, 'telegram_key')->textInput(['disabled' => ($model->telegram_notify ? false : true)]) ?>
+
+    </div>
 
 
     <?php if (@$msg): ?>

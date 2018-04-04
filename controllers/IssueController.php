@@ -61,6 +61,7 @@ class IssueController extends DefaultController
         $model = new Issue();
 
         $model->owner_id = Yii::$app->user->identity->id;
+        $model->create_date = date('Y-m-d H:i');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             $this->sendToTelegram(sprintf('User %s create new issue %s in project: %s',
@@ -121,11 +122,19 @@ class IssueController extends DefaultController
     {
             $model = $this->findModel($id);
 
+            $oldModel = clone $model;
+
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                $this->sendToTelegram(sprintf('User %s update issue %s in project: %s',
+                $changes = "\r\n";
+                foreach ($model->attributeLabels() as $key => $value){
+                    //$changes .= 'Changed ' . $value . "\r\n" . $model->{$key}. ' - ' . $oldModel->{$key} . "\r\n";
+                    if (@$model->{$key} != @$oldModel->{$key}) $changes .= 'Changed ' . @$value . "\r\n" . @$model->{$key}. "\r\n";
+                }
+                $this->sendToTelegram(sprintf('User %s update issue %s in project: %s ------------------------ %s',
                     Yii::$app->user->identity->username,
                     $model->name,
-                    Project::findOne(['id' => $model->project_id])->name
+                    Project::findOne(['id' => $model->project_id])->name,
+                    $changes
                 ));
                 return $this->renderPartial('_update_form', [
                     'model' => $model,

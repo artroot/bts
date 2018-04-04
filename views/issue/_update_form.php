@@ -5,7 +5,8 @@
     use app\models\Issuetype;
     use app\models\Project;
     use app\models\Sprint;
-    use app\models\Users;
+use app\models\State;
+use app\models\Users;
     use app\models\Version;
     use yii\helpers\ArrayHelper;
     use yii\helpers\Html;
@@ -15,6 +16,10 @@
 /* @var $this yii\web\View */
 /* @var $model app\models\Issue */
 /* @var $form yii\widgets\ActiveForm */
+
+
+$issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model->id;
+
 ?>
 <br>
 <div class="issue-form">
@@ -23,20 +28,24 @@
 
     <div class="row">
         <div class="col-md-8">
+            <a class="btn btn-default btn-xs" onclick="$('#issue_descr').toggle('fast'); $('#issue-name-s').toggle('fast');">
+                <span class="glyphicon glyphicon-edit"></span>
+            </a>
+            <h4>
+                <?= Issuestatus::findOne([
+                    'id' => $model->issuestatus_id
+                ])->state_id == State::DONE ? sprintf('<s>%s</s>', $issueName) : $issueName  ?>
+                <span> <?= $model->name ?></span>
+            </h4>
 
             <span id="issue-name-s" style="display: none;">
                 <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-            </span>
-            <h3><?= $model->name ?> <a class="glyphicon glyphicon-edit btn btn-default" onclick="$(this).parent().hide('fast'); $('#issue-name-s').show('fast');"></a></h3>
-
-            <span id="issue-description-s" style="display: none;">
                 <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
             </span>
-            <p><a class="glyphicon glyphicon-edit btn btn-default" onclick="$(this).parent().hide('fast'); $('#issue-description-s').show('fast');"></a>
-            <p><?= nl2br($model->description) ?></p></p>
 
+            <p id="issue_descr"><?= nl2br($model->description) ?></p>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 img-thumbnail">
             <table>
                 <?php
                     $template = [

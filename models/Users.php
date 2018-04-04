@@ -18,6 +18,9 @@ use Yii;
  * @property int $status
  * @property string $created_at
  * @property string $updated_at
+ * @property string $telegram_key
+ * @property string $telegram_notify
+ * @property string $mail_notify
  *
  * @property Task $task
  * @property Task[] $tasks
@@ -44,7 +47,7 @@ class Users extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['usertype_id', 'status'], 'integer'],
+            [['usertype_id', 'status', 'telegram_notify', 'mail_notify'], 'integer'],
             [['password_hash', 'password_reset_token', 'auth_key', 'new_password', 'conf_password'], 'string'],
             [['status'], 'required'],
             [['new_password', 'conf_password'], 'required', 'on'=>'insert'],
@@ -74,6 +77,8 @@ class Users extends \yii\db\ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'telegram_key' => 'Telegram Key',
+            'telegram_notify' => 'Telegram Notify Support',
+            'mail_notify' => 'Mail Notify Support',
         ];
     }
 
