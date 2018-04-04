@@ -1,6 +1,7 @@
 <?php
 
-    use app\models\Issuepriority;
+use app\models\Comment;
+use app\models\Issuepriority;
     use app\models\Issuestatus;
     use app\models\Issuetype;
     use app\models\Project;
@@ -24,34 +25,29 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
 <br>
 <div class="issue-form">
 
-    <?php $form = ActiveForm::begin(['id' => 'issueForm', 'action' => $action]); ?>
+
+
 
     <div class="row">
-        <div class="col-lg-8 col-sm-6 col-md-8 col-sm-12">
+        <?php $form = ActiveForm::begin(['id' => 'issueForm', 'action' => $action]); ?>
+        <div class="col-md-12">
             <a class="btn btn-default btn-xs" onclick="$('#issue_descr').toggle('fast'); $('#issue-name-s').toggle('fast');">
                 <span class="glyphicon glyphicon-edit"></span>
             </a>
-            <h4>
+            <h3>
                 <?= Issuestatus::findOne([
                     'id' => $model->issuestatus_id
                 ])->state_id == State::DONE ? sprintf('<s>%s</s>', $issueName) : $issueName  ?>
                 <span> <?= $model->name ?></span>
-            </h4>
+            </h3>
             <ol class="issue-nav">
                 <li><?= sprintf('Created by (%s): %s', Users::findOne(['id' => $model->owner_id])->username ,$model->create_date) ?></li>
                 <li><?= sprintf('Resolved: %s', $model->finish_date) ?></li>
             </ol>
-
-                    <span id="issue-name-s" style="display: none;">
-                        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
-                        <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
-                    </span>
-
-            <p id="issue_descr"><?= nl2br($model->description) ?></p>
         </div>
 
-        <div class="col-lg-4 col-sm-6 col-md-4 col-sm-12 panel-default">
-            <div class="panel-heading">
+        <div class="col-lg-3 col-sm-5 col-md-3 col-sm-push-7 col-md-push-9 panel-default">
+            <div class="panel-heading" style="font-size: smaller;">
             <table>
                 <?php
                     $template = [
@@ -74,12 +70,30 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
                 Sprint::find()->all(), 'id', 'name'),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
 
-            <?= $form->field($model, 'deadline', $template)->input('datetime-local') ?>
+            <?= $form->field($model, 'deadline', [
+                    'template' => "<tr><td>{label}</td><td></td></tr><tr><td colspan='2'>{input}\n{hint}\n{error}</td></tr>"
+                ])->input('datetime-local', ['style' => 'font-size: x-small;']) ?>
             </table>
             </div>
         </div>
-        <div class="col-lg-12 col-sm-12 col-md-12 col-sm-12">
-            Comments
+        <?php ActiveForm::end(); ?>
+        <div class="col-lg-9 col-sm-7 col-md-9 col-sm-pull-5 col-md-pull-3">
+
+
+                    <span id="issue-name-s" style="display: none;">
+                        <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+                        <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+                    </span>
+
+            <p id="issue_descr"><?= nl2br($model->description) ?></p>
+            <ul class="nav nav-tabs">
+                <li role="presentation" class="active"><a href="#">Comments</a></li>
+                <li role="presentation"><a href="#">Log</a></li>
+                <li role="presentation"><a href="#">Relate</a></li>
+            </ul>
+            <?= $this->renderAjax('@app/views/comment/index', [
+                'issue_id' => $model->id
+            ]) ?>
         </div>
     </div>
 
@@ -109,7 +123,7 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
 
 
 
-    <?php ActiveForm::end(); ?>
+
 
 
 

@@ -3,7 +3,8 @@
 /* @var $this \yii\web\View */
 /* @var $content string */
 
-    use app\models\Version;
+use app\models\Issue;
+use app\models\Version;
     use app\widgets\Alert;
     use app\models\Project;
     use yii\bootstrap\Modal;
@@ -74,6 +75,8 @@ use app\assets\AppAsset;
         $query = [];
         if (Yii::$app->controller->id == 'version' and isset(Yii::$app->controller->actionParams['id'])){
             $query = ['project_id' => Version::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id];
+        }elseif (Yii::$app->controller->id == 'issue' and isset(Yii::$app->controller->actionParams['id'])){
+            $query = ['project_id' => Issue::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id];
         }elseif (Yii::$app->controller->id == 'project' and isset(Yii::$app->controller->actionParams['id'])){
             $query = ['project_id' => Yii::$app->controller->actionParams['id']];
         }

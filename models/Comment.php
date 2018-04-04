@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property int $issue_id
  * @property string $text
+ * @property string $user_id
+ * @property string $create_date
  *
  * @property Issue $issue
  */
@@ -29,9 +31,11 @@ class Comment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['issue_id'], 'integer'],
+            [['issue_id','user_id'], 'integer'],
+            //[['issue_id','user_id'], 'required'],
             [['text'], 'string'],
-            [['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
+            //[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
+            //[['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -44,6 +48,8 @@ class Comment extends \yii\db\ActiveRecord
             'id' => 'ID',
             'issue_id' => 'Issue',
             'text' => 'Text',
+            'user_id' => 'User',
+            'create_date' => 'Created',
         ];
     }
 
@@ -53,5 +59,12 @@ class Comment extends \yii\db\ActiveRecord
     public function getIssue()
     {
         return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
+    }
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUser()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'user_id']);
     }
 }

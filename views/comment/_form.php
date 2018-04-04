@@ -8,18 +8,27 @@ use yii\widgets\ActiveForm;
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="comment-form">
+<div class="panel panel-default">
 
-    <?php $form = ActiveForm::begin(); ?>
-
-    <?= $form->field($model, 'issue_id')->textInput() ?>
-
-    <?= $form->field($model, 'text')->textarea(['rows' => 6]) ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+    <div class="panel-heading">
+        <span class="glyphicon glyphicon-comment"></span>
+        <span><?= Yii::$app->user->identity->username ?></span>
     </div>
 
-    <?php ActiveForm::end(); ?>
+    <div class="comment-form panel-body">
+
+        <?php $form = ActiveForm::begin(['action' => '/comment/create']); ?>
+
+        <?= $form->field($model, 'issue_id')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'user_id')->hiddenInput()->label(false) ?>
+        <?= $form->field($model, 'text')->textarea(['rows' => 6])->label(false) ?>
+
+        <div class="form-group">
+            <?= Html::submitButton('Send', ['class' => 'btn btn-success']) ?>
+        </div>
+
+        <?php ActiveForm::end(); ?>
+
+    </div>
 
 </div>

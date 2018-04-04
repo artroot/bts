@@ -19,15 +19,25 @@ class CommentController extends DefaultController
      * Lists all Comment models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($issue_id)
     {
-        $searchModel = new CommentSearch();
+        $model = new Comment();
+        $model->issue_id = $issue_id;
+        $model->user_id = Yii::$app->user->identity->getId();
+
+        return $this->render('index', [
+            'comments' => Comment::find()->where(['issue_id' => $issue_id])->orderBy(['id' => SORT_DESC])->all(),
+            'createForm' => $this->renderAjax('create', [
+                'model' => $model
+            ])
+        ]);
+        /*$searchModel = new CommentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-        ]);
+        ]);*/
     }
 
     /**
@@ -53,10 +63,10 @@ class CommentController extends DefaultController
         $model = new Comment();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['/issue/update', 'id' => $model->issue_id]);
         }
 
-        return $this->render('create', [
+        return $this->renderPartial('create', [
             'model' => $model,
         ]);
     }
