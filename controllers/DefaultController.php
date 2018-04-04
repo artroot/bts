@@ -50,7 +50,7 @@ class DefaultController extends Controller
 
     public function sendToTelegram($message)
     {
-        foreach (Users::find()->all() as $users){
+        foreach (Users::find()->where(['telegram_notify' => 1])->all() as $users){
             if (!empty($users->telegram_key)) Telegram::sendMessage(base64_decode($users->telegram_key), $message);
         }
     }
