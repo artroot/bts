@@ -26,9 +26,9 @@ class IssueController extends DefaultController
     {
         $searchModel = new IssueSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-            if ($project_id !== false) $dataProvider->query->where(['project_id' => $project_id]);
-            if ($version_id !== false) $dataProvider->query->where(['resolved_version_id' => $version_id]);
-            if ($state !== false) $dataProvider->query->where(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
+            //if ($project_id !== false) $dataProvider->query->andWhere(['project_id' => $project_id]);
+            if ($version_id !== false) $dataProvider->query->andWhere(['resolved_version_id' => $version_id]);
+            if ($state !== false) $dataProvider->query->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
 
 
         return $this->renderPartial('index', [

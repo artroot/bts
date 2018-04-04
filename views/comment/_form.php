@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'task_id')->textInput() ?>
+    <?= $form->field($model, 'issue_id')->textInput() ?>
 
     <?= $form->field($model, 'text')->textarea(['rows' => 6]) ?>
 

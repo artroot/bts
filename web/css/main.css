@@ -133,4 +133,22 @@ div.graphic > svg {
 .progress > *.tab-todo {
   background-color: #5bc0de; }
 
+ol.issue-nav {
+  padding: 0;
+  margin-bottom: 15px;
+  list-style: none;
+  border-bottom: 1px solid #ddd; }
+
+ol.issue-nav > li + li:before {
+  padding: 0 5px;
+  content: ''; }
+
+ol.issue-nav > li:first-child {
+  padding: 0; }
+
+ol.issue-nav > li {
+  color: #777;
+  display: inline-block;
+  font-size: smaller; }
+
 /*# sourceMappingURL=main.css.map */
