@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Project;
 use Yii;
 use app\models\Comment;
 use app\models\CommentSearch;
@@ -63,6 +64,12 @@ class CommentController extends DefaultController
         $model = new Comment();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            $this->sendToTelegram(sprintf('User <b>%s</b> create new comment to issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
+                Yii::$app->user->identity->username,
+                $model->getIssue()->one()->name,
+                Project::findOne(['id' => $model->getIssue()->one()->project_id])->name,
+                $model->text
+            ));
             return $this->redirect(['/issue/update', 'id' => $model->issue_id]);
         }
 

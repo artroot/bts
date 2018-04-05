@@ -87,7 +87,7 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
 
             <p id="issue_descr"><?= nl2br($model->description) ?></p>
             <ul class="nav nav-tabs">
-                <li role="presentation" class="active"><a href="#">Comments</a></li>
+                <li role="presentation" class="active"><a href="#">Comments <span class="badge"><?= Comment::find()->where(['issue_id' => $model->id])->count() ?></span></a></li>
                 <li role="presentation"><a href="#">Log</a></li>
                 <li role="presentation"><a href="#">Relate</a></li>
             </ul>
