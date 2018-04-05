@@ -65,10 +65,11 @@ class IssueController extends DefaultController
         $model->create_date = date('Y-m-d H:i');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $this->sendToTelegram(sprintf('User %s create new issue %s in project: %s',
+            $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the new issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                 Yii::$app->user->identity->username,
                 $model->name,
-                Project::findOne(['id' => $model->project_id])->name
+                Project::findOne(['id' => $model->project_id])->name,
+                $model->description
             ));
             return $this->redirect(['update', 'id' => $model->id]);
         }
@@ -133,10 +134,10 @@ class IssueController extends DefaultController
                     //$changes .= 'Changed ' . $value . "\r\n" . $model->{$key}. ' - ' . $oldModel->{$key} . "\r\n";
                     if (@$model->{$key} != @$oldModel->{$key}) $changes .= 'Changed ' . @$value . "\r\n" . @$model->{$key}. "\r\n";
                 }
-                $this->sendToTelegram(sprintf('User %s update issue %s in project: %s ------------------------ %s',
+                $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" .'<code>%s</code>',
                     Yii::$app->user->identity->username,
                     $model->name,
-                    Project::findOne(['id' => $model->project_id])->name,
+                    Project::findOne(['id' => @$model->project_id])->name,
                     $changes
                 ));
                 return $this->renderPartial('_update_form', [
@@ -160,9 +161,16 @@ class IssueController extends DefaultController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $redirectUrl = Url::to(['version/view', 'id' => $model->resolved_version_id]);
+        $this->sendToTelegram(sprintf('User <b>%s</b> DELETED the issue <b>%s</b> in project: <b>%s</b>',
+            Yii::$app->user->identity->username,
+            $model->name,
+            Project::findOne(['id' => $model->project_id])->name
+        ));
+        $model->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect($redirectUrl);
     }
 
     /**

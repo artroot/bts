@@ -34,6 +34,14 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
             <a class="btn btn-default btn-xs" onclick="$('#issue_descr').toggle('fast'); $('#issue-name-s').toggle('fast');">
                 <span class="glyphicon glyphicon-edit"></span>
             </a>
+            <?= Html::a('<span class="glyphicon glyphicon-trash"></span>', ['issue/delete', 'id' => $model->id], [
+                'class' => 'btn btn-default btn-xs',
+                'encodeLabels' => false,
+                'data' => [
+                    'confirm' => 'Are you sure you want to delete this issue?',
+                    'method' => 'post',
+                ],
+            ]) ?>
             <h3>
                 <?php if(Issuestatus::findOne(['id' => $model->issuestatus_id])->state_id == State::DONE): ?>
                        <span class="glyphicon glyphicon-ok text-success"></span>
@@ -82,7 +90,7 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
             </table>
             </div>
         </div>
-        <?php ActiveForm::end(); ?>
+
         <div class="col-lg-9 col-sm-7 col-md-9 col-sm-pull-5 col-md-pull-3">
 
 
@@ -92,6 +100,11 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
                     </span>
 
             <p id="issue_descr"><?= nl2br($model->description) ?></p>
+
+        </div>
+
+        <?php ActiveForm::end(); ?>
+        <div class="col-lg-9 col-sm-7 col-md-9 col-sm-pull-5 col-md-pull-3">
             <ul class="nav nav-tabs">
                 <li role="presentation" class="active"><a href="#">Comments <span class="badge"><?= Comment::find()->where(['issue_id' => $model->id])->count() ?></span></a></li>
                 <li role="presentation"><a href="#">Log</a></li>
@@ -101,6 +114,7 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
                 'issue_id' => $model->id
             ]) ?>
         </div>
+        <div class="col-lg-offset-3 col-sm-offset-5 col-md-offset-3"></div>
     </div>
 
 
