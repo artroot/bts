@@ -8,6 +8,7 @@ use Yii;
 use app\models\Issue;
 use app\models\IssueSearch;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -120,7 +121,9 @@ class IssueController extends DefaultController
      */
     public function actionUpdate($id)
     {
-            $model = $this->findModel($id);
+        Url::remember();
+
+        $model = $this->findModel($id);
 
             $oldModel = clone $model;
 

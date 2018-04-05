@@ -35,10 +35,16 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
                 <span class="glyphicon glyphicon-edit"></span>
             </a>
             <h3>
-                <?= Issuestatus::findOne([
-                    'id' => $model->issuestatus_id
-                ])->state_id == State::DONE ? sprintf('<s>%s</s>', $issueName) : $issueName  ?>
-                <span> <?= $model->name ?></span>
+                <?php if(Issuestatus::findOne(['id' => $model->issuestatus_id])->state_id == State::DONE): ?>
+                       <span class="glyphicon glyphicon-ok text-success"></span>
+                       <span class="text-muted">
+                            <s><?= $issueName ?></s> <?= $model->name ?>
+                       </span>
+                <?php else: ?>
+                        <span>
+                            <?= $issueName ?> <?= $model->name ?>
+                       </span>
+                <?php endif; ?>
             </h3>
             <ol class="issue-nav">
                 <li><?= sprintf('Created by (%s): %s', Users::findOne(['id' => $model->owner_id])->username ,$model->create_date) ?></li>

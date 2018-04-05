@@ -24,7 +24,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'text')->textarea(['rows' => 6])->label(false) ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Send', ['class' => 'btn btn-success']) ?>
+            <?= Html::submitButton('Send comment', ['class' => 'btn btn-success']) ?>
         </div>
 
         <?php ActiveForm::end(); ?>

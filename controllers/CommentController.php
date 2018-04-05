@@ -6,6 +6,7 @@ use app\models\Project;
 use Yii;
 use app\models\Comment;
 use app\models\CommentSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -64,13 +65,13 @@ class CommentController extends DefaultController
         $model = new Comment();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $this->sendToTelegram(sprintf('User <b>%s</b> create new comment to issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
+            $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the new comment to issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                 Yii::$app->user->identity->username,
                 $model->getIssue()->one()->name,
                 Project::findOne(['id' => $model->getIssue()->one()->project_id])->name,
                 $model->text
             ));
-            return $this->redirect(['/issue/update', 'id' => $model->issue_id]);
+            return $this->redirect(Url::previous());
         }
 
         return $this->renderPartial('create', [
@@ -107,9 +108,17 @@ class CommentController extends DefaultController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        $this->sendToTelegram(sprintf('User <b>%s</b> DELETED the comment from issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
+            Yii::$app->user->identity->username,
+            $model->getIssue()->one()->name,
+            Project::findOne(['id' => $model->getIssue()->one()->project_id])->name,
+            $model->text
+        ));
 
-        return $this->redirect(['index']);
+        $model->delete();
+
+        return $this->redirect(Url::previous());
     }
 
     /**

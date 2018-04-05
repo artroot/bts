@@ -30,6 +30,15 @@ $model->user_id = Yii::$app->user->identity->getId();
             <span><?= $comment->getUser()->one()->username ?></span>
             <span> / </span>
             <span><?= $comment->create_date ?></span>
+            <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['comment/delete', 'id' => $comment->id], [
+                'style' => 'float: right;',
+                'class' => 'btn btn-link btn-xs',
+                'encodeLabels' => false,
+                'data' => [
+                    'confirm' => 'Are you sure you want to delete this comment?',
+                    'method' => 'post',
+                ],
+            ]) ?>
         </div>
         <div class="panel-body">
             <?= nl2br($comment->text) ?>
