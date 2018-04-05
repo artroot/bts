@@ -1,4 +1,21 @@
 @import url(site.css);
+@keyframes nav-logo-animation {
+  0% {
+    transform: rotate(0deg); }
+  25% {
+    transform: rotate(15deg); }
+  45% {
+    transform: rotate(-15deg); }
+  65% {
+    transform: rotate(10deg); }
+  85% {
+    transform: rotate(-10deg); }
+  90% {
+    transform: rotate(5deg); }
+  95% {
+    transform: rotate(-5deg); }
+  100% {
+    transform: rotate(0deg); } }
 div.graphic {
   min-width: 300px;
   min-height: 300px;
@@ -150,5 +167,8 @@ ol.issue-nav > li {
   color: #777;
   display: inline-block;
   font-size: smaller; }
+
+#koalaLogo:hover {
+  animation: 0.5s nav-logo-animation; }
 
 /*# sourceMappingURL=main.css.map */
