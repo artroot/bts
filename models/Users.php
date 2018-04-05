@@ -16,15 +16,15 @@ use Yii;
  * @property string $email
  * @property string $auth_key
  * @property int $status
- * @property string $created_at
- * @property string $updated_at
  * @property string $telegram_key
  * @property string $telegram_notify
  * @property string $mail_notify
+ * @property string $first_name
+ * @property string $last_name
  *
- * @property Task $task
- * @property Task[] $tasks
- * @property Taskviewer[] $taskviewers
+ * @property Issue $issue
+ * @property Issue[] $issues
+ * @property Observer[] $observers
  * @property Teamusers[] $teamusers
  * @property Usertype $usertype
  */
@@ -48,11 +48,11 @@ class Users extends \yii\db\ActiveRecord
     {
         return [
             [['usertype_id', 'status', 'telegram_notify', 'mail_notify'], 'integer'],
-            [['password_hash', 'password_reset_token', 'auth_key', 'new_password', 'conf_password'], 'string'],
+            [['password_hash', 'password_reset_token', 'auth_key', 'new_password', 'conf_password', 'first_name', 'last_name'], 'string'],
             [['status'], 'required'],
             [['new_password', 'conf_password'], 'required', 'on'=>'insert'],
             ['conf_password', 'compare', 'compareAttribute' => 'new_password', 'skipOnEmpty' => false, 'message'=>"Passwords don't match"],
-            [['created_at', 'updated_at', 'telegram_key'], 'safe'],
+            [['telegram_key'], 'safe'],
             [['username', 'email'], 'string', 'max' => 255],
             [['usertype_id'], 'exist', 'skipOnError' => true, 'targetClass' => Usertype::className(), 'targetAttribute' => ['usertype_id' => 'id']],
         ];
@@ -66,7 +66,7 @@ class Users extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'usertype_id' => 'Group',
-            'username' => 'Username',
+            'username' => 'Login',
             'new_password' => 'New Password',
             'conf_password' => 'Confirm Password',
             'password_hash' => 'Password Hash',
@@ -74,11 +74,11 @@ class Users extends \yii\db\ActiveRecord
             'email' => 'Email',
             'auth_key' => 'Auth Key',
             'status' => 'Status',
-            'created_at' => 'Created At',
-            'updated_at' => 'Updated At',
             'telegram_key' => 'Telegram Key',
             'telegram_notify' => 'Telegram Notify Support',
             'mail_notify' => 'Mail Notify Support',
+            'first_name' => 'First Name',
+            'last_name' => 'Last Name',
         ];
     }
 
@@ -86,25 +86,25 @@ class Users extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTask()
+    public function getIssue()
     {
-        return $this->hasOne(Task::className(), ['performer_id' => 'id']);
+        return $this->hasOne(Issue::className(), ['performer_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks()
+    public function getIssues()
     {
-        return $this->hasMany(Task::className(), ['owner_id' => 'id']);
+        return $this->hasMany(Issue::className(), ['owner_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTaskviewers()
+    public function getObservers()
     {
-        return $this->hasMany(Taskviewer::className(), ['user_id' => 'id']);
+        return $this->hasMany(Observer::className(), ['user_id' => 'id']);
     }
 
     /**

@@ -19,7 +19,7 @@ class UsersSearch extends Users
     {
         return [
             [['id', 'usertype_id', 'status'], 'integer'],
-            [['username', 'password', 'password_hash', 'password_reset_token', 'email', 'auth_key', 'created_at', 'updated_at'], 'safe'],
+            [['username', 'password', 'password_hash', 'password_reset_token', 'email', 'auth_key'], 'safe'],
         ];
     }
 
@@ -62,8 +62,6 @@ class UsersSearch extends Users
             'id' => $this->id,
             'usertype_id' => $this->usertype_id,
             'status' => $this->status,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ]);
 
         $query->andFilterWhere(['like', 'username', $this->username])
