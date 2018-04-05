@@ -31,9 +31,8 @@ AppAsset::register($this);
 <div class="wrap">
     <?php
 
-
         NavBar::begin([
-            'brandLabel' => Yii::$app->name . ' admin',
+            'brandLabel' => Yii::$app->params['logo']['small']  . ' ' . Yii::$app->name . ' admin',
             'brandUrl' => Yii::$app->homeUrl,
             'options' => [
                 'class' => 'navbar-inverse navbar-fixed-top',
