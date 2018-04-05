@@ -55,7 +55,7 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
                 <?php endif; ?>
             </h3>
             <ol class="issue-nav">
-                <li><?= sprintf('Created by (%s): %s', Users::findOne(['id' => $model->owner_id])->username ,$model->create_date) ?></li>
+                <li title="<?= Users::findOne(['id' => $model->owner_id])->username ?>"><?= sprintf('Created by %s: %s', Users::findOne(['id' => $model->owner_id])->first_name . ' ' . Users::findOne(['id' => $model->owner_id])->last_name ,$model->create_date) ?></li>
                 <li><?= sprintf('Resolved: %s', $model->finish_date) ?></li>
             </ol>
         </div>

@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 
     <div class="panel-heading">
         <span class="glyphicon glyphicon-comment"></span>
-        <span><?= Yii::$app->user->identity->username ?></span>
+        <span><?= Yii::$app->user->identity->first_name ?> <?= Yii::$app->user->identity->last_name ?></span>
     </div>
 
     <div class="comment-form panel-body">

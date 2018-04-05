@@ -27,7 +27,7 @@ $model->user_id = Yii::$app->user->identity->getId();
     <div class="panel panel-default">
         <div class="panel-heading">
             <span class="glyphicon glyphicon-comment"></span>
-            <span><?= $comment->getUser()->one()->username ?></span>
+            <span title="<?= $comment->getUser()->one()->username ?>"><?= $comment->getUser()->one()->first_name ?> <?= $comment->getUser()->one()->last_name ?></span>
             <span> / </span>
             <span><?= $comment->create_date ?></span>
             <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['comment/delete', 'id' => $comment->id], [
