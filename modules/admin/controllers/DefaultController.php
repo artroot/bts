@@ -2,6 +2,8 @@
 
 namespace app\modules\admin\controllers;
 
+use app\models\Users;
+use app\modules\admin\models\Telegram;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -62,5 +64,12 @@ class DefaultController extends Controller
     public function actionIndex()
     {
         return $this->render('index');
+    }
+
+    public function sendToTelegram($message)
+    {
+        foreach (Users::find()->where(['telegram_notify' => 1])->all() as $users){
+            if (!empty($users->telegram_key)) Telegram::sendMessage(base64_decode($users->telegram_key), $message);
+        }
     }
 }

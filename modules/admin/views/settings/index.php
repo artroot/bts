@@ -7,20 +7,20 @@ use yii\widgets\Pjax;
 
     $this->title = 'Settings';
 ?>
-<div class="settings-index shell">
+<div class="settings-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <div class="row">
-    <?php Pjax::begin(['id' => 'settings','enablePushState' => false]); ?>
-        <div class="col-md-3 left-nav hidden-xs">
+    <?php Pjax::begin(['id' => 'settings','enablePushState' => false, 'linkSelector' => 'a.list-group-item']); ?>
+        <div class="col-md-3">
             <div class="list-group">
-                <?= Html::a('Main', ['settings/main'], ['class' => sprintf('list-group-item %s', $active == 'main' ? 'active' : ''), 'data-pjax'=>1]) ?>
-                <?= Html::a('Notification', ['settings/notification'], ['class' => sprintf('list-group-item %s', $active == 'notification' ? 'active' : ''), 'data-pjax'=>1]) ?>
-                <?= Html::a('Users', ['settings/users'], ['class' => sprintf('list-group-item %s', $active == 'users' ? 'active' : ''), 'data-pjax'=>1]) ?>
+                <?= Html::a('Main', ['settings/main'], ['class' => sprintf('list-group-item %s', $active == 'main' ? 'active' : ''), 'data-pjax'=>'settings']) ?>
+                <?= Html::a('Notification', ['settings/notification'], ['class' => sprintf('list-group-item %s', $active == 'notification' ? 'active' : ''), 'data-pjax'=>'settings']) ?>
+                <?= Html::a('Users', ['settings/users'], ['class' => sprintf('list-group-item %s', $active == 'users' ? 'active' : ''), 'data-pjax'=>'settings']) ?>
             </div>
         </div>
-        <div class="col-md-9 right-container col-xs-12">
+        <div class="col-md-9">
             <?= @$data ?>
         </div>
     <?php Pjax::end(); ?>

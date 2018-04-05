@@ -11,8 +11,7 @@ use yii\widgets\ActiveForm;
 ?>
 
 <div class="users-form">
-
-    <?php $form = ActiveForm::begin(['id' => 'userForm', 'action' =>['/admin/users/update?id=' . $model->id]]); ?>
+    <?php $form = ActiveForm::begin(['id' => 'userForm', 'action' => @$action ? [$action] : ['/admin/users/update?id=' . $model->id]]); ?>
     <h4 id="mainSettings">Main</h4>
 
 

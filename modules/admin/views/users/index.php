@@ -17,7 +17,11 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Users', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(
+            'Create Users',
+            ['/settings/create'],
+            ['data-pjax' => 'userSettings', 'class' => 'user-settings btn btn-success']
+        ) ?>
     </p>
 
     <?= GridView::widget([
@@ -38,7 +42,16 @@ $this->params['breadcrumbs'][] = $this->title;
             //'created_at',
             //'updated_at',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'update' => function ($url, $model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-pencil"></span>',
+                            ['/settings/index', 'id' => $model->id],
+                            ['data-pjax' => 'userSettings', 'class' => 'user-settings']
+                        );
+                    },
+                ], 'template' => '{update} {delete}'],
         ],
     ]); ?>
     <?php Pjax::end(); ?>

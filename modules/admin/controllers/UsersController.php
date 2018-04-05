@@ -53,13 +53,39 @@ class UsersController extends DefaultController
     public function actionCreate()
     {
         $model = new Users();
+        //$model = User::findOne(['id' => $id]);
+        $old = $model->telegram_key;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())){
+            //$model->changePass();
+            //$model->setPassword($model->password);
+            //$model->generateAuthKey();
+            $model->status = User::STATUS_ACTIVE;
+            $model->password_hash = Yii::$app->security->generatePasswordHash($model->new_password);
+
+            if ($model->save()) {
+                if ($old != $model->telegram_key and !empty($model->telegram_key)){
+                    Telegram::sendMessage(base64_decode($model->telegram_key), 'Your bot has been successfully activated!');
+                    Telegram::sendMessage(base64_decode($model->telegram_key),
+                        'Show all projects list - /projectList');
+                }
+                $this->sendToTelegram(sprintf('Was ADDED the new <b>%s</b>: %s <i>(%s %s)</i>',
+                    $model->getUsertype()->one()->name,
+                    $model->username,
+                    $model->first_name,
+                    $model->last_name
+                ));
+                return $this->renderPartial('update', [
+                    'model' => $model,
+                    'msg' => 'Success!',
+                ]);
+            }
+
         }
-
-        return $this->render('create', [
+        print_r($model->errors);
+        return $this->renderAjax('create', [
             'model' => $model,
+            'action' => '/admin/users/create',
         ]);
     }
 
