@@ -115,4 +115,12 @@ class Issue extends ActiveRecord
     {
         return (new self())->find()->where($condition)->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => State::getState(State::IN_PROGRESS)->id]), 'id', 'id')]);
     }
+
+    /**
+     * @return Issuepriority
+     */
+    public function getPriority()
+    {
+        return $this->hasOne(Issuepriority::className(), ['id' => 'issuepriority_id'])->one();
+    }
 }

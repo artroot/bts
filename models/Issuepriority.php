@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property int $level
+ * @property int $color
  *
  * @property Issue[] $issues
  */
@@ -29,9 +30,10 @@ class Issuepriority extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['level'], 'required'],
+            [['level', 'name', 'color'], 'required'],
             [['level'], 'integer'],
             [['name'], 'string', 'max' => 255],
+            [['color'], 'string', 'max' => 7],
         ];
     }
 
@@ -44,6 +46,7 @@ class Issuepriority extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'level' => 'Level',
+            'color' => 'Color',
         ];
     }
 
