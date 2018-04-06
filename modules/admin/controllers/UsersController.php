@@ -62,6 +62,7 @@ class UsersController extends DefaultController
             //$model->generateAuthKey();
             $model->status = User::STATUS_ACTIVE;
             $model->password_hash = Yii::$app->security->generatePasswordHash($model->new_password);
+            $model->auth_key = Yii::$app->security->generateRandomString();
 
             if ($model->save()) {
                 if ($old != $model->telegram_key and !empty($model->telegram_key)){
