@@ -39,7 +39,7 @@ class IssueSearch extends Issue
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $conditions = [])
     {
         $query = Issue::find();
 
@@ -79,6 +79,10 @@ class IssueSearch extends Issue
 
         $query->andFilterWhere(['like', 'name', $this->name])
             ->andFilterWhere(['like', 'description', $this->description]);
+
+        if (!empty($conditions)){
+            foreach ($conditions as $condition) $query->andFilterWhere($condition);
+        }
 
         return $dataProvider;
     }

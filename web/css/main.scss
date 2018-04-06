@@ -126,3 +126,8 @@ ol.issue-nav > li {
 #koalaLogo:hover {
   animation: 0.5s nav-logo-animation;
 }
+
+#searchResult {
+  max-height: 300px;
+  overflow: auto;
+}

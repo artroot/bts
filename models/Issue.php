@@ -117,6 +117,14 @@ class Issue extends ActiveRecord
     }
 
     /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->hasOne(Project::className(), ['id' => 'project_id'])->one();
+    }
+
+    /**
      * @return Issuepriority
      */
     public function getPriority()
@@ -130,5 +138,18 @@ class Issue extends ActiveRecord
     public function getType()
     {
         return $this->hasOne(Issuetype::className(), ['id' => 'issuetype_id'])->one();
+    }
+
+    /**
+     * @return Issuestatus
+     */
+    public function getStatus()
+    {
+        return $this->hasOne(Issuestatus::className(), ['id' => 'issuestatus_id'])->one();
+    }
+
+    public function index()
+    {
+        return sprintf('#%s-%s', $this->getProject()->name, $this->id);
     }
 }

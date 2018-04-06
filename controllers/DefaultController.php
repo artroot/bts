@@ -29,7 +29,7 @@ class DefaultController extends Controller
                     ],
                     [
                         'actions' => ['logout', 'index', 'view', 'update', 'delete', 'create', 'get', 'graph', 'signup', 'draft',
-                        'new'],
+                        'new', 'search'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

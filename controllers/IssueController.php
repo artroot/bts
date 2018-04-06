@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\Issuestatus;
 use app\models\Project;
+use app\models\Relation;
+use app\models\State;
 use Yii;
 use app\models\Issue;
 use app\models\IssueSearch;
@@ -131,8 +133,9 @@ class IssueController extends DefaultController
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
                 $changes = "\r\n";
                 foreach ($model->attributeLabels() as $key => $value){
-                    //$changes .= 'Changed ' . $value . "\r\n" . $model->{$key}. ' - ' . $oldModel->{$key} . "\r\n";
-                    if (@$model->{$key} != @$oldModel->{$key}) $changes .= 'Changed ' . @$value . "\r\n" . @$model->{$key}. "\r\n";
+                    if (@$model->{$key} != @$oldModel->{$key}) {
+                        $changes .= 'Changed ' . @$value . "\r\n" . @$model->{$key}. "\r\n";
+                    }
                 }
                 $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" .'<code>%s</code>',
                     Yii::$app->user->identity->username,
@@ -166,12 +169,34 @@ class IssueController extends DefaultController
         $this->sendToTelegram(sprintf('User <b>%s</b> DELETED the issue <b>%s</b> in project: <b>%s</b>',
             Yii::$app->user->identity->username,
             $model->name,
-            Project::findOne(['id' => $model->project_id])->name
+            @Project::findOne(['id' => $model->project_id])->name
         ));
         $model->delete();
 
         return $this->redirect($redirectUrl);
     }
+
+    public function actionSearch()
+    {
+        //if (isset(Yii::$app->request->post()['search'])) {
+            $searchModel = new IssueSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams, [
+                ['!=', 'id', @Yii::$app->request->queryParams['issue_id']],
+                [
+                    'NOT IN', 'id', ArrayHelper::map(Relation::find()->where(['from_issue' => @Yii::$app->request->queryParams['issue_id']])->all(),'to_issue', 'to_issue')
+                ],
+                [
+                'in', 'issuestatus_id', ArrayHelper::map(Issuestatus::find()->where(['!=', 'state_id', State::DONE])->all(),'id', 'id')
+                ]
+            ]);
+
+            return $this->renderPartial('search_relation_index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider
+            ]);
+        //}
+    }
+    
 
     /**
      * Finds the Issue model based on its primary key value.
