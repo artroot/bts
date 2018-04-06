@@ -44,6 +44,7 @@ $issueName = Project::findOne(['id' => $model->project_id])->name . '-' . $model
             ]) ?>
             <h3>
                 <span class="badge text-uppercase" title="<?= @$model->getPriority()->name ?>" style="background-color: <?= @$model->getPriority()->color ?>;"><?= substr(@$model->getPriority()->name, 0, 1) ?></span>
+                <span class="badge"><?= @$model->getType()->name ?></span>
                 <?php if(Issuestatus::findOne(['id' => $model->issuestatus_id])->state_id == State::DONE): ?>
                        <span class="glyphicon glyphicon-ok text-success"></span>
                        <span class="text-muted">

@@ -123,4 +123,12 @@ class Issue extends ActiveRecord
     {
         return $this->hasOne(Issuepriority::className(), ['id' => 'issuepriority_id'])->one();
     }
+
+    /**
+     * @return Issuetype
+     */
+    public function getType()
+    {
+        return $this->hasOne(Issuetype::className(), ['id' => 'issuetype_id'])->one();
+    }
 }
