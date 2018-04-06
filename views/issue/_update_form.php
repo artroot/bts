@@ -34,19 +34,20 @@ use yii\widgets\Pjax;
     <div class="row">
         <?php $form = ActiveForm::begin(['id' => 'issueForm', 'action' => $action]); ?>
         <div class="col-md-12">
-            <a class="btn btn-default btn-xs" onclick="$('#issue_descr').toggle('fast'); $('#issue-name-s').toggle('fast');">
+            <a class="btn btn-default btn-xs" title="Edit Subject and Description" onclick="$('#issue_descr').toggle('fast'); $('#issue-name-s').toggle('fast');">
                 <span class="glyphicon glyphicon-edit"></span>
             </a>
             <?= Html::a('<span class="glyphicon glyphicon-trash"></span>', ['issue/delete', 'id' => $model->id], [
                 'class' => 'btn btn-default btn-xs',
                 'encodeLabels' => false,
+                'title' => 'Delete this Issue',
                 'data' => [
                     'confirm' => 'Are you sure you want to delete this issue?',
                     'method' => 'post',
                 ],
             ]) ?>
 
-            <a class="btn btn-default btn-xs"  data-toggle="modal" data-target="#associated">
+            <a class="btn btn-default btn-xs" title="Add Relations" data-toggle="modal" data-target="#associated">
                 <span class="glyphicon glyphicon-link"></span>
             </a>
 
@@ -82,13 +83,15 @@ use yii\widgets\Pjax;
             <?= $form->field($model, 'issuepriority_id', $template)->dropDownList(ArrayHelper::map(Issuepriority::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'issuetype_id', $template)->dropDownList(ArrayHelper::map(Issuetype::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'issuestatus_id', $template)->dropDownList(ArrayHelper::map(Issuestatus::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
-            <?= $form->field($model, 'performer_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', 'username'),
+            <?= $form->field($model, 'performer_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
+                    return $user->first_name . ' ' . $user->last_name;
+                }),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'detected_version_id', $template)->dropDownList(ArrayHelper::map(
                 Version::find()->where(['project_id' => $model->project_id])->all(), 'id', 'name'),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'resolved_version_id', $template)->dropDownList(ArrayHelper::map(
-                    Version::find()->where(['project_id' => $model->project_id])->all(), 'id', 'name'),
+                    Version::find()->where(['project_id' => $model->project_id])->all(), 'id', ['name']),
                     ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'sprint_id', $template)->dropDownList(ArrayHelper::map(
                 Sprint::find()->all(), 'id', 'name'),
@@ -117,7 +120,11 @@ use yii\widgets\Pjax;
         <div class="col-lg-9 col-sm-7 col-md-9 col-sm-pull-5 col-md-pull-3">
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments <span class="badge"><?= Comment::find()->where(['issue_id' => $model->id])->count() ?></span></a></li>
+                    <a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments
+                        <?php if ($commentsCount = Comment::find()->where(['issue_id' => $model->id])->count() and $commentsCount > 0): ?>
+                        <span class="badge"><?= $commentsCount ?></span>
+                        <?php endif; ?>
+                    </a></li>
                 <li role="presentation"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">Log</a></li>
                 <li role="presentation"><a href="#related_for" aria-controls="related_for" role="tab" data-toggle="tab">Related for
                         <?php if ($relatedForCount = Relation::find()->where(['to_issue' => $model->id])->count() and $relatedForCount > 0): ?>

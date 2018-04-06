@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Issue;
 use Yii;
 use app\models\Relation;
 use app\models\RelationSearch;
@@ -68,11 +69,23 @@ class RelationController extends DefaultController
         $model = new Relation();
 
         if ($model->load(Yii::$app->request->post())){
+            $relations = null;
+            $from_issueModel = Issue::findOne(['id' => $model->from_issue]);
             foreach ($model->to_issues as $to_issue){
-                $model = clone $model;
-                $model->to_issue = $to_issue;
-                $model->save();
+                $relation = new Relation();
+                $relation->load(Yii::$app->request->post());
+                $relation->to_issue = $to_issue;
+                $relation->save();
+                $to_issueModel = Issue::findOne(['id' => $relation->to_issue]);
+                $relations .= "\r\n" . ' <b>' . $to_issueModel->index() . '</b> <b>' . $to_issueModel->name . '</b>';
             }
+            $this->sendToTelegram(sprintf('User <b>%s</b> ADDED the new relations in issue: <b>%s</b> ASSOCIATED WITH: %s ' . "\r\n" . 'With comment: <i>%s</i>',
+                Yii::$app->user->identity->username,
+                @$from_issueModel->index() . ' ' . @$from_issueModel->name,
+                @$relations,
+                @$model->comment
+            ));
+
             return $this->redirect(Url::previous());
         }
 

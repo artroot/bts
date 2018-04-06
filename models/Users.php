@@ -49,7 +49,7 @@ class Users extends \yii\db\ActiveRecord
         return [
             [['usertype_id', 'status', 'telegram_notify', 'mail_notify'], 'integer'],
             [['password_hash', 'password_reset_token', 'auth_key', 'new_password', 'conf_password', 'first_name', 'last_name'], 'string'],
-            [['status'], 'required'],
+            [['status', 'first_name', 'last_name'], 'required'],
             [['new_password', 'conf_password'], 'required', 'on'=>'insert'],
             ['conf_password', 'compare', 'compareAttribute' => 'new_password', 'skipOnEmpty' => false, 'message'=>"Passwords don't match"],
             [['telegram_key'], 'safe'],

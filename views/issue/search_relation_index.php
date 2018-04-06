@@ -26,11 +26,10 @@ GridView::widget([
             }
         ],
         [
-            'label' => 'id',
+            'label' => 'Index',
             'content' => function ($model){
-                return sprintf('<label class="btn btn-link" for="select_issue_%s">%s</label>', $model->id , $model->index());
+                return sprintf('<label class="btn btn-link" for="select_issue_%s">%s %s</label>', $model->id , $model->index(), $model->name);
             }
-        ],
-        'name',
+        ]
     ],
 ]); ?>
