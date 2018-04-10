@@ -90,7 +90,8 @@ use app\assets\AppAsset;
                 $versionsList[] = '<li class="divider"></li>';
                 $versionsList[] = '<li>' .
                     Html::a('More...', ['project/view', 'id' => $query['project_id']], ['style' => 'display: inline-block;']) . '</li>';
-                $versionsList[] = ['label' => 'Create version', 'url' => Url::toRoute('version/create')];
+
+                $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => 'version-actions']) . '</li>';
 
                 return [
                     'label' => 'Version',
@@ -150,6 +151,10 @@ use app\assets\AppAsset;
 
     <?php Pjax::begin(['enablePushState' => false, 'id' => 'userSettings', 'linkSelector'=>'a.user-settings']); ?>
     <?php Pjax::end(); ?>
+
+    <?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'a.version-actions']); ?>
+    <?php Pjax::end(); ?>
+
 
 </div>
 

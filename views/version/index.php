@@ -93,8 +93,5 @@
 
 </div>
 
-<?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'a.version-actions']); ?>
-
-<?php Pjax::end(); ?>
 
 

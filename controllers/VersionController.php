@@ -128,7 +128,7 @@ class VersionController extends DefaultController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate($project_id)
+    public function actionCreate($project_id = null)
     {
         $model = new Version();
 
