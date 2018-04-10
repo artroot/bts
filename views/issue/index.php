@@ -37,7 +37,7 @@ $this->title = 'Issues';
                 'label' => 'ID',
                 'content' => function($model){
                     $index = $model->isDone() ? sprintf('<s>%s</s>', $model->index()) : $model->index();
-                    return  Html::a($index, ['issue/update', 'id' => $model->id]);
+                    return  Html::a($index, ['issue/update', 'id' => $model->id], ['class' => $model->isDone() ? 'text-muted' : '']);
                 },
                 'contentOptions' => ['style' => 'min-width:150px;'],
             ],
