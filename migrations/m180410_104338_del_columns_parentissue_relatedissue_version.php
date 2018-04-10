@@ -12,6 +12,9 @@ class m180410_104338_del_columns_parentissue_relatedissue_version extends Migrat
      */
     public function safeUp()
     {
+        $this->dropForeignKey('task_fk4', 'issue');
+        $this->dropForeignKey('task_fk9', 'issue');
+        $this->dropForeignKey('task_fk10', 'issue');
         $this->dropColumn('issue', 'version_id');
         $this->dropColumn('issue', 'parentissue_id');
         $this->dropColumn('issue', 'relatedissue_id');

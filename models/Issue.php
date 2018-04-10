@@ -46,7 +46,7 @@ class Issue extends ActiveRecord
             [['description'], 'string'],
             [['create_date', 'finish_date', 'deadline'], 'safe'],
             [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id'], 'integer'],
-            [['owner_id', 'project_id'], 'required'],
+            [['owner_id', 'project_id', 'detected_version_id', 'resolved_version_id'], 'required'],
             [['name'], 'string', 'max' => 255]
         ];
     }

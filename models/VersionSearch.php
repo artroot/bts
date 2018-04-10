@@ -20,7 +20,7 @@ class VersionSearch extends Version
     {
         return [
             [['id', 'project_id'], 'integer'],
-            [['name', 'description', 'create_date', 'finish_date'], 'safe'],
+            [['name', 'description', 'start_date', 'finish_date'], 'safe'],
         ];
     }
 
@@ -62,7 +62,7 @@ class VersionSearch extends Version
         $query->andFilterWhere([
             'id' => $this->id,
             'project_id' => $this->project_id,
-            'create_date' => $this->create_date,
+            'start_date' => $this->start_date,
             'finish_date' => $this->finish_date,
         ]);
 

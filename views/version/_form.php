@@ -19,7 +19,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'create_date')->textInput() ?>
+    <?= $form->field($model, 'start_date')->textInput() ?>
 
     <?= $form->field($model, 'finish_date')->textInput() ?>
 

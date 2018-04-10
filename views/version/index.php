@@ -48,7 +48,7 @@
 				},
 				'filter' => $searchModel
 			],
-			'create_date',
+			'start_date',
 			'finish_date',
 			'description:ntext',
 
