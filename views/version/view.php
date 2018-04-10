@@ -40,7 +40,9 @@ $this->params['breadcrumbs'][] = $this->title;*/
 <div class="version-view">
 
     <h3><?= $model->getStatusIcon() ?> <?= Html::encode($this->title) ?> <span class="label label-warning text-uppercase" style="    font-size: x-small;
-    vertical-align: middle;"><?= $model->status ? 'released' : 'unreleased' ?></span></h3>
+    vertical-align: middle;"><?= $model->status ? 'released' : 'unreleased' ?></span>
+    <?= Html::a(($model->status == 0 ? 'RELEASE' : 'UNRELEASED'), ['version/' . ($model->status == 0 ? 'release' : 'unrelease'), 'id' => $model->id],['class' => 'btn btn-danger', 'style' => 'float: right;']) ?>
+    </h3>
 
     <div>
         <div class="progress">

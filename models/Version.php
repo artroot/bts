@@ -17,6 +17,9 @@ use Yii;
  */
 class Version extends \yii\db\ActiveRecord
 {
+    const RELEASED = 1;
+    const UNRELEASED = 0;
+
     /**
      * @inheritdoc
      */

@@ -77,6 +77,7 @@ class VersionController extends DefaultController
      */
     public function actionView($id)
     {
+        Url::remember();
         $searchModel = new IssueSearch();
         $searchModel->resolved_version_id = $id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
@@ -88,6 +89,38 @@ class VersionController extends DefaultController
                 'dataProvider' => $dataProvider
             ])
         ]);
+    }
+    
+    public function actionRelease($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = Version::RELEASED;
+        $model->finish_date = date('Y-m-d H:i:s');
+        $model->save();
+
+        $this->sendToTelegram(sprintf('User %s <b>RELEASED</b> version <b>%s</b> in project <b>%s</b>',
+            Yii::$app->user->identity->username,
+            $model->name,
+            Project::findOne(['id' => $model->project_id])->name
+        ));
+
+        return $this->redirect(Url::previous());
+    }
+
+    public function actionUnrelease($id)
+    {
+        $model = $this->findModel($id);
+        $model->status = Version::UNRELEASED;
+        $model->finish_date = null;
+        $model->save();
+
+        $this->sendToTelegram(sprintf('User %s <b>UNRELEASED</b> version <b>%s</b> in project <b>%s</b>',
+            Yii::$app->user->identity->username,
+            $model->name,
+            Project::findOne(['id' => $model->project_id])->name
+        ));
+
+        return $this->redirect(Url::previous());
     }
 
     /**

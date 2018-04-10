@@ -18,7 +18,7 @@ class IssueSearch extends Issue
     public function rules()
     {
         return [
-            [['id', 'project_id', 'issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
+            [['id', 'project_id', 'issuetype_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id'], 'integer'],
             [['name', 'description', 'create_date', 'finish_date', 'deadline'], 'safe'],
         ];
     }
@@ -67,14 +67,11 @@ class IssueSearch extends Issue
             'issuepriority_id' => $this->issuepriority_id,
             'issuestatus_id' => $this->issuestatus_id,
             'sprint_id' => $this->sprint_id,
-            'version_id' => $this->version_id,
             'resolved_version_id' => $this->resolved_version_id,
             'detected_version_id' => $this->detected_version_id,
             'performer_id' => $this->performer_id,
             'owner_id' => $this->owner_id,
             'project_id' => $this->project_id,
-            'parentissue_id' => $this->parentissue_id,
-            'relatedissue_id' => $this->relatedissue_id,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name])

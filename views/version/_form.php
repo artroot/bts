@@ -11,17 +11,14 @@ use yii\widgets\ActiveForm;
 <div class="version-form">
 
     <?php $form = ActiveForm::begin(['id' => 'versionForm']); ?>
-
-
-    <?= $form->field($model, 'status')->checkbox() ?>
-
+    
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'start_date')->textInput() ?>
+    <?= $form->field($model, 'start_date')->input('datetime-local') ?>
 
-    <?= $form->field($model, 'finish_date')->textInput() ?>
+    <?= $form->field($model, 'finish_date')->input('datetime-local') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
