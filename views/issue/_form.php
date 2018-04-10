@@ -55,33 +55,7 @@
             </table>
         </div>
     </div>
-
-
-
-    <?= $form->field($model, 'create_date')->textInput() ?>
-
-    <?= $form->field($model, 'finish_date')->textInput() ?>
-
-
-
-
-
-
-    <?= $form->field($model, 'version_id')->textInput() ?>
-
-
-
-
-
-
-
-
-    <?= $form->field($model, 'parentissue_id')->textInput() ?>
-
-    <?= $form->field($model, 'relatedissue_id')->textInput() ?>
-
-
-
+    
     <?php ActiveForm::end(); ?>
 
 

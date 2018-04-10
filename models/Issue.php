@@ -20,13 +20,10 @@ use yii\helpers\ArrayHelper;
  * @property int $issuepriority_id
  * @property int $issuestatus_id
  * @property int $sprint_id
- * @property int $version_id
  * @property int $resolved_version_id
  * @property int $detected_version_id
  * @property int $performer_id
  * @property int $owner_id
- * @property int $parentissue_id
- * @property int $relatedissue_id
  * @property int $project_id
  */
 class Issue extends ActiveRecord
@@ -48,7 +45,7 @@ class Issue extends ActiveRecord
         return [
             [['description'], 'string'],
             [['create_date', 'finish_date', 'deadline'], 'safe'],
-            [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'version_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'parentissue_id', 'relatedissue_id'], 'integer'],
+            [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id'], 'integer'],
             [['owner_id', 'project_id'], 'required'],
             [['name'], 'string', 'max' => 255]
         ];
@@ -70,13 +67,10 @@ class Issue extends ActiveRecord
             'issuepriority_id' => 'Priority',
             'issuestatus_id' => 'State',
             'sprint_id' => 'Sprint',
-            'version_id' => 'Version',
             'resolved_version_id' => 'Resolved Version',
             'detected_version_id' => 'Detected Version',
             'performer_id' => 'Performer',
             'owner_id' => 'Owner ID',
-            'parentissue_id' => 'ParentIssue ID',
-            'relatedissue_id' => 'RelatedIssue ID',
             'project_id' => 'Project',
         ];
     }
