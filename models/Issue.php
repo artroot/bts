@@ -60,8 +60,8 @@ class Issue extends ActiveRecord
             'id' => 'ID',
             'name' => 'Subject',
             'description' => 'Description',
-            'create_date' => 'Create Date',
-            'finish_date' => 'Finish Date',
+            'create_date' => 'Created',
+            'finish_date' => 'Finished',
             'deadline' => 'Deadline',
             'issuetype_id' => 'Type',
             'issuepriority_id' => 'Priority',
@@ -142,8 +142,13 @@ class Issue extends ActiveRecord
         return $this->hasOne(Issuestatus::className(), ['id' => 'issuestatus_id'])->one();
     }
 
+    public function isDone()
+    {
+        return Issuestatus::findOne(['id' => $this->issuestatus_id])->state_id == State::DONE;
+    }
+
     public function index()
     {
-        return sprintf('#%s-%s', $this->getProject()->name, $this->id);
+        return sprintf('#%s-%s', @$this->getProject()->name, @$this->id);
     }
 }
