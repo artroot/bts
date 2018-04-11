@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Project;
 use Yii;
 use app\models\Sprint;
 use app\models\SprintSearch;
@@ -56,9 +57,27 @@ class SprintController extends DefaultController
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
+        $model->project_id = Project::find()->one()->id;
+
         return $this->render('create', [
             'model' => $model,
+            'action' => '/sprint/draft'
         ]);
+    }
+
+    /**
+     * Creates a new Sprint model.
+     * @return mixed
+     */
+    public function actionDraft()
+    {
+        $model = new Sprint();
+
+        $model->load(Yii::$app->request->post());
+            return $this->renderPartial('_form', [
+                'model' => $model,
+                'action' => '/sprint/draft'
+            ]);
     }
 
     /**

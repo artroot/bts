@@ -56,6 +56,15 @@ class Version extends \yii\db\ActiveRecord
             'status' => 'Status',
         ];
     }
+
+
+    /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->hasOne(Project::className(), ['id' => 'project_id'])->one();
+    }
     
     public function getStatusIcon()
     {

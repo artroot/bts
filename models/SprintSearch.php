@@ -18,8 +18,8 @@ class SprintSearch extends Sprint
     public function rules()
     {
         return [
-            [['id', 'version_id'], 'integer'],
-            [['name'], 'safe'],
+            [['id', 'version_id', 'project_id'], 'integer'],
+            [['name', 'start_date', 'finish_date'], 'safe'],
         ];
     }
 
@@ -61,6 +61,9 @@ class SprintSearch extends Sprint
         $query->andFilterWhere([
             'id' => $this->id,
             'version_id' => $this->version_id,
+            'project_id' => $this->project_id,
+            'start_date' => $this->start_date,
+            'finish_date' => $this->finish_date,
         ]);
 
         $query->andFilterWhere(['like', 'name', $this->name]);

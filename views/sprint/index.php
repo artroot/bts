@@ -26,9 +26,23 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
 
-            'id',
+            //'id',
+            [
+                'label' => 'ID',
+                'content' => function ($model){
+                    return $model->index();
+                }
+            ],
+            [
+                'label' => 'Project',
+                'content' => function ($model){
+                    return @$model->getProject()->name;
+                }
+            ],
             'name',
             'version_id',
+            'start_date',
+            'finish_date',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

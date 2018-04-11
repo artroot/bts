@@ -10,9 +10,13 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property int $version_id
+ * @property string $start_date
+ * @property string $finish_date
+ * @property int $project_id
+ * @property boolean $status
  *
  * @property Version $version
- * @property Task[] $tasks
+ * @property Issue[] $issues
  */
 class Sprint extends \yii\db\ActiveRecord
 {
@@ -30,8 +34,10 @@ class Sprint extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['version_id'], 'integer'],
+            [['version_id', 'project_id', 'status'], 'integer'],
             [['name'], 'string', 'max' => 255],
+            [['start_date', 'finish_date'], 'string'],
+            [['start_date', 'finish_date', 'project_id'], 'required'],
             [['version_id'], 'exist', 'skipOnError' => true, 'targetClass' => Version::className(), 'targetAttribute' => ['version_id' => 'id']],
         ];
     }
@@ -44,23 +50,43 @@ class Sprint extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'version_id' => 'Version ID',
+            'version_id' => 'Version',
+            'project_id' => 'Project',
+            'start_date' => 'Start Date',
+            'finish_date' => 'Finish Date',
+            'status' => 'Status',
         ];
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return Version
      */
     public function getVersion()
     {
-        return $this->hasOne(Version::className(), ['id' => 'version_id']);
+        return $this->hasOne(Version::className(), ['id' => 'version_id'])->one();
+    }
+
+    /**
+     * @return Project
+     */
+    public function getProject()
+    {
+        return $this->hasOne(Version::className(), ['id' => 'version_id'])->one();
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks()
+    public function getIssues()
     {
-        return $this->hasMany(Task::className(), ['sprint_id' => 'id']);
+        return $this->hasMany(Issue::className(), ['sprint_id' => 'id']);
+    }
+
+    /**
+     * @return string
+     */
+    public function index()
+    {
+        return $this->status ? sprintf('<s>Sprint-%d</s>', $this->id) : sprintf('Sprint-%d', $this->id);
     }
 }
