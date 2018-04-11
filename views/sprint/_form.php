@@ -4,8 +4,13 @@ use app\models\Project;
 use app\models\Version;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\web\JqueryAsset;
 use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
+
+
+app\assets\AppAsset::register($this);
+
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Sprint */
@@ -35,11 +40,21 @@ use yii\widgets\Pjax;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'data-pjax' => false]) ?>
 
-    <?= $form->field($model, 'start_date')->input('datetime-local', ['class' => 'form-control', 'data-pjax' => false]) ?>
-    <?= $form->field($model, 'finish_date')->input('datetime-local', ['class' => 'form-control', 'data-pjax' => false]) ?>
+    <?= $form->field($model, 'start_date')->textInput(['data-pjax' => false]) ?>
+    <?= $form->field($model, 'finish_date')->textInput(['data-pjax' => false]) ?>
+
+
+    <script>
+        $(document).ready(function () {
+            $(['#sprint-start_date', '#sprint-finish_date']).datetimepicker({
+                datepicker:true,
+                format:'Y-m-d H:i'
+            });
+        });
+    </script>
 
     <div class="form-group">
-        <?= Html::button('Save', ['class' => 'btn btn-success', 'onclick' => '$(\'#sprintForm\').attr(\'action\', \'/sprint/create\').submit();']) ?>
+        <?= Html::button('Save', ['class' => 'btn btn-success', 'onclick' => '$(\'#sprintForm\').attr(\'action\', \'/sprint/update?id=' . $model->id . '\').submit();']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

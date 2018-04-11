@@ -21,10 +21,14 @@ use yii\widgets\Pjax;
 /* @var $this yii\web\View */
 /* @var $model app\models\Issue */
 /* @var $form yii\widgets\ActiveForm */
+/*
+$this->registerJsFile('/assets/f514d8f4/jquery.js', ['position' => \yii\web\View::POS_HEAD]);
+*/
 
-
+app\assets\AppAsset::register($this);
 
 ?>
+
 <br>
 <div class="issue-form">
 
@@ -97,10 +101,17 @@ use yii\widgets\Pjax;
                 Sprint::find()->all(), 'id', 'name'),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
 
-            <?= $form->field($model, 'deadline', [
-                    'template' => "<tr><td>{label}</td><td></td></tr><tr><td colspan='2'>{input}\n{hint}\n{error}</td></tr>"
-                ])->input('datetime-local', ['style' => 'font-size: x-small;']) ?>
+                <?= $form->field($model, 'deadline', $template)->textInput() ?>
             </table>
+
+                <script>
+                    $(document).ready(function () {
+                        $('#issue-deadline').datetimepicker({
+                            datepicker:true,
+                            format:'Y-m-d H:i'
+                        });
+                    });
+                </script>
             </div>
         </div>
 
@@ -140,19 +151,19 @@ use yii\widgets\Pjax;
             <!-- Tab panes -->
             <div class="tab-content">
                 <div role="tabpanel" class="tab-pane active" id="comments">
-                    <?= $this->renderAjax('@app/views/comment/index', [
+                    <?= $this->render('@app/views/comment/index', [
                         'issue_id' => $model->id
                     ]) ?>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="log">...</div>
                 <div role="tabpanel" class="tab-pane" id="related_for">
-                    <?= $this->renderAjax('@app/views/relation/index_related_for', [
+                    <?= $this->render('@app/views/relation/index_related_for', [
                         'searchModel' => $searchModelRelatedFor = new RelationSearch(),
                         'dataProvider' => $searchModelRelatedFor->search(['RelationSearch' => ['to_issue' => $model->id], '_pjax' => '#w_related_for']),
                     ]) ?>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="associated_with">
-                    <?= $this->renderAjax('@app/views/relation/index_associated_with', [
+                    <?= $this->render('@app/views/relation/index_associated_with', [
                         'searchModel' => $searchModelAssociatedWith = new RelationSearch(),
                         'dataProvider' => $searchModelAssociatedWith->search(['RelationSearch' => ['from_issue' => $model->id], '_pjax' => '#w_associated_with']),
                     ]) ?>

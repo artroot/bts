@@ -69,14 +69,14 @@ class SprintController extends DefaultController
      * Creates a new Sprint model.
      * @return mixed
      */
-    public function actionDraft()
+    public function actionDraft($id = false)
     {
-        $model = new Sprint();
+        $model = $id ? $this->findModel($id) : new Sprint();
 
         $model->load(Yii::$app->request->post());
             return $this->renderPartial('_form', [
                 'model' => $model,
-                'action' => '/sprint/draft'
+                'action' => '/sprint/draft' . ($id ? '?id=' . $id : '')
             ]);
     }
 
@@ -97,6 +97,7 @@ class SprintController extends DefaultController
 
         return $this->render('update', [
             'model' => $model,
+            'action' => '/sprint/draft?id=' . $id
         ]);
     }
 

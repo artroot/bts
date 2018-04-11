@@ -12,10 +12,15 @@
     use yii\jui\DatePicker;
     use yii\widgets\ActiveForm;
 
+
+
+app\assets\AppAsset::register($this);
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Issue */
 /* @var $form yii\widgets\ActiveForm */
 ?>
+
 <br>
 <div class="issue-form">
 
@@ -51,7 +56,19 @@
                 Sprint::find()->all(), 'id', 'name'),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
 
-            <?= $form->field($model, 'deadline', $template)->input('datetime-local') ?>
+            <?= $form->field($model, 'deadline', $template)->textInput() ?>
+                <script>
+                    $(document).ready(function () {
+                        $('#issue-deadline').datetimepicker({
+                            datepicker:true,
+                            format:'Y-m-d H:i',
+                            onSelectDate: function(data, item){
+                                $(item.closest("form")).submit();
+                            }
+                        });
+                    });
+                </script>
+
             </table>
         </div>
     </div>

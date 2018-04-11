@@ -131,18 +131,20 @@ class IssueController extends DefaultController
             $oldModel = clone $model;
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
-                $changes = "\r\n";
+                $changes = null;
                 foreach ($model->attributeLabels() as $key => $value){
                     if (@$model->{$key} != @$oldModel->{$key}) {
-                        $changes .= 'Changed ' . @$value . "\r\n" . @$model->{$key}. "\r\n";
+                        $changes .= "\r\n" . 'Changed ' . @$value . "\r\n" . @$model->{$key};
                     }
                 }
-                $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" .'<code>%s</code>',
-                    Yii::$app->user->identity->username,
-                    $model->name,
-                    Project::findOne(['id' => @$model->project_id])->name,
-                    $changes
-                ));
+                if (!empty($changes)) {
+                    $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
+                        Yii::$app->user->identity->username,
+                        $model->name,
+                        Project::findOne(['id' => @$model->project_id])->name,
+                        $changes
+                    ));
+                }
                 return $this->renderPartial('_update_form', [
                     'model' => $model,
                     'action' => '/issue/update?id=' . $id

@@ -16,7 +16,6 @@ use yii\bootstrap\NavBar;
 use app\assets\AppAsset;
     use yii\widgets\Pjax;
 
-    AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
@@ -28,7 +27,6 @@ use app\assets\AppAsset;
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 </head>
 <body>
 <?php $this->beginBody() ?>
@@ -91,7 +89,7 @@ use app\assets\AppAsset;
                 $versionsList[] = '<li>' .
                     Html::a('More...', ['project/view', 'id' => $query['project_id']], ['style' => 'display: inline-block;']) . '</li>';
 
-                $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => 'version-actions']) . '</li>';
+                $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => '']) . '</li>';
 
                 return [
                     'label' => 'Version',
