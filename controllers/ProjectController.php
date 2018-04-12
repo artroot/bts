@@ -9,6 +9,7 @@ use Yii;
 use app\models\Project;
 use app\models\ProjectSearch;
 use yii\base\View;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -53,6 +54,8 @@ class ProjectController extends DefaultController
      */
     public function actionView($id)
     {
+        Url::remember();
+
         $model = $this->findModel($id);
 
         $searchModel = new VersionSearch();

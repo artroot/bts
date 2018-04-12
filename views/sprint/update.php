@@ -1,5 +1,6 @@
 <?php
 
+use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
@@ -10,14 +11,31 @@ $this->title = 'Update ' . $model->index();
 ?>
 <div class="sprint-update">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <?php
+    Modal::begin([
+        'header' => '<h1>'. Html::encode($this->title) .'</h1>',
+        'id' => 'sprintFormModal',
+        'size' => 'modal-lg',
+        'clientOptions' => ['backdrop' => 'static', 'keyboard' => FALSE]
+    ]); ?>
 
     <div id="sprintMainForm">
         <?= $this->render('_form', [
             'model' => $model,
-            'action' => $action
+            'action' => $action,
+            'disableProjectAndVersion' => $disableProjectAndVersion
         ]) ?>
     </div>
+
+    <div class="form-group">
+        <?= Html::button('Save', ['class' => 'btn btn-success', 'onclick' => '$(\'#sprintForm\').attr(\'action\', \'/sprint/update?id=' . $model->id . '\').submit();']) ?>
+    </div>
+
+    <?php Modal::end(); ?>
+
+    <script>
+        $('#sprintFormModal').modal('show');
+    </script>
 </div>
 <?php
 Pjax::widget([

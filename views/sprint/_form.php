@@ -21,6 +21,14 @@ app\assets\AppAsset::register($this);
 
     <?php $form = ActiveForm::begin(['id' => 'sprintForm', 'action' => @$action]); ?>
 
+    <?php if ($disableProjectAndVersion): ?>
+
+        <label>Project</label>
+        <p class="form-control disabled"><?= @$model->getProject()->name ?></p>
+        <label>Version</label>
+        <p class="form-control disabled"><?= @$model->getVersion()->name ?></p>
+
+    <?php else: ?>
     <?= $form->field($model, 'project_id')->dropDownList(ArrayHelper::map(Project::find()->all(), 'id', 'name')) ?>
 
     <?=
@@ -37,7 +45,7 @@ app\assets\AppAsset::register($this);
         ,['prompt' => 'Not set', 'data-pjax' => false]
     )
     ?>
-
+    <?php endif; ?>
     <?= $form->field($model, 'name')->textInput(['maxlength' => true, 'data-pjax' => false]) ?>
 
     <?= $form->field($model, 'start_date')->textInput(['data-pjax' => false]) ?>
@@ -52,10 +60,6 @@ app\assets\AppAsset::register($this);
             });
         });
     </script>
-
-    <div class="form-group">
-        <?= Html::button('Save', ['class' => 'btn btn-success', 'onclick' => '$(\'#sprintForm\').attr(\'action\', \'/sprint/update?id=' . $model->id . '\').submit();']) ?>
-    </div>
 
     <?php ActiveForm::end(); ?>
 

@@ -3,7 +3,9 @@
 use app\components\SVG;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\DetailView;
+
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Sprint */
@@ -15,6 +17,7 @@ $this->title = $model->index() . ' ' . $model->name;
 ?>
 <div class="sprint-view">
 
+    <h3><?= Html::a(@$model->getProject()->name, ['project/view', 'id' => $model->project_id], ['class' => 'ext-muted']) ?></h3>
     <h2><?= Html::encode($this->title) ?></h2>
     <?php if($model->version_id): ?>
        //
@@ -31,6 +34,7 @@ $this->title = $model->index() . ' ' . $model->name;
         </div>
     </div>
 
+    <?php if ($model->getIssues()->count() > 0): ?>
     <div>
         <h3><center>BurnDown Diagram</center></h3>
         <?= $this->render('graph', [
@@ -45,6 +49,7 @@ $this->title = $model->index() . ' ' . $model->name;
     </div>
     <br>
     <br>
+    <?php endif; ?>
     <h3><center>Issues Desk</center></h3>
     <table class="table table-striped table-bordered">
         <thead>

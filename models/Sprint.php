@@ -71,7 +71,7 @@ class Sprint extends \yii\db\ActiveRecord
      */
     public function getProject()
     {
-        return $this->hasOne(Version::className(), ['id' => 'version_id'])->one();
+        return $this->hasOne(Project::className(), ['id' => 'project_id'])->one();
     }
 
     /**
@@ -84,7 +84,6 @@ class Sprint extends \yii\db\ActiveRecord
 
     public function getProgress()
     {
-
         do{
             if (!isset($date)) $date = (new \DateTime($this->start_date));
 
@@ -105,7 +104,7 @@ class Sprint extends \yii\db\ActiveRecord
 
     public function getCompleteProgressPercent()
     {
-        return ($this->getIssues()->where(['!=', 'finish_date', ''])->count())*100/($this->getIssues()->count());
+        return $this->getIssues()->count() > 0 ? ($this->getIssues()->where(['!=', 'finish_date', ''])->count())*100/($this->getIssues()->count()) : 0;
     }
 
     public function getDaysRemaining()

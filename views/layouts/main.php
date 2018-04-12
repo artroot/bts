@@ -62,7 +62,8 @@ app\assets\AppAsset::register($this);
                 $sprintList[] = ['label' => $sprint->index() . ' ' . $sprint->name, 'url' => ['sprint/view', 'id' => $sprint->id]];
             }
             $sprintList[] = '<li class="divider"></li>';
-            $sprintList[] = ['label' => 'Create sprint', 'url' => Url::toRoute('sprint/create')];
+            $sprintList[] = '<li>' . Html::a('Create sprint', ['sprint/create'], ['data-pjax' => 'sprints', 'class' => 'sprint-actions']) . '</li>';
+            //$sprintList[] = ['label' => 'Create sprint', 'url' => Url::toRoute('sprint/create'), 'class' => 'sprint-actions'];
 
             return $sprintList;
         };
@@ -106,7 +107,7 @@ app\assets\AppAsset::register($this);
                 $versionsList[] = '<li>' .
                     Html::a('More...', ['project/view', 'id' => $query['project_id']], ['style' => 'display: inline-block;']) . '</li>';
 
-                $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => '']) . '</li>';
+                $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => 'version-actions']) . '</li>';
 
                 return [
                     'label' => 'Version',
@@ -167,7 +168,10 @@ app\assets\AppAsset::register($this);
     <?php Pjax::begin(['enablePushState' => false, 'id' => 'userSettings', 'linkSelector'=>'a.user-settings']); ?>
     <?php Pjax::end(); ?>
 
-    <?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'a.version-actions']); ?>
+    <?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'.version-actions']); ?>
+    <?php Pjax::end(); ?>
+
+    <?php Pjax::begin(['enablePushState' => false, 'id' => 'sprints', 'linkSelector'=>'.sprint-actions']); ?>
     <?php Pjax::end(); ?>
 
 

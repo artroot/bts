@@ -13,6 +13,7 @@ use yii\helpers\Html;
         'version' => 'Versions',
         'task' => 'Tasks',
         'team' => 'Team',
+        'sprint' => 'Sprint'
     ];
 
 /*$this->title = $model->name;

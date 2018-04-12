@@ -2,10 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\Issue;
 use app\models\Project;
+use app\models\Version;
 use Yii;
 use app\models\Sprint;
 use app\models\SprintSearch;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -20,12 +23,13 @@ class SprintController extends DefaultController
      * Lists all Sprint models.
      * @return mixed
      */
-    public function actionIndex()
+    public function actionIndex($project_id)
     {
         $searchModel = new SprintSearch();
+        $searchModel->project_id = $project_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        return $this->render('index', [
+        return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -46,7 +50,7 @@ class SprintController extends DefaultController
         foreach ($model->getIssues()->all() as $issue){
             $sprintIssues[$issue->getStatus()->name][] = $issue;
         }
-
+        
         return $this->render('view', [
             'model' => $model,
             'sprintIssues' => $sprintIssues
@@ -63,14 +67,31 @@ class SprintController extends DefaultController
         $model = new Sprint();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            if ($model->version_id){
+                foreach (Issue::find()->where(['resolved_version_id' => $model->version_id])->all() as $issueModel){
+                    $issueModel->sprint_id = $model->id;
+                    $issueModel->save(false);
+                }
+            }
+
+            $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the <b>%s</b> in project <b>%s</b>' . "\r\n" . '<code>%s</code>' . "\r\n" . 'Link: %s',
+                Yii::$app->user->identity->username,
+                $model->index(),
+                $model->getProject()->name,
+                $model->name,
+                Url::to(['/sprint/view', 'id' => $model->id], true)
+            ));
+            
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
         $model->project_id = Project::find()->one()->id;
 
-        return $this->render('create', [
+        return $this->renderAjax('create', [
             'model' => $model,
-            'action' => '/sprint/draft'
+            'action' => '/sprint/draft',
+            'disableProjectAndVersion' => false
         ]);
     }
 
@@ -85,7 +106,8 @@ class SprintController extends DefaultController
         $model->load(Yii::$app->request->post());
             return $this->renderPartial('_form', [
                 'model' => $model,
-                'action' => '/sprint/draft' . ($id ? '?id=' . $id : '')
+                'action' => '/sprint/draft' . ($id ? '?id=' . $id : ''),
+                'disableProjectAndVersion' => false
             ]);
     }
 
@@ -104,9 +126,10 @@ class SprintController extends DefaultController
             return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->render('update', [
+        return $this->renderAjax('update', [
             'model' => $model,
-            'action' => '/sprint/draft?id=' . $id
+            'action' => '/sprint/draft?id=' . $id,
+            'disableProjectAndVersion' => true
         ]);
     }
 
@@ -119,9 +142,14 @@ class SprintController extends DefaultController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        foreach (Issue::find()->where(['sprint_id' => $id])->all() as $issueModel) {
+            $issueModel->sprint_id = null;
+            $issueModel->save(false);
+        }
 
-        return $this->redirect(['index']);
+        if($this->findModel($id)->delete())
+
+        return $this->redirect(Url::previous());
     }
 
     /**

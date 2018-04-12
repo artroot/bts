@@ -17,26 +17,17 @@ $this->params['breadcrumbs'][] = $this->title;
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <p>
-        <?= Html::a('Create Sprint', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Sprint', ['create'], ['class' => 'btn btn-success sprint-actions']) ?>
     </p>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            //'id',
             [
                 'label' => 'ID',
                 'content' => function ($model){
-                    return $model->index();
-                }
-            ],
-            [
-                'label' => 'Project',
-                'content' => function ($model){
-                    return @$model->getProject()->name;
+                    return Html::a($model->index(), ['sprint/view', 'id' => $model->id]);
                 }
             ],
             'name',
@@ -44,7 +35,15 @@ $this->params['breadcrumbs'][] = $this->title;
             'start_date',
             'finish_date',
 
-            ['class' => 'yii\grid\ActionColumn'],
+            ['class' => 'yii\grid\ActionColumn',
+                'buttons' => [
+                    'update' => function ($url, $model) {
+                        return Html::a(
+                            '<span class="glyphicon glyphicon-pencil"></span>',
+                            ['sprint/update', 'id' => $model->id],
+                            ['class' => 'sprint-actions', 'data-pjax' => 'sprints']);
+                    },
+                ], 'template' => '{update} {delete}'],
         ],
     ]); ?>
     <?php Pjax::end(); ?>
