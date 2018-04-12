@@ -5,6 +5,9 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+app\assets\AppAsset::register($this);
+
+
 /* @var $this yii\web\View */
 /* @var $model app\models\Version */
 /* @var $form yii\widgets\ActiveForm */
@@ -24,9 +27,16 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'start_date')->input('datetime-local') ?>
+    <?= $form->field($model, 'start_date')->textInput() ?>
 
-    <?= $form->field($model, 'finish_date')->input('datetime-local') ?>
+    <script>
+        $(document).ready(function () {
+            $('#version-start_date').datetimepicker({
+                datepicker:true,
+                format:'Y-m-d H:i'
+            });
+        });
+    </script>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
