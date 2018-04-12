@@ -45,7 +45,7 @@ $this->title = $model->index() . ' ' . $model->name;
     </div>
     <br>
     <br>
-    <h3><center>Issues</center></h3>
+    <h3><center>Issues Desk</center></h3>
     <table class="table table-striped table-bordered">
         <thead>
             <tr>

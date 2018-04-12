@@ -135,6 +135,22 @@ class Issue extends ActiveRecord
     }
 
     /**
+     * @return Users
+     */
+    public function getOwner()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'owner_id'])->one();
+    }
+
+    /**
+     * @return Users
+     */
+    public function getPerformer()
+    {
+        return $this->hasOne(Users::className(), ['id' => 'performer_id'])->one();
+    }
+
+    /**
      * @return Issuestatus
      */
     public function getStatus()

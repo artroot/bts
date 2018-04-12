@@ -70,7 +70,7 @@ app\assets\AppAsset::register($this);
                 <?php endif; ?>
             </h3>
             <ol class="issue-nav">
-                <li title="<?= Users::findOne(['id' => $model->owner_id])->username ?>"><?= sprintf('Created by %s: %s', Users::findOne(['id' => $model->owner_id])->first_name . ' ' . Users::findOne(['id' => $model->owner_id])->last_name ,$model->create_date) ?></li>
+                <li title="<?= $model->getOwner()->username ?>"><?= sprintf('Created by %s: %s', $model->getOwner()->first_name . ' ' . $model->getOwner()->last_name ,$model->create_date) ?></li>
                 <li><?= sprintf('Resolved: %s', $model->finish_date) ?></li>
             </ol>
         </div>
