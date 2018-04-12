@@ -63,33 +63,6 @@
 			], 'template' => '{update} {delete}'],
 		],
 	]); ?>
-<?php
-
-	$data = [
-		100,
-		97,
-		95,
-		90,
-		90,
-		90,
-		80,
-		37,
-		22,
-		0
-	];
-
-	$svg = SVG::generate($data, 10);
-
-	echo $this->render('graph', [
-		'graphs' => [
-			$svg->getIdeal(),
-			$svg->getCoords(),
-		],
-		'scales' => $svg->getScales(),
-	]);
-?>
-		<br>
-		<br>
 
 </div>
 

@@ -39,8 +39,17 @@ class SprintController extends DefaultController
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+
+        $sprintIssues = [];
+
+        foreach ($model->getIssues()->all() as $issue){
+            $sprintIssues[$issue->getStatus()->name][] = $issue;
+        }
+
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
+            'sprintIssues' => $sprintIssues
         ]);
     }
 

@@ -67,6 +67,12 @@ class IssueController extends DefaultController
         $model->create_date = date('Y-m-d H:i');
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+            if ($model->isDone()) {
+                $model->finish_date = date('Y-m-d H:i:s');
+                $model->save();
+            }
+
             $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the new issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                 Yii::$app->user->identity->username,
                 $model->name,
@@ -131,6 +137,12 @@ class IssueController extends DefaultController
             $oldModel = clone $model;
 
             if ($model->load(Yii::$app->request->post()) && $model->save()) {
+
+                if ($model->issuestatus_id !== $oldModel->issuestatus_id && $model->isDone()) {
+                    $model->finish_date = date('Y-m-d H:i:s');
+                    $model->save();
+                }
+
                 $changes = null;
                 foreach ($model->attributeLabels() as $key => $value){
                     if (@$model->{$key} != @$oldModel->{$key}) {

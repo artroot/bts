@@ -82,6 +82,37 @@ class Sprint extends \yii\db\ActiveRecord
         return $this->hasMany(Issue::className(), ['sprint_id' => 'id']);
     }
 
+    public function getProgress()
+    {
+
+        do{
+            if (!isset($date)) $date = (new \DateTime($this->start_date));
+
+            $progress[] = $this->getIssues()->where(['finish_date' => NULL])->orWhere(['>', 'finish_date', $date->modify('+1 day')->format('Y-m-d 01:00:00')])->count();
+
+        }while($date->format('Y-m-d') <= (new \DateTime())->format('Y-m-d'));
+
+        return $progress;
+    }
+
+    public function getSprintCountDays()
+    {
+        $dateSatrt = new \DateTime($this->start_date);
+        $dateFinish = new \DateTime($this->finish_date);
+
+        return $dateFinish->diff($dateSatrt)->format('%a');
+    }
+
+    public function getCompleteProgressPercent()
+    {
+        return ($this->getIssues()->where(['!=', 'finish_date', ''])->count())*100/($this->getIssues()->count());
+    }
+
+    public function getDaysRemaining()
+    {
+        return (new \DateTime())->diff((new \DateTime($this->finish_date)))->format('%a');
+    }
+
     /**
      * @return string
      */

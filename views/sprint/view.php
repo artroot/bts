@@ -1,37 +1,70 @@
 <?php
 
+use app\components\SVG;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Sprint */
+/* @var array $sprintIssues */
 
-$this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => 'Sprints', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$svg = SVG::generate($model->getProgress(), $model->getSprintCountDays());
+
+$this->title = $model->index() . ' ' . $model->name;
 ?>
 <div class="sprint-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
+    <h2><?= Html::encode($this->title) ?></h2>
+    <?php if($model->version_id): ?>
+       //
+    <?php endif; ?>
+    <p><?= sprintf('<span class="btn-link">%s</span> - <span class="btn-link">%s</span>', $model->start_date, $model->finish_date) ?>
+        <span class="text-muted">
+        <span class="glyphicon glyphicon-hourglass"></span><span><?= $model->getDaysRemaining() ?> days remaining</span>
+    </span>
     </p>
 
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'name',
-            'version_id',
-        ],
-    ]) ?>
+    <div class="progress">
+        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="<?= $model->getCompleteProgressPercent() ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= $model->getCompleteProgressPercent() ?>%">
+            <span><?= round($model->getCompleteProgressPercent()) ?>% Complete</span>
+        </div>
+    </div>
 
+    <div>
+        <h3><center>BurnDown Diagram</center></h3>
+        <?= $this->render('graph', [
+            'graphs' => [
+                $svg->getIdeal(),
+                $svg->getCoords(),
+            ],
+            'scales' => $svg->getScales(),
+        ])
+        ?>
+        
+    </div>
+    <br>
+    <br>
+    <h3><center>Issues</center></h3>
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+            <?php foreach ($sprintIssues as $status => $issues): ?>
+                <th><?= $status ?></th>
+            <?php endforeach; ?>
+            </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <?php foreach ($sprintIssues as $status => $issues): ?>
+                <td>
+                    <?php foreach ($issues as $issue): ?>
+                        <?= $this->render('@app/views/issue/short_view', ['model' => $issue]) ?>
+                    <?php endforeach; ?>
+                </td>
+        <?php endforeach; ?>
+        </tr>
+        </tbody>
+    </table>
+        
 </div>

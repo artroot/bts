@@ -22,7 +22,7 @@
 			  y2="0%"
 			  x2="0%"
 			  y1="100%"
-			  x1="0%" stroke-width="1" stroke="#999999" fill="none"/>
+			  x1="0%" stroke-width="1" stroke="#cccccc" fill="none"/>
 	</g>
 	<g>
 		<?php foreach($scales[SVG::SVG_Y]['coords'] as $id => $coord): ?>
@@ -30,7 +30,7 @@
 				  y2="<?= $coord['y2'] ?>"
 				  x2="<?= $coord['x2'] ?>"
 				  y1="<?= $coord['y1'] ?>"
-				  x1="<?= $coord['x1'] ?>" stroke-width="1" stroke="#999999" fill="none"/>
+				  x1="<?= $coord['x1'] ?>" stroke-width="1" stroke="#cccccc" fill="none"/>
 		<?php endforeach; ?>
 	</g>
 	<g>
@@ -39,7 +39,7 @@
 				  y2="<?= $coord['y2'] ?>"
 				  x2="<?= $coord['x2'] ?>"
 				  y1="<?= $coord['y1'] ?>"
-				  x1="<?= $coord['x1'] ?>" stroke-width="1" stroke="#999999" fill="none"/>
+				  x1="<?= $coord['x1'] ?>" stroke-width="1" stroke="#cccccc" fill="none"/>
 		<?php endforeach; ?>
 	</g>
 	<?php foreach ($graphs as $coords): ?>

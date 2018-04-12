@@ -100,7 +100,7 @@ final class SVG
 	 */
 	private function divideToPortion($countMax)
 	{
-		$step = str_pad(1, strlen($countMax), 0)/2;
+		$step = $countMax >= 20 ? str_pad(1, strlen($countMax), 0)/2 : str_pad(1, strlen($countMax), 0);
 		$max = 0;
 		do{
 			$max += $step;

@@ -4,6 +4,7 @@
 /* @var $content string */
 
 use app\models\Issue;
+use app\models\Sprint;
 use app\models\Version;
     use app\widgets\Alert;
     use app\models\Project;
@@ -56,6 +57,15 @@ app\assets\AppAsset::register($this);
 
             return $projectsList;
         };
+        $sprintDropdownItems = function($sprintList = []){
+            foreach (Sprint::find()->orderBy(['id' => SORT_DESC])->all() as $sprint) {
+                $sprintList[] = ['label' => $sprint->index() . ' ' . $sprint->name, 'url' => ['sprint/view', 'id' => $sprint->id]];
+            }
+            $sprintList[] = '<li class="divider"></li>';
+            $sprintList[] = ['label' => 'Create sprint', 'url' => Url::toRoute('sprint/create')];
+
+            return $sprintList;
+        };
 
         $menuItems = [
             '<li>' . Html::a('Create issue', ['issue/create'], ['class' => 'btn btn-default']) . '</li>',
@@ -66,6 +76,10 @@ app\assets\AppAsset::register($this);
                 ],
                 'url' => Url::toRoute('issue/create')
             ],*/
+            [
+                'label' => 'SCRUM',
+                'items' => @$sprintDropdownItems()
+            ],
             [
                 'label' => 'Projects',
                 'items' => @$projectDropdownItems()
