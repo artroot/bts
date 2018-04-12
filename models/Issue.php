@@ -70,7 +70,7 @@ class Issue extends ActiveRecord
             'resolved_version_id' => 'Resolved Version',
             'detected_version_id' => 'Detected Version',
             'performer_id' => 'Performer',
-            'owner_id' => 'Owner ID',
+            'owner_id' => 'Owner',
             'project_id' => 'Project',
         ];
     }

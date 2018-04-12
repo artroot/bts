@@ -89,8 +89,10 @@ app\assets\AppAsset::register($this);
             <?= $form->field($model, 'issuestatus_id', $template)->dropDownList(ArrayHelper::map(Issuestatus::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'performer_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
                     return $user->first_name . ' ' . $user->last_name;
-                }),
-                ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
+                }), ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
+                <?= $form->field($model, 'owner_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
+                    return $user->first_name . ' ' . $user->last_name;
+                }), ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'detected_version_id', $template)->dropDownList(ArrayHelper::map(
                 Version::find()->where(['project_id' => $model->project_id])->all(), 'id', 'name'),
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>

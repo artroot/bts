@@ -77,7 +77,7 @@ app\assets\AppAsset::register($this);
                 'url' => Url::toRoute('issue/create')
             ],*/
             [
-                'label' => 'SCRUM',
+                'label' => 'Sprints',
                 'items' => @$sprintDropdownItems()
             ],
             [

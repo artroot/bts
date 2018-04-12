@@ -8,6 +8,16 @@
  */
 use yii\helpers\Html;
 
+
+$description = $model->description;
+if (strlen($model->description) > 100) {
+    $description = substr($description, 0, 100);
+    $description = rtrim($description, "!,.-");
+    $description = substr($description, 0, strrpos($description, ' '));
+    $description .= '...';
+}
+
+
 ?>
 
 <div class="panel panel-info">
@@ -28,6 +38,6 @@ use yii\helpers\Html;
         <ol class="issue-nav">
             <li title="<?= $model->getOwner()->username ?>"><?= sprintf('Created by %s: %s', $model->getOwner()->first_name . ' ' . $model->getOwner()->last_name ,$model->create_date) ?></li>
         </ol>
-        <span class="text-muted"><?= $model->description ?></span>
+        <span class="text-muted"><?= $description ?></span>
     </div>
 </div>
