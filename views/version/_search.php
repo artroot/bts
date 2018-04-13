@@ -14,7 +14,12 @@ use yii\widgets\ActiveForm;
         'action' => ['index'],
         'method' => 'get',
         'options' => [
+            'class' => 'form-horizontal',
             'data-pjax' => 1
+        ],
+        'fieldConfig' => [
+            'template' => "<div class=\"col-sm-3\">{label}</div>\n<div class=\"col-sm-9\">{input}</div>\n<div class=\"col-sm-12 col-sm-offset-3\">{error}</div>",
+            'labelOptions' => ['class' => ''],
         ],
     ]); ?>
 
@@ -24,7 +29,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description') ?>
 
-    <?= $form->field($model, 'create_date') ?>
+    <?= $form->field($model, 'start_date') ?>
+
+    <?= $form->field($model, 'finish_date') ?>
 
     <?php // echo $form->field($model, 'finish_date') ?>
 

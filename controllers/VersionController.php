@@ -31,6 +31,8 @@ class VersionController extends DefaultController
         $searchModel->project_id = $project_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $dataProvider->query->orderBy(['id' => SORT_DESC]);
+
         return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,

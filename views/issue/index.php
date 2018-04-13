@@ -12,15 +12,12 @@ $this->title = 'Issues';
 /*$this->params['breadcrumbs'][] = $this->title;*/
 ?>
 <div class="issue-index">
+    <h3><?= Html::encode($this->title) ?></h3>
 
-    <h1><?= Html::encode($this->title) ?> <?= Html::a('Create Issue', ['issue/create'], ['class' => 'btn btn-success', 'style' => 'float: right;']) ?></h1>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
-            //['class' => 'yii\grid\SerialColumn'],
-
-            //'id',
             [
                 'label' => '',
                 'content' => function($model){
@@ -42,23 +39,9 @@ $this->title = 'Issues';
                 'contentOptions' => ['style' => 'min-width:150px;'],
             ],
             'name',
-            //'description:ntext',
             'create_date',
             'finish_date',
             'deadline',
-            //'issuetype_id',
-            //'issuepriority_id',
-            //'issuestatus_id',
-            //'sprint_id',
-            //'version_id',
-            //'resolved_version_id',
-            //'detected_version_id',
-            //'performer_id',
-            //'owner_id',
-            //'parentissue_id',
-            //'relatedissue_id',
-
-
         ],
     ]); ?>
     

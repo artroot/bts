@@ -37,6 +37,7 @@ app\assets\AppAsset::register($this);
 
 <div class="wrap">
     <?php
+
         NavBar::begin([
             'brandLabel' => Yii::$app->params['logo']['small'],
             'brandUrl' => Yii::$app->homeUrl,
@@ -44,6 +45,9 @@ app\assets\AppAsset::register($this);
                 'class' => 'navbar-inverse navbar-fixed-top',
             ],
         ]);
+
+        $leftMenuItems = [];
+        $rightMenuItems = [];
 
         $projectDropdownItems = function($projectsList = []){
             foreach (Project::find()->orderBy(['id' => SORT_DESC])->all() as $project) {
@@ -57,81 +61,81 @@ app\assets\AppAsset::register($this);
 
             return $projectsList;
         };
+
         $sprintDropdownItems = function($sprintList = []){
-            foreach (Sprint::find()->orderBy(['id' => SORT_DESC])->all() as $sprint) {
+            $sprints = Sprint::find();
+
+            if (Yii::$app->controller->id == 'version' and isset(Yii::$app->controller->actionParams['id'])){
+                $sprints->where(['project_id' => Version::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id])
+                ->andWhere(['version_id' => Yii::$app->controller->actionParams['id']]);
+            }elseif (Yii::$app->controller->id == 'issue' and isset(Yii::$app->controller->actionParams['id'])){
+                $sprints->where(['version_id' => Issue::findOne(['id' => Yii::$app->controller->actionParams['id']])->resolved_version_id]);
+            }elseif (Yii::$app->controller->id == 'project' and isset(Yii::$app->controller->actionParams['id'])){
+                $sprints->where(['project_id' => Yii::$app->controller->actionParams['id']]);
+            }
+            foreach ($sprints->orderBy(['id' => SORT_DESC])->all() as $sprint) {
                 $sprintList[] = ['label' => $sprint->index() . ' ' . $sprint->name, 'url' => ['sprint/view', 'id' => $sprint->id]];
             }
             $sprintList[] = '<li class="divider"></li>';
             $sprintList[] = '<li>' . Html::a('Create sprint', ['sprint/create'], ['data-pjax' => 'sprints', 'class' => 'sprint-actions']) . '</li>';
-            //$sprintList[] = ['label' => 'Create sprint', 'url' => Url::toRoute('sprint/create'), 'class' => 'sprint-actions'];
 
             return $sprintList;
         };
 
-        $menuItems = [
-            '<li>' . Html::a('Create issue', ['issue/create'], ['class' => 'btn btn-default']) . '</li>',
-            /*[
-                'label' => 'Create issue',
-                'options' => [
-                   ''
-                ],
-                'url' => Url::toRoute('issue/create')
-            ],*/
-            [
-                'label' => 'Sprints',
-                'items' => @$sprintDropdownItems()
-            ],
-            [
+        $versionDropdownItems = function ($versionsList = []) {
+
+            $versions = Version::find();
+
+            if (Yii::$app->controller->id == 'version' and isset(Yii::$app->controller->actionParams['id'])){
+                $versions->where(['project_id' => Version::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id]);
+            }elseif (Yii::$app->controller->id == 'issue' and isset(Yii::$app->controller->actionParams['id'])){
+                $versions->where(['project_id' => Issue::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id]);
+            }elseif (Yii::$app->controller->id == 'project' and isset(Yii::$app->controller->actionParams['id'])){
+                $versions->where(['project_id' => Yii::$app->controller->actionParams['id']]);
+            }else {
+                return false;
+            }
+
+            $countAllVersion = $versions->orderBy(['id' => SORT_DESC]);
+
+            foreach ($versions->limit(6)->all() as $version) {
+                $versionsList[] = '<li>' .
+                    Html::a($version->getStatusIcon() .  ' ' . $version->name, ['version/view', 'id' => $version->id], ['style' => 'display: inline-block;']) . '</li>';
+            }
+            $versionsList[] = '<li class="divider"></li>';
+            if ($countAllVersion->count() > 6) {
+                $versionsList[] = '<li>' .
+                    Html::a('More...', ['project/view', 'id' => $version->project_id], ['style' => 'display: inline-block;']) . '</li>';
+            }
+
+            $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => 'version-actions']) . '</li>';
+
+            return $versionsList;
+        };
+
+        if (isset($this->params['titleItems'])) $leftMenuItems[] = $this->params['titleItems'];
+
+        $leftMenuItems[] = [
                 'label' => 'Projects',
                 'items' => @$projectDropdownItems()
-            ]
+        ];
+        $leftMenuItems[] = [
+                'label' => 'Sprints',
+                'items' => @$sprintDropdownItems()
         ];
 
-        //if (@$model instanceof Version) {
-        $query = [];
-        if (Yii::$app->controller->id == 'version' and isset(Yii::$app->controller->actionParams['id'])){
-            $query = ['project_id' => Version::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id];
-        }elseif (Yii::$app->controller->id == 'issue' and isset(Yii::$app->controller->actionParams['id'])){
-            $query = ['project_id' => Issue::findOne(['id' => Yii::$app->controller->actionParams['id']])->project_id];
-        }elseif (Yii::$app->controller->id == 'project' and isset(Yii::$app->controller->actionParams['id'])){
-            $query = ['project_id' => Yii::$app->controller->actionParams['id']];
+        if ($versionDropdownItemsList = $versionDropdownItems() and $versionDropdownItemsList !== false) {
+            $leftMenuItems[] = [
+                'label' => 'Versions',
+                'items' => $versionDropdownItemsList
+            ];
         }
-            $versionDropdownItems = function ($query, $versionsList = []) {
-                if (empty($query)) return false;
 
-                foreach (Version::find()->where($query)->orderBy(['id' => SORT_DESC])->limit(6)->all() as $version) {
-                    $versionsList[] = '<li>' .
-                        Html::a($version->getStatusIcon() .  ' ' . $version->name, ['version/view', 'id' => $version->id], ['style' => 'display: inline-block;']) . '</li>';
-                }
-                $versionsList[] = '<li class="divider"></li>';
-                $versionsList[] = '<li>' .
-                    Html::a('More...', ['project/view', 'id' => $query['project_id']], ['style' => 'display: inline-block;']) . '</li>';
-
-                $versionsList[] = '<li>' . Html::a('Create version', ['version/create'], ['data-pjax' => 'versions', 'class' => 'version-actions']) . '</li>';
-
-                return [
-                    'label' => 'Version',
-                    'items' => $versionsList
-                ];
-            };
-        //}
-
-        if (!empty(@$query)) $menuItems[] = @$versionDropdownItems($query);
-
-       /* $menuItems[] = ['label' => 'Home', 'url' => ['/site/index']];
-        $menuItems[] = ['label' => 'About', 'url' => ['/task/new']];
-        $menuItems[] = ['label' => 'Contact', 'url' => ['/site/contact']];*/
-
-        /*$menuItems[] = [
-            ['label' => 'Home', 'url' => ['/site/index']],
-            ['label' => 'About', 'url' => ['/task/new']],
-            ['label' => 'Contact', 'url' => ['/site/contact']],
-        ];*/
         if (Yii::$app->user->isGuest) {
-            $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-            $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+            $rightMenuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
+            $rightMenuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
         } else {
-            $menuItems[] = [
+            $rightMenuItems[] = [
                 'label' => '<span class="glyphicon glyphicon-user"></span> ' . Yii::$app->user->identity->username,
                 'items' => [
                     '<li>'
@@ -151,8 +155,16 @@ app\assets\AppAsset::register($this);
         }
         echo Nav::widget([
             'encodeLabels' => false,
+            'options' => ['class' => 'navbar-nav'],
+            'items' => $leftMenuItems,
+        ]);
+
+        echo '<div class="navbar-form navbar-left">' . Html::a('Create issue', ['issue/create'], ['class' => 'btn btn-default']) . '</div>';
+
+        echo Nav::widget([
+            'encodeLabels' => false,
             'options' => ['class' => 'navbar-nav navbar-right'],
-            'items' => $menuItems,
+            'items' => $rightMenuItems,
         ]);
         NavBar::end();
     ?>

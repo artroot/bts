@@ -9,11 +9,10 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = 'Teams';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="team-index">
 
-    <h1><?= Html::encode($this->title) ?> <?= Html::a('Create Team', ['create'], ['class' => 'btn btn-success', 'style' => 'float: right;']) ?></h1>
+    <h3><?= Html::encode($this->title) ?> <?= Html::a('Create Team', ['create'], ['class' => 'btn btn-success', 'style' => 'float: right;']) ?></h3>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,

@@ -15,24 +15,14 @@
 	$this->params['breadcrumbs'][] = $this->title;*/
 ?>
 <div class="version-index">
-	<h1><?= Html::encode($this->title) ?>
-
-		<?= Html::a('Create Version',
-				['version/create', 'project_id' => $project->id],
-				['class' => 'btn btn-success version-actions', 'style' => 'float:right;', 'data-pjax' => 'versions']) ?>
-	</h1>
-	<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
+	<h3><?= Html::encode($this->title) ?></h3>
+	
 	<?= GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
 		'class' => 'table-condensed',
 		'columns' => [
 
-
-			//'id',
-			// 'project_id',
-			//'status',
 			[
 				'label' => 'Status',
 				'content' => function($data){

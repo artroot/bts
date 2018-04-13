@@ -14,6 +14,46 @@
 /* @var $model app\models\Version */
 
 $this->title = Project::findOne(['id' => $model->project_id])->name . ' ' . $model->name;
+
+
+$this->params['titleItems'] = [
+    'label' => $this->title,
+    'items' => [
+        [
+            'label' => '<center>' . $model->getStatusIcon() . '</center>'
+        ],
+        [
+            'label' => '<center>' . 'Version ' . $this->title . '</center>'
+        ],
+        [
+            'label' => '<li class="divider"></li>'
+        ],
+        [
+            'label' => '<li>' . Html::a('Create issue', ['issue/create', 'project_id' => $model->project_id, 'version_id' => $model->id]) . '</li>',
+        ],
+        [
+            'label' => '<li>' . Html::a('Create sprint', ['sprint/create', 'project_id' => $model->project_id, 'version_id' => $model->id], ['data-pjax' => 'sprints', 'class' => 'sprint-actions']) . '</li>',
+        ],
+        [
+            'label' => '<li class="divider"></li>'
+        ],
+        [
+            'label' => '<li>' . Html::a(($model->status == 0 ? 'Release version' : 'Unrelease version'), ['version/' . ($model->status == 0 ? 'release' : 'unrelease'), 'id' => $model->id]) . '</li>',
+        ],
+        [
+            'label' => '<li>' . Html::a('Edit version', ['version/update', 'id' => $model->id], ['data-pjax' => 'versions', 'class' => 'version-actions']) . '</li>',
+        ],
+        [
+            'label' => '<li>' . Html::a('Delete version', ['version/delete', 'id' => $model->id], ['data' => [
+                    'confirm' => 'Are you sure you want to delete this version?',
+                    'method' => 'post',
+                ]]) . '</li>',
+
+        ],
+    ]
+];
+
+
 /*$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;*/
 
@@ -40,9 +80,7 @@ $this->params['breadcrumbs'][] = $this->title;*/
 <div class="version-view">
 
     <h3><?= $model->getStatusIcon() ?> <?= Html::encode($this->title) ?> <span class="label label-warning text-uppercase" style="    font-size: x-small;
-    vertical-align: middle;"><?= $model->status ? 'released' : 'unreleased' ?></span>
-    <?= Html::a(($model->status == 0 ? 'RELEASE' : 'UNRELEASED'), ['version/' . ($model->status == 0 ? 'release' : 'unrelease'), 'id' => $model->id],['class' => 'btn btn-danger', 'style' => 'float: right;']) ?>
-    </h3>
+    vertical-align: middle;"><?= $model->status ? 'released' : 'unreleased' ?></span></h3>
 
     <div>
         <div class="progress">

@@ -27,34 +27,46 @@ $this->registerJsFile('/assets/f514d8f4/jquery.js', ['position' => \yii\web\View
 
 app\assets\AppAsset::register($this);
 
+$this->title = $model->index();
+
+$this->params['titleItems'] = [
+    'label' => $this->title,
+    'items' => [
+        [
+            'label' => '<center><span class="badge text-capitalize" title="'. @$model->getPriority()->name .'" style="background-color: '. @$model->getPriority()->color . ';">'. @$model->getPriority()->name . '</span>
+                <span class="badge text-capitalize">'. @$model->getType()->name . '</span>
+                <span class="badge text-capitalize">'. @$model->getStatus()->name . '</span></center>'
+        ],
+        [
+            'label' => sprintf('Created by %s: %s', $model->getOwner()->first_name . ' ' . $model->getOwner()->last_name ,$model->create_date)
+        ],
+        [
+            'label' => '<li class="divider"></li>'
+        ],
+        [
+            'label' => '<li>' . Html::a('Edit Subject and Description', '#', ['onclick' => '$(\'#issue_descr\').toggle(\'fast\'); $(\'#issue-name-s\').toggle(\'fast\');']) . '</li>',
+        ],
+        [
+            'label' => '<li>' . Html::a('Add relation', '#', ['data-toggle' => 'modal', 'data-target' => '#associated']) . '</li>',
+        ],
+        [
+            'label' => '<li>' . Html::a('Delete issue', ['issue/delete', 'id' => $model->id], ['data' => [
+                    'confirm' => 'Are you sure you want to delete this issue?',
+                    'method' => 'post',
+                ]]) . '</li>',
+
+        ],
+    ]
+];
+
 ?>
 
 <br>
 <div class="issue-form">
 
-
-
-
     <div class="row">
         <?php $form = ActiveForm::begin(['id' => 'issueForm', 'action' => $action]); ?>
         <div class="col-md-12">
-            <a class="btn btn-default btn-xs" title="Edit Subject and Description" onclick="$('#issue_descr').toggle('fast'); $('#issue-name-s').toggle('fast');">
-                <span class="glyphicon glyphicon-edit"></span>
-            </a>
-            <?= Html::a('<span class="glyphicon glyphicon-trash"></span>', ['issue/delete', 'id' => $model->id], [
-                'class' => 'btn btn-default btn-xs',
-                'encodeLabels' => false,
-                'title' => 'Delete this Issue',
-                'data' => [
-                    'confirm' => 'Are you sure you want to delete this issue?',
-                    'method' => 'post',
-                ],
-            ]) ?>
-
-            <a class="btn btn-default btn-xs" title="Add Relations" data-toggle="modal" data-target="#associated">
-                <span class="glyphicon glyphicon-link"></span>
-            </a>
-
             <h3>
                 <span class="badge text-uppercase" title="<?= @$model->getPriority()->name ?>" style="background-color: <?= @$model->getPriority()->color ?>;"><?= substr(@$model->getPriority()->name, 0, 1) ?></span>
                 <span class="badge text-capitalize"><?= @$model->getType()->name ?></span>

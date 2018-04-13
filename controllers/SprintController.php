@@ -29,6 +29,8 @@ class SprintController extends DefaultController
         $searchModel->project_id = $project_id;
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
+        $dataProvider->query->orderBy(['id' => SORT_DESC]);
+        
         return $this->renderPartial('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -62,9 +64,14 @@ class SprintController extends DefaultController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($project_id = false, $version_id = false)
     {
         $model = new Sprint();
+
+        if ($project_id) $model->project_id = $project_id;
+        else $model->project_id = Project::find()->one()->id;
+
+        if ($version_id) $model->version_id = $version_id;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -85,8 +92,6 @@ class SprintController extends DefaultController
             
             return $this->redirect(['view', 'id' => $model->id]);
         }
-
-        $model->project_id = Project::find()->one()->id;
 
         return $this->renderAjax('create', [
             'model' => $model,

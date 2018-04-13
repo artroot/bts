@@ -31,8 +31,10 @@ class IssueController extends DefaultController
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
             //if ($project_id !== false) $dataProvider->query->andWhere(['project_id' => $project_id]);
             if ($version_id !== false) $dataProvider->query->andWhere(['resolved_version_id' => $version_id]);
+            if ($project_id !== false) $dataProvider->query->andWhere(['project_id' => $project_id]);
             if ($state !== false) $dataProvider->query->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => $state]), 'id', 'id')]);
 
+        $dataProvider->query->orderBy(['id' => SORT_DESC]);
 
         return $this->renderPartial('index', [
             'searchModel' => $searchModel,
@@ -59,12 +61,17 @@ class IssueController extends DefaultController
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
-    public function actionCreate()
+    public function actionCreate($project_id = false, $version_id = false)
     {
         $model = new Issue();
 
         $model->owner_id = Yii::$app->user->identity->id;
         $model->create_date = date('Y-m-d H:i');
+
+        if ($project_id) $model->project_id = $project_id;
+        else $model->project_id = Project::find()->one()->id;
+
+        if ($version_id) $model->resolved_version_id = $version_id;
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 
@@ -83,7 +90,6 @@ class IssueController extends DefaultController
         }
 
         $model->issuestatus_id = 2;
-        $model->project_id = Project::find()->one()->id;
 
         return $this->render('create', [
             'model' => $model,
