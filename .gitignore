@@ -43,3 +43,5 @@ tests/
 widgets/
 yii
 yii.bat
+
+web/prototypes/*

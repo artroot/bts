@@ -177,17 +177,20 @@ app\assets\AppAsset::register($this);
         <?= $content ?>
     </div>
 
-    <?php Pjax::begin(['enablePushState' => false, 'id' => 'userSettings', 'linkSelector'=>'a.user-settings']); ?>
-    <?php Pjax::end(); ?>
-
-    <?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'.version-actions']); ?>
-    <?php Pjax::end(); ?>
-
-    <?php Pjax::begin(['enablePushState' => false, 'id' => 'sprints', 'linkSelector'=>'.sprint-actions']); ?>
-    <?php Pjax::end(); ?>
-
-
 </div>
+
+
+<?php Pjax::begin(['enablePushState' => false, 'id' => 'userSettings', 'linkSelector'=>'a.user-settings']); ?>
+<?php Pjax::end(); ?>
+
+<?php Pjax::begin(['enablePushState' => false, 'id' => 'versions', 'linkSelector'=>'.version-actions']); ?>
+<?php Pjax::end(); ?>
+
+<?php Pjax::begin(['enablePushState' => false, 'id' => 'sprints', 'linkSelector'=>'.sprint-actions']); ?>
+<?php Pjax::end(); ?>
+
+<?php Pjax::begin(['enablePushState' => false,  'id' => 'prototypes', 'linkSelector'=>'.prototype-actions']); ?>
+<?php Pjax::end(); ?>
 
 <?php $this->endBody() ?>
 </body>
