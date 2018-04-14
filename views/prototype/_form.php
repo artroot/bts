@@ -8,6 +8,7 @@ use yii\widgets\ActiveForm;
 
 ?>
 
+<div class="prototype-create">
 <div class="prototype-form">
 
     <?php $form = ActiveForm::begin(['id' => 'prototypeForm', 'options' => ['enctype'=>'multipart/form-data']]); ?>
@@ -15,8 +16,6 @@ use yii\widgets\ActiveForm;
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
     <?= $form->field($model, 'resource')->fileInput(['accept' => 'application/zip']) ?>
-
-    <?= $form->field($model, 'indexFileName')->textInput(['placeholder' => 'index.html']) ?>
 
     <?= $form->field($model, 'issue_id')->hiddenInput()->label(false) ?>
 
@@ -26,4 +25,5 @@ use yii\widgets\ActiveForm;
 
     <?php ActiveForm::end(); ?>
 
+</div>
 </div>

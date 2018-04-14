@@ -12,7 +12,7 @@ use Yii;
  * @property string $path
  * @property int $issue_id
  * @property resource $resource
- * @property string $indexFileName
+ * @property string $index_file_name
  *
  * @property Issue $issue
  */
@@ -35,11 +35,11 @@ class Prototype extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'indexFileName'], 'required'],
-            ['indexFileName','match','pattern'=>'/[\d\w\.-_]\.[\w]/i'],
+            [['name'], 'required'],
+            //['index_file_name','match','pattern'=>'/[\d\w\.-_]\.[\w]/i'],
             [['issue_id'], 'integer'],
             [['resource'], 'file', 'extensions' => ['zip']],
-            [['name', 'path'], 'string', 'max' => 255],
+            [['name', 'path', 'index_file_name'], 'string', 'max' => 255],
             //[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
         ];
     }
@@ -55,7 +55,7 @@ class Prototype extends \yii\db\ActiveRecord
             'path' => 'Path',
             'issue_id' => 'Issue ID',
             'resource' => 'Upload the *.zip archive with prototype',
-            'indexFileName' => 'Index file (your prototype startup file)',
+            'index_file_name' => 'Index file (your prototype startup file)',
         ];
     }
 
@@ -65,6 +65,16 @@ class Prototype extends \yii\db\ActiveRecord
             (is_dir("$path/$file")) ? self::delTree("$path/$file") : unlink("$path/$file");
         }
         return rmdir($path);
+    }
+
+    public function getPrototypeFiles()
+    {
+        /*$fileList = [];
+        foreach (array_diff(scandir(Yii::$app->basePath . '/web' . $this->path), array('.','..')) as $file) {
+            if(!is_dir(Yii::$app->basePath . '/web' . $this->path . $file)) $fileList[$file] = $file;
+        }
+        return $fileList;*/
+        return array_diff(scandir(Yii::$app->basePath . '/web' . $this->path), array('.','..'));
     }
 
     /**

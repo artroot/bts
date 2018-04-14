@@ -4,11 +4,10 @@ use yii\bootstrap\Modal;
 use yii\helpers\Html;
 use yii\widgets\Pjax;
 
-
 /* @var $this yii\web\View */
 /* @var $model app\models\Prototype */
 
-$this->title = 'Create Prototype';
+$this->title = 'Update ' . $model->index();
 ?>
 
     <?php
@@ -21,10 +20,11 @@ $this->title = 'Create Prototype';
     ]); ?>
 
     <div id="prototypeMainForm">
-    <?= $this->render('_form', [
-        'model' => $model,
-    ]) ?>
-        </div>
+        <?= $this->render('_update_form', [
+            'model' => $model,
+            'action' => $action
+        ]) ?>
+    </div>
     <?php Modal::end(); ?>
 
     <script>
