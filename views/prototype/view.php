@@ -32,7 +32,7 @@ $this->params['titleItems'] = [
 
 ?>
 <div class="prototype-view">
-    <iframe width="100%" style="border: 0; position: fixed; left: 0; overflow: auto; width: 100%; height: 92%;" src="<?= $model->path . $model->index_file_name ?>"></iframe>
+    <iframe width="100%" style="border: 0; position: fixed; left: 0; overflow: auto; width: 100%; height: 92%;" src="<?= $model->path . '/' .  $model->index_file_name ?>"></iframe>
 </div>
 <script>
     $('body').css('overflow', 'hidden');

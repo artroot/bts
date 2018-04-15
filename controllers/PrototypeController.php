@@ -73,7 +73,7 @@ class PrototypeController extends DefaultController
         if ($model->load(Yii::$app->request->post()) && $model->validate()) {
             $model->resource = UploadedFile::getInstance($model, 'resource');
             $dirName = sha1(time().$model->resource->baseName.time());
-            $model->path = sprintf('/prototypes/%s/', $dirName);
+            $model->path = sprintf('/prototypes/%s', $dirName);
             mkdir(Yii::$app->basePath . '/web' . $model->path, 0777, true);
             $zip = new ZipArchive;
             $zip->open($model->resource->tempName);
@@ -102,6 +102,22 @@ class PrototypeController extends DefaultController
         }
 
         return $this->renderAjax('update', [
+            'model' => $model,
+            'action' => 'update?id=' . $model->id
+        ]);
+    }
+
+    public function actionFilebrowser($id)
+    {
+        $model = $this->findModel($id);
+
+        if (isset(Yii::$app->request->queryParams['browse_to'])){
+            $model->setTree(Yii::$app->request->queryParams['browse_to']);
+        }elseif (isset(Yii::$app->request->queryParams['back_to'])){
+            $model->tree = explode('/', Yii::$app->request->queryParams['back_to']);
+        }
+
+        return $this->renderAjax('_update_form', [
             'model' => $model,
             'action' => 'update?id=' . $model->id
         ]);

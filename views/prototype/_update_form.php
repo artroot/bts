@@ -15,24 +15,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
 
-    <div class="thumbnail" style="max-height: 300px; overflow: auto;">
-
-
-        <?= $form->field($model, 'index_file_name')->radioList($model->getPrototypeFiles(), [
-            'item' => function($index, $label, $name, $checked, $value) use ($model) {
-                $return = '<p><label>';
-                if(!is_dir(Yii::$app->basePath . '/web' . $model->path . $label)) {
-                    $return .= '<span class="glyphicon glyphicon-file"></span> <input type="radio" ' . ($model->index_file_name == $label ? 'checked' : '') . ' name="' . $name . '" value="' . $label . '" tabindex="3"> <span>' . $label   . '</span>';
-                }else{
-                    $return .= '<span class="glyphicon glyphicon-folder-open"></span> <span>' . $label . '</span>';
-                }
-                $return .= '</label></p>';
-
-                return $return;
-            }
-        ])->label(false) ?>
-
-    </div>
+    <?= $this->render('file_browser', [
+        'model' => $model,
+        'form' => $form,
+        'path' => explode('/', $model->path)
+    ]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

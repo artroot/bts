@@ -13,6 +13,7 @@ use Yii;
  * @property int $issue_id
  * @property resource $resource
  * @property string $index_file_name
+ * @property array $tree
  *
  * @property Issue $issue
  */
@@ -20,6 +21,7 @@ class Prototype extends \yii\db\ActiveRecord
 {
     public $resource;
     public $indexFileName;
+    public $tree = [];
 
     /**
      * @inheritdoc
@@ -74,7 +76,7 @@ class Prototype extends \yii\db\ActiveRecord
             if(!is_dir(Yii::$app->basePath . '/web' . $this->path . $file)) $fileList[$file] = $file;
         }
         return $fileList;*/
-        return array_diff(scandir(Yii::$app->basePath . '/web' . $this->path), array('.','..'));
+        return array_diff(scandir(Yii::$app->basePath . '/web/prototypes/' . implode('/', $this->getTree())), array('.','..'));
     }
 
     /**
@@ -83,6 +85,26 @@ class Prototype extends \yii\db\ActiveRecord
     public function getIssue()
     {
         return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
+    }
+
+    public function getTree()
+    {
+        if (empty($this->tree)) {
+            $this->tree = explode('/', $this->index_file_name);
+            array_pop($this->tree);
+            $root = explode('/', $this->path);
+            $root = array_pop($root);
+            array_unshift($this->tree, $root);
+        }
+        return $this->tree;
+    }
+
+    public function setTree($folder)
+    {
+        //$this->getTree();
+        $folder = explode('/', $folder);
+        foreach ($folder as $f) array_push($this->tree, $f);
+        return $this->tree;
     }
 
     public function index()
