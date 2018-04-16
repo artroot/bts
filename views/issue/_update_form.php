@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Attachment;
 use app\models\Comment;
 use app\models\Issuepriority;
     use app\models\Issuestatus;
@@ -61,8 +62,9 @@ $this->params['titleItems'] = [
     ]
 ];
 
+$attachmentModel = new Attachment();
+$attachmentModel->issue_id = $model->id;
 ?>
-
 <br>
 <div class="issue-form">
 
@@ -185,8 +187,8 @@ $this->params['titleItems'] = [
                 <li role="presentation" class="dropdown">
                     <a class="dropdown-toggle btn-xs" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
                         Additions 
-                        <?php if ($model->getPrototypes()->count() > 0): ?>
-                            <span class="badge"><?= $model->getPrototypes()->count() ?></span>
+                        <?php if ($model->getPrototypes()->count()+$model->getAttachments()->count() > 0): ?>
+                            <span class="badge"><?= $model->getPrototypes()->count()+$model->getAttachments()->count() ?></span>
                         <?php endif; ?>
                         <span class="caret"></span>
                     </a>
@@ -212,7 +214,19 @@ $this->params['titleItems'] = [
                             <?= Html::a('Add prototype', ['prototype/create', 'issue_id' => $model->id], ['data-pjax' => 'prototypes', 'class' => 'prototype-actions']) ?>
                         </li>
                         <li>
-                            <?= Html::a('Add attachment', ['attachment/create', 'issue_id' => $model->id], ['data-pjax' => 'attachments', 'class' => 'attachment-actions']) ?>
+                            <a>
+                                <?php $form = ActiveForm::begin([
+                                    'id' => 'attachmentForm',
+                                    'action' => Url::to(['attachment/create']),
+                                    'options' => ['enctype' => 'multipart/form-data']
+                                ]); ?>
+                                <?= $form->field($attachmentModel, 'issue_id')->hiddenInput()->label(false) ?>
+                                <label style="font-weight: unset;">
+                                    Add attachment
+                                    <input type="file" style="display: none;" form="attachmentForm" name="Attachment[file]">
+                                </label>
+                                <?php ActiveForm::end(); ?>
+                            </a>
                         </li>
                     </ul>
                 </li>
@@ -244,10 +258,23 @@ $this->params['titleItems'] = [
                     ]) ?>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="attachList">
-                    
+                    <?= $this->render('@app/views/attachment/list', [
+                        'attachments' => Attachment::find()->where(['issue_id' => $model->id])->orderBy(['id' => SORT_DESC])->all()
+                    ]);
+                    ?>
                 </div>
             </div>
         </div>
+
+        <?php
+        Pjax::widget([
+            'id' => 'attachList',  // response goes in this element
+            'enablePushState' => false,
+            'enableReplaceState' => false,
+            'formSelector' => '#attachmentForm',// this form is submitted on change
+            'submitEvent' => 'change',
+        ]);
+        ?>
         <div class="col-lg-offset-3 col-sm-offset-5 col-md-offset-3"></div>
     </div>
 
@@ -300,3 +327,5 @@ $this->params['titleItems'] = [
         </div>
     </div>
 </div>
+<?php Pjax::begin(['enablePushState' => false,  'id' => 'prototypes', 'linkSelector'=>'.prototype-actions']); ?>
+<?php Pjax::end(); ?>

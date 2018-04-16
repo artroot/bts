@@ -13,18 +13,11 @@ use yii\widgets\Pjax;
 
 ?>
 
-
-<?php Pjax::begin(['enablePushState' => false,  'id' => 'prototypes', 'linkSelector'=>'.prototype-actions']); ?>
-<?php Pjax::end(); ?>
-<ul class="nav nav-pills nav-stacked">
 <?php foreach ($prototypeList as $prototype): ?>
-
-    <li>
+    <blockquote style="font-size: small;">
         <a href="<?= Url::to(['prototype/view', 'id' => $prototype->id]) ?>">
         <span class="glyphicon glyphicon-eye-open"></span>
         <?= $prototype->index() ?> <?= $prototype->name ?>
         </a>
-    </li>
-
+    </blockquote>
 <?php endforeach; ?>
-</ul>

@@ -5,9 +5,12 @@ namespace app\controllers;
 use Yii;
 use app\models\Attachment;
 use app\models\AttachmentSearch;
+use yii\web\Response;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * AttachmentController implements the CRUD actions for Attachment model.
@@ -15,32 +18,13 @@ use yii\filters\VerbFilter;
 class AttachmentController extends DefaultController
 {
 
-    /**
-     * Lists all Attachment models.
-     * @return mixed
-     */
-    public function actionIndex()
+    public function actionGet($id)
     {
-        $searchModel = new AttachmentSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Attachment model.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $model = $this->findModel($id);
+        \Yii::$app->response->format = Response::FORMAT_RAW;
+        \Yii::$app->response->headers->add('content-type',$model->type);
+        \Yii::$app->response->data = base64_decode($model->file);
+        return \Yii::$app->response;
     }
 
     /**
@@ -52,31 +36,25 @@ class AttachmentController extends DefaultController
     {
         $model = new Attachment();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $file = UploadedFile::getInstance($model, 'file');
+            if ($file) {
+                $model->file = base64_encode(file_get_contents($file->tempName));
+                $model->type = $file->type;
+                $model->base_name = $file->baseName . '.' . $file->extension;
+            }
+            $model->save();
+            $this->sendToTelegram(sprintf('User <b>%s</b> UPLOADED the new file to issue <b>%s</b>' . "\r\n" . '%s',
+                Yii::$app->user->identity->username,
+                $model->getIssue()->one()->name,
+                Url::to(['/issue/update', 'id' => $model->getIssue()->one()->id], true)
+            ));
+            return $this->renderPartial('list', [
+                'attachments' => Attachment::find()->where(['issue_id' => $model->issue_id])->orderBy(['id' => SORT_DESC])->all()
+            ]);
         }
 
         return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing Attachment model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
             'model' => $model,
         ]);
     }

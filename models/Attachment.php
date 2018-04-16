@@ -11,6 +11,7 @@ use Yii;
  * @property int $issue_id
  * @property string $file
  * @property string $type
+ * @property string $base_name
  *
  * @property Issue $issue
  */
@@ -31,7 +32,7 @@ class Attachment extends \yii\db\ActiveRecord
     {
         return [
             [['issue_id'], 'integer'],
-            [['file', 'type'], 'string'],
+            [['file', 'type', 'base_name'], 'string'],
             [['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
         ];
     }
@@ -46,6 +47,7 @@ class Attachment extends \yii\db\ActiveRecord
             'issue_id' => 'Issue',
             'file' => 'File',
             'type' => 'Type',
+            'base_name' => 'Base Name',
         ];
     }
 
