@@ -5,6 +5,8 @@ use app\models\Issuepriority;
     use app\models\Issuestatus;
     use app\models\Issuetype;
     use app\models\Project;
+use app\models\Prototype;
+use app\models\PrototypeSearch;
 use app\models\Relation;
 use app\models\RelationSearch;
 use app\models\Sprint;
@@ -145,22 +147,75 @@ $this->params['titleItems'] = [
         <div class="col-lg-9 col-sm-7 col-md-9 col-sm-pull-5 col-md-pull-3">
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
-                    <a href="#comments" aria-controls="comments" role="tab" data-toggle="tab">Comments
+                    <a href="#comments" class="btn-xs" aria-controls="comments" role="tab" data-toggle="tab">Comments
                         <?php if ($commentsCount = Comment::find()->where(['issue_id' => $model->id])->count() and $commentsCount > 0): ?>
                         <span class="badge"><?= $commentsCount ?></span>
                         <?php endif; ?>
                     </a></li>
-                <li role="presentation"><a href="#log" aria-controls="log" role="tab" data-toggle="tab">Log</a></li>
-                <li role="presentation"><a href="#related_for" aria-controls="related_for" role="tab" data-toggle="tab">Related for
-                        <?php if ($relatedForCount = Relation::find()->where(['to_issue' => $model->id])->count() and $relatedForCount > 0): ?>
-                            <span class="badge"><?= $relatedForCount ?></span>
+                <li role="presentation"><a href="#log" class="btn-xs" aria-controls="log" role="tab" data-toggle="tab">Log</a></li>
+                <li role="presentation" class="dropdown">
+                    <a class="dropdown-toggle btn-xs" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        Relations
+                        <?php if ($model->getAssociateWith()->count()+$model->getRelatedFor()->count() > 0): ?>
+                            <span class="badge"><?= $model->getAssociateWith()->count()+$model->getRelatedFor()->count() ?></span>
                         <?php endif; ?>
-                    </a></li>
-                <li role="presentation"><a href="#associated_with" aria-controls="associated_with" role="tab" data-toggle="tab">Associated with
-                        <?php if ($associatedWithCount = Relation::find()->where(['from_issue' => $model->id])->count() and $associatedWithCount > 0): ?>
-                            <span class="badge"><?= $associatedWithCount ?></span>
+                        <span class="caret"></span>
+                    </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="#related_for" aria-controls="related_for" role="tab" data-toggle="tab">Related for
+                                    <?php if ($model->getRelatedFor()->count() > 0): ?>
+                                        <span class="badge"><?= $model->getRelatedFor()->count() ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#associated_with" aria-controls="associated_with" role="tab" data-toggle="tab">Associated with
+                                    <?php if ($model->getAssociateWith()->count() > 0): ?>
+                                        <span class="badge"><?= $model->getAssociateWith()->count() ?></span>
+                                    <?php endif; ?>
+                                </a>
+                            </li>
+                            <li class="divider"></li>
+                            <li>
+                                <?= Html::a('Add relation', '#', ['data-toggle' => 'modal', 'data-target' => '#associated']) ?>
+                            </li>
+                        </ul>
+                    </li>
+                <li role="presentation" class="dropdown">
+                    <a class="dropdown-toggle btn-xs" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        Additions 
+                        <?php if ($model->getPrototypes()->count() > 0): ?>
+                            <span class="badge"><?= $model->getPrototypes()->count() ?></span>
                         <?php endif; ?>
-                    </a></li>
+                        <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="#prototypeList" aria-controls="prototypeList" role="tab" data-toggle="tab">
+                                Prototypes
+                                <?php if ($model->getPrototypes()->count() > 0): ?>
+                                    <span class="badge"><?= $model->getPrototypes()->count() ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#attachList" aria-controls="attachList" role="tab" data-toggle="tab">
+                                Attachments
+                                <?php if ($model->getAttachments()->count() > 0): ?>
+                                    <span class="badge"><?= $model->getAttachments()->count() ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <?= Html::a('Add prototype', ['prototype/create', 'issue_id' => $model->id], ['data-pjax' => 'prototypes', 'class' => 'prototype-actions']) ?>
+                        </li>
+                        <li>
+                            <?= Html::a('Add attachment', ['attachment/create', 'issue_id' => $model->id], ['data-pjax' => 'attachments', 'class' => 'attachment-actions']) ?>
+                        </li>
+                    </ul>
+                </li>
             </ul>
             <!-- Tab panes -->
             <div class="tab-content">
@@ -181,6 +236,15 @@ $this->params['titleItems'] = [
                         'searchModel' => $searchModelAssociatedWith = new RelationSearch(),
                         'dataProvider' => $searchModelAssociatedWith->search(['RelationSearch' => ['from_issue' => $model->id], '_pjax' => '#w_associated_with']),
                     ]) ?>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="prototypeList">
+                    <?= $this->render('@app/views/prototype/list', [
+                        'prototypeList' => Prototype::find()->where(['issue_id' => $model->id])->orderBy(['id' => SORT_DESC])->all(),
+                        'model' => $model
+                    ]) ?>
+                </div>
+                <div role="tabpanel" class="tab-pane" id="attachList">
+                    
                 </div>
             </div>
         </div>

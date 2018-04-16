@@ -82,7 +82,7 @@ class PrototypeController extends DefaultController
             $model->save();
             return $this->renderAjax('_update_form', [
                 'model' => $model,
-                'action' => 'update?id=' . $model->id
+                'action' => '/prototype/update?id=' . $model->id
             ]);
             //return $this->redirect(['view', 'id' => $model->id]);
         }
@@ -103,7 +103,7 @@ class PrototypeController extends DefaultController
 
         return $this->renderAjax('update', [
             'model' => $model,
-            'action' => 'update?id=' . $model->id
+            'action' => '/prototype/update?id=' . $model->id
         ]);
     }
 
@@ -119,7 +119,7 @@ class PrototypeController extends DefaultController
 
         return $this->renderAjax('_update_form', [
             'model' => $model,
-            'action' => 'update?id=' . $model->id
+            'action' => '/prototype/update?id=' . $model->id
         ]);
     }
 

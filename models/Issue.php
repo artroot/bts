@@ -167,4 +167,36 @@ class Issue extends ActiveRecord
     {
         return sprintf('#%s-%s', @$this->getProject()->name, @$this->id);
     }
+
+    /**
+     * @return ActiveRecord
+     */
+    public function getAssociateWith()
+    {
+        return Relation::find()->where(['from_issue' => $this->id]);
+    }
+
+    /**
+     * @return ActiveRecord
+     */
+    public function getRelatedFor()
+    {
+        return Relation::find()->where(['to_issue' => $this->id]);
+    }
+
+    /**
+     * @return ActiveRecord
+     */
+    public function getPrototypes()
+    {
+        return Prototype::find()->where(['issue_id' => $this->id]);
+    }
+
+    /**
+     * @return ActiveRecord
+     */
+    public function getAttachments()
+    {
+        return Attachment::find()->where(['issue_id' => $this->id]);
+    }
 }

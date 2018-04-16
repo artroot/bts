@@ -8,11 +8,11 @@ use Yii;
  * This is the model class for table "attachment".
  *
  * @property int $id
- * @property int $task_id
+ * @property int $issue_id
  * @property string $file
  * @property string $type
  *
- * @property Task $task
+ * @property Issue $issue
  */
 class Attachment extends \yii\db\ActiveRecord
 {
@@ -30,9 +30,9 @@ class Attachment extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['task_id'], 'integer'],
+            [['issue_id'], 'integer'],
             [['file', 'type'], 'string'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
+            [['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
         ];
     }
 
@@ -43,7 +43,7 @@ class Attachment extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'task_id' => 'Task ID',
+            'issue_id' => 'Issue',
             'file' => 'File',
             'type' => 'Type',
         ];
@@ -52,8 +52,8 @@ class Attachment extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getTask()
+    public function getIssue()
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
+        return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
     }
 }
