@@ -9,6 +9,7 @@
  */
 
 use yii\bootstrap\Modal;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 ?>
@@ -18,10 +19,11 @@ use yii\helpers\Url;
     <li>
         <blockquote style="font-size: small;">
         <?php if (strstr($attachment->type, 'image') !== false): ?>
-                <a data-toggle="modal" data-target="#img_<?= $attachment->id ?>">
-                <figure>
-                <img height="70px" src="<?= Url::to(['attachment/get', 'id' => $attachment->id]) ?>">
-                <figcaption>
+                <a href="#" data-toggle="modal" data-target="#img_<?= $attachment->id ?>">
+                <span class="glyphicon glyphicon-picture"></span>
+                <figure style="display: inline;">
+                <img class="img-thumbnail" style="height: 70px;" src="<?= Url::to(['attachment/get', 'id' => $attachment->id]) ?>">
+                <figcaption style="display: inline;">
                     <?= $attachment->base_name ?>
                 </figcaption>
                 </figure>
@@ -41,6 +43,11 @@ use yii\helpers\Url;
                     <span class="glyphicon glyphicon-file"></span> <?= $attachment->base_name ?>
                 </a>
         <?php endif; ?>
+            <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['attachment/delete', 'id' => $attachment->id],
+                ['class' => 'pull-right', 'style' => 'position: absolute; right: 0; top: 45%;', 'data' => [
+                'confirm' => 'Are you sure you want to delete this attachment?',
+                'method' => 'post',
+            ]]) ?>
         </blockquote>
     </li>
 <?php endforeach; ?>

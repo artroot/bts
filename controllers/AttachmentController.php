@@ -49,9 +49,7 @@ class AttachmentController extends DefaultController
                 $model->getIssue()->one()->name,
                 Url::to(['/issue/update', 'id' => $model->getIssue()->one()->id], true)
             ));
-            return $this->renderPartial('list', [
-                'attachments' => Attachment::find()->where(['issue_id' => $model->issue_id])->orderBy(['id' => SORT_DESC])->all()
-            ]);
+            return $this->redirect(Url::previous());
         }
 
         return $this->render('create', [
@@ -70,7 +68,7 @@ class AttachmentController extends DefaultController
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(Url::previous());
     }
 
     /**

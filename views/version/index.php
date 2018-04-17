@@ -39,6 +39,7 @@
 				'filter' => $searchModel
 			],
 			'start_date',
+			'plan_date',
 			'finish_date',
 			'description:ntext',
 

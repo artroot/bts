@@ -12,12 +12,20 @@ use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 ?>
-
+<ul class="nav nav-pills nav-stacked">
 <?php foreach ($prototypeList as $prototype): ?>
-    <blockquote style="font-size: small;">
+    <li>
+    <blockquote class="" style="font-size: small;">
         <a href="<?= Url::to(['prototype/view', 'id' => $prototype->id]) ?>">
-        <span class="glyphicon glyphicon-eye-open"></span>
+        <span class="glyphicon glyphicon-compressed"></span>
         <?= $prototype->index() ?> <?= $prototype->name ?>
         </a>
+        <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['prototype/delete', 'id' => $prototype->id],
+            ['class' => 'pull-right', 'style' => 'position: absolute; right: 0; top: 45%;', 'data' => [
+                'confirm' => 'Are you sure you want to delete this prototype?',
+                'method' => 'post',
+            ]]) ?>
     </blockquote>
+    </li>
 <?php endforeach; ?>
+</ul>

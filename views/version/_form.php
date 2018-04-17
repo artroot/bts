@@ -29,9 +29,11 @@ app\assets\AppAsset::register($this);
 
     <?= $form->field($model, 'start_date')->textInput() ?>
 
+    <?= $form->field($model, 'plan_date')->textInput() ?>
+
     <script>
         $(document).ready(function () {
-            $('#version-start_date').datetimepicker({
+            $(['#version-start_date', '#version-plan_date']).datetimepicker({
                 datepicker:true,
                 format:'Y-m-d H:i'
             });

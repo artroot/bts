@@ -97,15 +97,14 @@ class VersionController extends DefaultController
     {
         $model = $this->findModel($id);
         $model->status = Version::RELEASED;
-        $model->finish_date = date('Y-m-d H:i:s');
-        $model->save();
-
-        $this->sendToTelegram(sprintf('User %s <b>RELEASED</b> version <b>%s</b> in project <b>%s</b>',
-            Yii::$app->user->identity->username,
-            $model->name,
-            Project::findOne(['id' => $model->project_id])->name
-        ));
-
+        $model->finish_date = date('Y-m-d H:i');
+        if ($model->save(false)) {
+            $this->sendToTelegram(sprintf('User %s <b>RELEASED</b> version <b>%s</b> in project <b>%s</b>',
+                Yii::$app->user->identity->username,
+                $model->name,
+                Project::findOne(['id' => $model->project_id])->name
+            ));
+        }
         return $this->redirect(Url::previous());
     }
 
@@ -114,14 +113,13 @@ class VersionController extends DefaultController
         $model = $this->findModel($id);
         $model->status = Version::UNRELEASED;
         $model->finish_date = null;
-        $model->save();
-
-        $this->sendToTelegram(sprintf('User %s <b>UNRELEASED</b> version <b>%s</b> in project <b>%s</b>',
-            Yii::$app->user->identity->username,
-            $model->name,
-            Project::findOne(['id' => $model->project_id])->name
-        ));
-
+        if($model->save(false)) {
+            $this->sendToTelegram(sprintf('User %s <b>UNRELEASED</b> version <b>%s</b> in project <b>%s</b>',
+                Yii::$app->user->identity->username,
+                $model->name,
+                Project::findOne(['id' => $model->project_id])->name
+            ));
+        }
         return $this->redirect(Url::previous());
     }
 
@@ -136,20 +134,23 @@ class VersionController extends DefaultController
 
         $model->project_id = $project_id;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $this->sendToTelegram(sprintf('User %s create new varsion %s in project: %s',
-                Yii::$app->user->identity->username,
-                $model->name,
-                Project::findOne(['id' => $model->project_id])->name
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->validate() and $model->save()) {
+                $this->sendToTelegram(sprintf('User %s create new varsion %s in project: %s',
+                    Yii::$app->user->identity->username,
+                    $model->name,
+                    Project::findOne(['id' => $model->project_id])->name
                 ));
-            return $this->redirect(['project/view', 'id' => $model->project_id]);
+                return $this->redirect(['project/view', 'id' => $model->project_id]);
+            }else{
+                return $this->renderPartial('_form', [
+                    'model' => $model,
+                ]);
+            }
         }
 
         return $this->renderAjax('create', [
-            //'model' => $model,
-            'versionForm' => $this->renderPartial('_form', [
-                'model' => $model,
-            ])
+            'model' => $model,
         ]);
     }
 

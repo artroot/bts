@@ -16,7 +16,9 @@ $this->title = 'My Yii Application';
 
     <div class="row">
         <div class="col-md-4">
-            <h3>Project List</h3>
+            <h3>Project List
+            <?= Html::a('Create Project', ['project/create'], ['class' => 'btn btn-warning pull-right']) ?>
+            </h3>
            <?php foreach (Project::find()->orderBy(['id' => SORT_DESC])->all() as $project): ?>
            <a href="<?= Url::to(['project/view', 'id' => $project->id]) ?>">
            <div class="panel panel-primary">

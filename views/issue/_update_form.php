@@ -194,18 +194,10 @@ $attachmentModel->issue_id = $model->id;
                     </a>
                     <ul class="dropdown-menu">
                         <li>
-                            <a href="#prototypeList" aria-controls="prototypeList" role="tab" data-toggle="tab">
-                                Prototypes
-                                <?php if ($model->getPrototypes()->count() > 0): ?>
-                                    <span class="badge"><?= $model->getPrototypes()->count() ?></span>
-                                <?php endif; ?>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#attachList" aria-controls="attachList" role="tab" data-toggle="tab">
-                                Attachments
-                                <?php if ($model->getAttachments()->count() > 0): ?>
-                                    <span class="badge"><?= $model->getAttachments()->count() ?></span>
+                            <a href="#additions" aria-controls="additions" role="tab" data-toggle="tab">
+                                Attachments & Prototypes
+                                <?php if ($model->getPrototypes()->count()+$model->getAttachments()->count() > 0): ?>
+                                    <span class="badge"><?= $model->getPrototypes()->count()+$model->getAttachments()->count() ?></span>
                                 <?php endif; ?>
                             </a>
                         </li>
@@ -221,12 +213,23 @@ $attachmentModel->issue_id = $model->id;
                                     'options' => ['enctype' => 'multipart/form-data']
                                 ]); ?>
                                 <?= $form->field($attachmentModel, 'issue_id')->hiddenInput()->label(false) ?>
-                                <label style="font-weight: unset;">
+                                <label style="font-weight: unset; cursor: pointer;">
                                     Add attachment
-                                    <input type="file" style="display: none;" form="attachmentForm" name="Attachment[file]">
+                                    <input type="file" id="attachment-file" style="display: none;" form="attachmentForm" name="Attachment[file]">
                                 </label>
                                 <?php ActiveForm::end(); ?>
+                                <div class="progress hidden" id="uploadingProgress">
+                                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                        Uploading file...
+                                    </div>
+                                </div>
                             </a>
+                            <script>
+                                $('#attachment-file').change(function() {
+                                    $('#attachmentForm').addClass('hidden');
+                                    $('#uploadingProgress').removeClass('hidden');
+                                });
+                            </script>
                         </li>
                     </ul>
                 </li>
@@ -251,13 +254,11 @@ $attachmentModel->issue_id = $model->id;
                         'dataProvider' => $searchModelAssociatedWith->search(['RelationSearch' => ['from_issue' => $model->id], '_pjax' => '#w_associated_with']),
                     ]) ?>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="prototypeList">
+                <div role="tabpanel" class="tab-pane" id="additions">
                     <?= $this->render('@app/views/prototype/list', [
                         'prototypeList' => Prototype::find()->where(['issue_id' => $model->id])->orderBy(['id' => SORT_DESC])->all(),
                         'model' => $model
                     ]) ?>
-                </div>
-                <div role="tabpanel" class="tab-pane" id="attachList">
                     <?= $this->render('@app/views/attachment/list', [
                         'attachments' => Attachment::find()->where(['issue_id' => $model->id])->orderBy(['id' => SORT_DESC])->all()
                     ]);
@@ -268,7 +269,7 @@ $attachmentModel->issue_id = $model->id;
 
         <?php
         Pjax::widget([
-            'id' => 'attachList',  // response goes in this element
+            'id' => 'additions',  // response goes in this element
             'enablePushState' => false,
             'enableReplaceState' => false,
             'formSelector' => '#attachmentForm',// this form is submitted on change
@@ -297,7 +298,6 @@ $attachmentModel->issue_id = $model->id;
                     <div class="relation-form">
                         <form id="createRelationForm" action="<?= Url::to(['relation/create']) ?>" method="post">
                             <div id="searchResult">
-
                             </div>
                         </form>
                     </div>
@@ -310,6 +310,7 @@ $attachmentModel->issue_id = $model->id;
                         'formSelector' => '#searchIssue',// this form is submitted on change
                         'submitEvent' => 'keyup',
                     ]);
+
                     ?>
                 </div>
                 <div class="modal-footer">

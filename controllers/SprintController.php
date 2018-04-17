@@ -71,7 +71,12 @@ class SprintController extends DefaultController
         if ($project_id) $model->project_id = $project_id;
         else $model->project_id = Project::find()->one()->id;
 
-        if ($version_id) $model->version_id = $version_id;
+        if ($version_id) {
+            $versionModel = Version::findOne(['id' => $version_id]);
+            $model->version_id = $version_id;
+            $model->start_date = $versionModel->start_date;
+            $model->finish_date = $versionModel->plan_date;
+        }
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
 

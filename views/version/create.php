@@ -18,8 +18,6 @@
 /* @var $model app\models\Version */
 
 $this->title = 'Create Version';
-$this->params['breadcrumbs'][] = ['label' => 'Versions', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="version-create">
 
@@ -32,7 +30,9 @@ $this->params['breadcrumbs'][] = $this->title;
         ]); ?>
 
     <div id="versionFormContainer">
-    <?= @$versionForm ?>
+    <?= $this->render('_form', [
+        'model' => $model
+    ]) ?>
     </div>
 
     <?php Modal::end(); ?>

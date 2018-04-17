@@ -13,6 +13,7 @@ use Yii;
  * @property string $description
  * @property string $start_date
  * @property string $finish_date
+ * @property string $plan_date
  * @property int $status
  */
 class Version extends \yii\db\ActiveRecord
@@ -35,8 +36,8 @@ class Version extends \yii\db\ActiveRecord
     {
         return [
             [['project_id', 'status'], 'integer'],
-            [['description'], 'string'],
-            [['start_date', 'finish_date'], 'safe'],
+            [['description', 'finish_date'], 'string'],
+            [['start_date', 'plan_date'], 'datetime', 'format' => 'php:Y-m-d H:i'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -52,7 +53,8 @@ class Version extends \yii\db\ActiveRecord
             'name' => 'Name',
             'description' => 'Description',
             'start_date' => 'Start Date',
-            'finish_date' => 'Release Date',
+            'finish_date' => 'Released',
+            'plan_date' => 'Release Date',
             'status' => 'Status',
         ];
     }
