@@ -6,6 +6,7 @@ use Yii;
 use app\models\Prototype;
 use app\models\PrototypeSearch;
 use app\controllers\DefaultController;
+use yii\helpers\Url;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\web\UploadedFile;
@@ -135,12 +136,9 @@ class PrototypeController extends DefaultController
     {
         $model = $this->findModel($id);
         $path = $model->path;
-        $path = explode('/',$path);
-        array_pop($path);
-        $path = implode('/', $path);
         $this->findModel($id)->delete();
         Prototype::delTree(Yii::$app->basePath . '/web' . $path);
-        return $this->redirect(['index']);
+        return $this->redirect(Url::previous());
     }
 
     /**

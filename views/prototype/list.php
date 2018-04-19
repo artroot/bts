@@ -16,7 +16,7 @@ use yii\widgets\Pjax;
 <?php foreach ($prototypeList as $prototype): ?>
     <li>
     <blockquote class="" style="font-size: small;">
-        <a href="<?= Url::to(['prototype/view', 'id' => $prototype->id]) ?>">
+        <a href="<?= Url::to(['prototype/view', 'id' => $prototype->id]) ?>" target="_blank">
         <span class="glyphicon glyphicon-compressed"></span>
         <?= $prototype->index() ?> <?= $prototype->name ?>
         </a>
