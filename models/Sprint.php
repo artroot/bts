@@ -104,7 +104,7 @@ class Sprint extends \yii\db\ActiveRecord
 
     public function getCompleteProgressPercent()
     {
-        return $this->getIssues()->count() > 0 ? ($this->getIssues()->where(['!=', 'finish_date', ''])->count())*100/($this->getIssues()->count()) : 0;
+        return $this->getIssues()->count() > 0 ? ($this->getIssues()->where(['!=', 'finish_date', ''])->orWhere(['>', 'finish_date', '0000-00-00 00:00:00'])->count())*100/($this->getIssues()->count()) : 0;
     }
 
     public function getDaysRemaining()
