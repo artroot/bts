@@ -118,9 +118,9 @@ class Sprint extends \yii\db\ActiveRecord
             return sprintf('deadline day');
         }elseif($this->getDaysRemaining() <= 0){
             if ((new \DateTime($this->finish_date))->format('Y-m-d H:i'))
-                return sprintf('overdue today at %s', (new \DateTime($this->finish_date))->format('H:i'));
+                return sprintf('expired today at %s', (new \DateTime($this->finish_date))->format('H:i'));
             else
-                return sprintf('overdue %d days ago', intval($this->getDaysRemaining()));
+                return sprintf('expired %d days ago', intval($this->getDaysRemaining()));
         }else{
             return sprintf('%d days remaining', intval($this->getDaysRemaining()));
         }
