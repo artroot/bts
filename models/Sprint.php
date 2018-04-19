@@ -109,7 +109,18 @@ class Sprint extends \yii\db\ActiveRecord
 
     public function getDaysRemaining()
     {
-        return (new \DateTime())->diff((new \DateTime($this->finish_date)))->format('%a');
+        return (new \DateTime())->diff((new \DateTime($this->finish_date)))->format('%R%a');
+    }
+
+    public function getState()
+    {
+        if ($this->getDaysRemaining() == 0){
+            return sprintf('deadline day');
+        }elseif($this->getDaysRemaining() < 0){
+            return sprintf('overdue %d days ago', intval($this->getDaysRemaining()));
+        }else{
+            return sprintf('%d days remaining', intval($this->getDaysRemaining()));
+        }
     }
 
     /**
@@ -117,6 +128,6 @@ class Sprint extends \yii\db\ActiveRecord
      */
     public function index()
     {
-        return $this->status ? sprintf('<s>Sprint-%d</s>', $this->id) : sprintf('Sprint-%d', $this->id);
+        return (($this->status or date('Y-m-d H:i') > (new \DateTime($this->finish_date))->format('Y-m-d H:i')) ? sprintf('<s>Sprint-%d</s>', $this->id) : sprintf('Sprint-%d', $this->id));
     }
 }

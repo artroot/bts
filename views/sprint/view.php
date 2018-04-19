@@ -24,7 +24,7 @@ $this->params['titleItems'] = [
         ],
         [
             'label' => '<center><span class="text-muted">
-        <span class="glyphicon glyphicon-hourglass"></span><span>'. $model->getDaysRemaining() .' days remaining</span>
+        <span class="glyphicon glyphicon-hourglass"></span><span>'. $model->getState() .'</span>
     </span></center>'
         ],
         [
@@ -56,7 +56,7 @@ $this->params['titleItems'] = [
     <h3><?= $model->name ?></h3>
     <p><?= sprintf('<span class="btn-link">%s</span> - <span class="btn-link">%s</span>', $model->start_date, $model->finish_date) ?>
         <span class="text-muted">
-        <span class="glyphicon glyphicon-hourglass"></span><span><?= $model->getDaysRemaining() ?> days remaining</span>
+        <span class="glyphicon glyphicon-hourglass"></span><span><?= $model->getState() ?></span>
     </span>
     </p>
 
