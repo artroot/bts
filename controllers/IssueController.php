@@ -147,6 +147,9 @@ class IssueController extends DefaultController
                 if ($model->issuestatus_id !== $oldModel->issuestatus_id && $model->isDone()) {
                     $model->finish_date = date('Y-m-d H:i:s');
                     $model->save();
+                }elseif($oldModel->isDone() && !$model->isDone()){
+                    $model->finish_date = '0000-00-00 00:00:00';
+                    $model->save();
                 }
 
                 $changes = null;

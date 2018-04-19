@@ -87,7 +87,9 @@ $attachmentModel->issue_id = $model->id;
             </h3>
             <ol class="issue-nav">
                 <li title="<?= $model->getOwner()->username ?>"><?= sprintf('Created by %s: %s', $model->getOwner()->first_name . ' ' . $model->getOwner()->last_name ,$model->create_date) ?></li>
+                <?php if (!empty($model->finish_date) and $model->finish_date != '0000-00-00 00:00:00'): ?>
                 <li><?= sprintf('Resolved: %s', $model->finish_date) ?></li>
+                <?php endif; ?>
             </ol>
         </div>
 
