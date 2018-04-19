@@ -13,8 +13,6 @@ use yii\widgets\DetailView;
 
 $svg = SVG::generate($model->getProgress(), $model->getSprintCountDays());
 
-var_dump($model->getProgress());
-
 $this->title = @$model->getProject()->name . ' ' . $model->index();
 
 
