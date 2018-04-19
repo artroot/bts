@@ -114,10 +114,13 @@ class Sprint extends \yii\db\ActiveRecord
 
     public function getState()
     {
-        if ($this->getDaysRemaining() == 0){
+        if ($this->getDaysRemaining() == 0 && (new \DateTime($this->finish_date))->format('Y-m-d H:i') > date('Y-m-d H:i')){
             return sprintf('deadline day');
-        }elseif($this->getDaysRemaining() < 0){
-            return sprintf('overdue %d days ago', intval($this->getDaysRemaining()));
+        }elseif($this->getDaysRemaining() <= 0){
+            if ((new \DateTime($this->finish_date))->format('Y-m-d H:i'))
+                return sprintf('overdue today at %s', (new \DateTime($this->finish_date))->format('H:i'));
+            else
+                return sprintf('overdue %d days ago', intval($this->getDaysRemaining()));
         }else{
             return sprintf('%d days remaining', intval($this->getDaysRemaining()));
         }
