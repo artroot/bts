@@ -87,9 +87,9 @@ class Sprint extends \yii\db\ActiveRecord
         do{
             if (!isset($date)) $date = (new \DateTime($this->start_date));
 
-            $progress[] = $this->getIssues()->where(['finish_date' => NULL])->orWhere(['>', 'finish_date', $date->modify('+1 day')->format('Y-m-d 01:00:00')])->count();
+            $progress[] = $this->getIssues()->where(['finish_date' => ''])->orWhere(['>=', 'finish_date', $date->modify('+1 day')->format('Y-m-d H:i:s')])->count();
 
-        }while($date->format('Y-m-d') <= (new \DateTime())->format('Y-m-d'));
+        }while($date->format('Y-m-d H:i') <= (new \DateTime())->format('Y-m-d H:i'));
 
         return $progress;
     }
