@@ -1,7 +1,8 @@
 <?php
 
-namespace app\models;
+namespace app\modules\admin\models;
 
+use app\models\Issue;
 use Yii;
 
 /**
@@ -10,6 +11,8 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property int $state_id
+ * @property int $count_progress_from
+ * @property int $count_progress_to
  *
  * @property Issue[] $issues
  */
@@ -30,7 +33,7 @@ class Issuestatus extends \yii\db\ActiveRecord
     {
         return [
             [['state_id'], 'required'],
-            [['state_id'], 'integer'],
+            [['state_id', 'count_progress_to', 'count_progress_from'], 'integer'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -43,7 +46,9 @@ class Issuestatus extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'state_id' => 'State',
+            'state_id' => 'Main State',
+            'count_progress_from' => 'Count the execution time in the transition from',
+            'count_progress_to' => 'Count the execution time in the transition to',
         ];
     }
 

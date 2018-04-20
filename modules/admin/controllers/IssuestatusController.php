@@ -1,11 +1,10 @@
 <?php
 
-namespace app\controllers;
+namespace app\modules\admin\controllers;
 
 use Yii;
-use app\models\Issuestatus;
-use app\models\IssuestatusSearch;
-use yii\web\Controller;
+use app\modules\admin\models\Issuestatus;
+use app\modules\admin\models\IssuestatusSearch;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -53,7 +52,7 @@ class IssuestatusController extends DefaultController
         $model = new Issuestatus();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['settings/statuses']);
         }
 
         return $this->render('create', [
@@ -73,7 +72,7 @@ class IssuestatusController extends DefaultController
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['settings/statuses']);
         }
 
         return $this->render('update', [
@@ -92,7 +91,7 @@ class IssuestatusController extends DefaultController
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['settings/statuses']);
     }
 
     /**

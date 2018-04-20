@@ -69,13 +69,13 @@ final class SVG
 				'line' => [
 					'y1' => (isset($this->data[$i - 1]) ? 100-($this->data[$i - 1]*100/$this->getDivide(self::SVG_Y)['max']) . '%' : 100-($this->data[$i]*100/$this->getDivide(self::SVG_Y)['max']) . '%'),
 					'y2' => 100-($this->data[$i]*100/$this->getDivide(self::SVG_Y)['max']) . '%',
-					'x1' => ($i > 0 ? (($i-1)*100/($this->maxX-1)) . '%' : ($i*100/($this->maxX-1)) . '%'),
-					'x2' => ($i*100/($this->maxX-1)) . '%',
+					'x1' => ($i > 0 ? (($i-1)*100/($this->maxX)) . '%' : ($i*100/($this->maxX)) . '%'),
+					'x2' => ($i*100/($this->maxX)) . '%',
 					'stroke-width' => 1.5,
 					'stroke' => 'red'
 				],
 				'ellipse' => [
-					'cx' => ($i*100/($this->maxX-1)) . '%',
+					'cx' => ($i*100/($this->maxX)) . '%',
 					'cy' => 100-($this->data[$i]*100/$this->getDivide(self::SVG_Y)['max']) . '%',
 					'rx' => 1.6,
 					'ry' => 1.6,

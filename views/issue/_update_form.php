@@ -3,7 +3,7 @@
 use app\models\Attachment;
 use app\models\Comment;
 use app\models\Issuepriority;
-    use app\models\Issuestatus;
+    use app\modules\admin\models\Issuestatus;
     use app\models\Issuetype;
     use app\models\Project;
 use app\models\Prototype;

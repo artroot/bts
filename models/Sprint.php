@@ -89,7 +89,7 @@ class Sprint extends \yii\db\ActiveRecord
 
             $progress[] = $this->getIssues()->where(['finish_date' => ''])->orWhere(['>=', 'finish_date', $date->modify('+1 day')->format('Y-m-d H:i:s')])->count();
 
-        }while($date->format('Y-m-d H:i') <= (new \DateTime())->format('Y-m-d H:i'));
+        }while($date->format('Y-m-d H:i') < (new \DateTime())->format('Y-m-d H:i'));
 
         return $progress;
     }
@@ -117,8 +117,10 @@ class Sprint extends \yii\db\ActiveRecord
         if ($this->getDaysRemaining() == 0 && (new \DateTime($this->finish_date))->format('Y-m-d H:i') > date('Y-m-d H:i')){
             return sprintf('deadline day');
         }elseif($this->getDaysRemaining() <= 0){
-            if ((new \DateTime($this->finish_date))->format('Y-m-d H:i'))
+            if ((new \DateTime($this->finish_date))->format('Y-m-d') == date('Y-m-d'))
                 return sprintf('expired today at %s', (new \DateTime($this->finish_date))->format('H:i'));
+            elseif($this->getDaysRemaining() == 0)
+                return sprintf('expired yesterday at %s', (new \DateTime($this->finish_date))->format('H:i'));
             else
                 return sprintf('expired %d days ago', intval($this->getDaysRemaining()));
         }else{

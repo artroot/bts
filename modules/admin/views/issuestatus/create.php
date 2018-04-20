@@ -7,7 +7,7 @@ use yii\helpers\Html;
 /* @var $model app\models\Issuestatus */
 
 $this->title = 'Create Issuestatus';
-$this->params['breadcrumbs'][] = ['label' => 'Issuestatuses', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Settings', 'url' => ['settings/statuses']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="issuestatus-create">

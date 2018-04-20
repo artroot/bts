@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\controllers;
 
+use app\modules\admin\models\IssuestatusSearch;
 use app\models\UsersSearch;
 use app\modules\admin\models\Telegram;
 use Predis\Client;
@@ -74,6 +75,30 @@ class SettingsController extends DefaultController
         }
     }
 
+    public function actionStatuses()
+    {
+        $searchModel = new IssuestatusSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        if (Yii::$app->request->isAjax) {
+            return $this->renderPartial('index', [
+                'data' => $this->renderPartial('@app/modules/admin/views/issuestatus/index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                ]),
+                'active' => 'statuses'
+            ]);
+        }else{
+            return $this->render('index', [
+                'data' => $this->renderPartial('@app/modules/admin/views/issuestatus/index', [
+                    'searchModel' => $searchModel,
+                    'dataProvider' => $dataProvider,
+                ]),
+                'active' => 'statuses'
+            ]);
+        }
+    }
+    
     public function actionUsers()
     {
         $searchModel = new UsersSearch();

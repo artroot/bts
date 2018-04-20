@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\modules\admin\models\Issuestatus;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
