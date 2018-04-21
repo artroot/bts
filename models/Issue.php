@@ -159,6 +159,24 @@ class Issue extends ActiveRecord
         return $this->hasOne(Issuestatus::className(), ['id' => 'issuestatus_id'])->one();
     }
 
+    public function getIssuestatus()
+    {
+        return $this->getStatus();
+    }
+
+    /**
+     * @return Issuepriority
+     */
+    public function getIssuepriority()
+    {
+        return $this->getPriority();
+    }
+
+    public function getIssuetype()
+    {
+        return $this->getType();
+    }
+
     public function isDone()
     {
         return Issuestatus::findOne(['id' => $this->issuestatus_id])->state_id == State::DONE;

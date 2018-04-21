@@ -14,7 +14,8 @@ use app\models\Sprint;
 use app\models\State;
 use app\models\Users;
     use app\models\Version;
-    use yii\helpers\ArrayHelper;
+use app\modules\admin\models\Log;
+use yii\helpers\ArrayHelper;
     use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\jui\DatePicker;
@@ -243,7 +244,11 @@ $attachmentModel->issue_id = $model->id;
                         'issue_id' => $model->id
                     ]) ?>
                 </div>
-                <div role="tabpanel" class="tab-pane" id="log">...</div>
+                <div role="tabpanel" class="tab-pane" id="log">
+                    <?= $this->render('@app/modules/admin/views/log/index', [
+                        'logModels' => Log::find()->where(['model' => $model->className()])->andWhere(['model_id' => $model->id])->orderBy(['date' => SORT_DESC])->all()
+                    ]) ?>
+                </div>
                 <div role="tabpanel" class="tab-pane" id="related_for">
                     <?= $this->render('@app/views/relation/index_related_for', [
                         'searchModel' => $searchModelRelatedFor = new RelationSearch(),

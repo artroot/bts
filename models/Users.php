@@ -122,4 +122,10 @@ class Users extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Usertype::className(), ['id' => 'usertype_id']);
     }
+
+    public function index()
+    {
+        return sprintf('%s %s', $this->first_name, $this->last_name);
+    }
+
 }

@@ -2,10 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\Issuestatus;
+use app\modules\admin\models\Issuestatus;
 use app\models\Project;
 use app\models\Relation;
 use app\models\State;
+use app\modules\admin\models\Log;
 use Yii;
 use app\models\Issue;
 use app\models\IssueSearch;
@@ -159,6 +160,7 @@ class IssueController extends DefaultController
                     }
                 }
                 if (!empty($changes)) {
+                    Log::add($model, 'update', $oldModel);
                     $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                         Yii::$app->user->identity->username,
                         $model->name,
