@@ -143,35 +143,59 @@ class IssueController extends DefaultController
 
             $oldModel = clone $model;
 
-            if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            if ($model->load(Yii::$app->request->post())) {
 
-                if ($model->issuestatus_id !== $oldModel->issuestatus_id && $model->isDone()) {
-                    $model->finish_date = date('Y-m-d H:i:s');
-                    $model->save();
-                }elseif($oldModel->isDone() && !$model->isDone()){
-                    $model->finish_date = '0000-00-00 00:00:00';
-                    $model->save();
+                if($model->start_date == NULL && $model->issuestatus_id !== $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_to && $model->getStatus()->count_progress_from){
+
+                    $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i:s');
+                    return $this->renderPartial('_update_form', [
+                        'model' => $model,
+                        'action' => '/issue/update?id=' . $id
+                    ]);
+                }else{
+                    $diff = (new \DateTime())->diff((new \DateTime($model->start_date)));
+                    $hours = $diff->h;
+                    $hours = $hours + ($diff->days*24);
+                    $model->progress_time += $hours;
                 }
 
-                $changes = null;
-                foreach ($model->attributeLabels() as $key => $value){
-                    if (@$model->{$key} != @$oldModel->{$key}) {
-                        $changes .= "\r\n" . 'Changed ' . @$value . "\r\n" . @$model->{$key};
+                if($model->save()) {
+
+                    if ($model->issuestatus_id !== $oldModel->issuestatus_id && $model->isDone()) {
+                        $model->finish_date = date('Y-m-d H:i:s');
+                        $model->save(false);
+                    } elseif ($oldModel->isDone() && !$model->isDone()) {
+                        $model->finish_date = '0000-00-00 00:00:00';
+                        $model->save(false);
                     }
+
+                    $changes = null;
+                    foreach ($model->attributeLabels() as $key => $value) {
+                        if (@$model->{$key} != @$oldModel->{$key}) {
+                            $changes .= "\r\n" . 'Changed ' . @$value . "\r\n" . @$model->{$key};
+                        }
+                    }
+                    if (!empty($changes)) {
+                        Log::add($model, 'update', $oldModel);
+                        $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
+                            Yii::$app->user->identity->username,
+                            $model->name,
+                            Project::findOne(['id' => @$model->project_id])->name,
+                            $changes
+                        ));
+                    }
+                    $model->start_date = NULL;
+                    return $this->renderPartial('_update_form', [
+                        'model' => $model,
+                        'action' => '/issue/update?id=' . $id
+                    ]);
+                }else{
+                    $model->start_date = NULL;
+                    return $this->renderPartial('_update_form', [
+                        'model' => $model,
+                        'action' => '/issue/update?id=' . $id
+                    ]);
                 }
-                if (!empty($changes)) {
-                    Log::add($model, 'update', $oldModel);
-                    $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
-                        Yii::$app->user->identity->username,
-                        $model->name,
-                        Project::findOne(['id' => @$model->project_id])->name,
-                        $changes
-                    ));
-                }
-                return $this->renderPartial('_update_form', [
-                    'model' => $model,
-                    'action' => '/issue/update?id=' . $id
-                ]);
             }
 
             return $this->render('update', [

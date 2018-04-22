@@ -3,6 +3,7 @@
 namespace app\models;
 
 use app\modules\admin\models\Issuestatus;
+use app\modules\admin\models\Log;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
@@ -26,9 +27,14 @@ use yii\helpers\ArrayHelper;
  * @property int $performer_id
  * @property int $owner_id
  * @property int $project_id
+ * @property int $progress_time
+ *
+ * @property int $start_date
  */
 class Issue extends ActiveRecord
 {
+
+    public $start_date;
 
     /**
      * @inheritdoc
@@ -45,9 +51,9 @@ class Issue extends ActiveRecord
     {
         return [
             [['description'], 'string'],
-            [['create_date', 'finish_date', 'deadline'], 'safe'],
-            [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id'], 'integer'],
-            [['owner_id', 'project_id', 'detected_version_id', 'resolved_version_id'], 'required'],
+            [['create_date', 'finish_date', 'deadline', 'start_date'], 'safe'],
+            [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'progress_time'], 'integer'],
+            [['owner_id', 'project_id'], 'required'],
             [['name'], 'string', 'max' => 255]
         ];
     }
@@ -63,16 +69,18 @@ class Issue extends ActiveRecord
             'description' => 'Description',
             'create_date' => 'Created',
             'finish_date' => 'Finished',
+            'start_date' => 'Started at',
             'deadline' => 'Deadline',
             'issuetype_id' => 'Type',
             'issuepriority_id' => 'Priority',
-            'issuestatus_id' => 'State',
+            'issuestatus_id' => 'Status',
             'sprint_id' => 'Sprint',
             'resolved_version_id' => 'Resolved Version',
             'detected_version_id' => 'Detected Version',
             'performer_id' => 'Performer',
             'owner_id' => 'Owner',
             'project_id' => 'Project',
+            'progress_time' => 'Spent Time',
         ];
     }
 
@@ -217,5 +225,46 @@ class Issue extends ActiveRecord
     public function getAttachments()
     {
         return Attachment::find()->where(['issue_id' => $this->id]);
+    }
+
+    public function getResolved_version()
+    {
+        return $this->hasOne(Version::className(), ['id' => 'resolved_version_id'])->one();
+    }
+
+    public function getDetected_version()
+    {
+        return $this->hasOne(Version::className(), ['id' => 'detected_version_id'])->one();
+    }
+
+    public function getSprint()
+    {
+        return $this->hasOne(Sprint::className(), ['id' => 'sprint_id'])->one();
+    }
+
+    public function getLastChangedStatusDate()
+    {
+        $log = Log::find()
+            ->where(['model' => $this->className()])
+            ->where(['model_id' => $this->id])
+            ->where(['like', 'data_new', '%issuestatus_id%', false])
+            ->orderBy(['id' => SORT_DESC])->limit(1)->one();
+        return @$log->date;
+    }
+
+    public function getProgressTime()
+    {
+        if ($this->progress_time) {
+            $diff = (new \DateTime())->diff((new \DateTime())->modify('-' . $this->progress_time . ' hour'));
+            $msg = null;
+            if ($diff->format('%y')) $msg .= $diff->format('%y') . ' Years ';
+            if ($diff->format('%m')) $msg .= $diff->format('%m') . ' Months ';
+            if ($diff->format('%d')) $msg .= $diff->format('%d') . ' Days ';
+            if ($diff->format('%h')) $msg .= $diff->format('%h') . ' Hour ';
+        }else{
+            $msg = '0 Days';
+        }
+
+        return $msg;
     }
 }

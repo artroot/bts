@@ -106,7 +106,20 @@ $attachmentModel->issue_id = $model->id;
             <?= $form->field($model, 'issuepriority_id', $template)->dropDownList(ArrayHelper::map(Issuepriority::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'issuetype_id', $template)->dropDownList(ArrayHelper::map(Issuetype::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'issuestatus_id', $template)->dropDownList(ArrayHelper::map(Issuestatus::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
-            <?= $form->field($model, 'performer_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
+
+                <?php if($model->start_date): ?>
+
+                    <?= $form->field($model, 'start_date', [
+                        'template' => "<tr><td>{label}</td><td>{input}\n{hint}\n{error}\r\n<input type='submit' class='btn btn-success' value='OK'></td></tr>"
+                    ])->textInput() ?>
+
+                <?php endif; ?>
+
+                <?= $form->field($model, 'progress_time', [
+                    'template' => "<tr><td>{label}</td><td><span class='btn btn-link'>" . $model->getProgressTime() . "</span></td></tr>"
+                ]) ?>
+
+                <?= $form->field($model, 'performer_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
                     return $user->first_name . ' ' . $user->last_name;
                 }), ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
                 <?= $form->field($model, 'owner_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
@@ -127,7 +140,7 @@ $attachmentModel->issue_id = $model->id;
 
                 <script>
                     $(document).ready(function () {
-                        $('#issue-deadline').datetimepicker({
+                        $(['#issue-deadline', '#issue-start_date']).datetimepicker({
                             datepicker:true,
                             format:'Y-m-d H:i'
                         });

@@ -72,11 +72,23 @@ class Log extends \yii\db\ActiveRecord
             $fc = 'get' . ucfirst(str_replace('_id', '', $key));
             if ($oldModel !== false && isset($oldModel->{$key})) {
                 if (method_exists($oldModel, $fc)) $objectOld = $oldModel->$fc();
-                $data_old[$key] = (@$objectOld instanceof ActiveRecord && isset($objectOld->name)) ? $objectOld->name : $oldModel->{$key};
+
+                if(@$objectOld instanceof ActiveRecord && isset($objectOld->name))
+                    $data_old[$key] = $objectOld->name;
+                elseif(@$objectOld instanceof ActiveRecord && method_exists($oldModel, 'index'))
+                    $data_old[$key] = $objectOld->index();
+                else
+                    $data_old[$key] = $oldModel->{$key};
             }
             if (isset($model->{$key})) {
                 if (method_exists($model, $fc)) $objectNew = $model->$fc();
-                $data_new[$key] = (@$objectNew instanceof ActiveRecord && isset($objectNew->name)) ? $objectNew->name : $model->{$key};
+
+                if(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
+                    $data_new[$key] = $objectNew->name;
+                elseif(@$objectNew instanceof ActiveRecord && method_exists($model, 'index'))
+                    $data_new[$key] = $objectNew->index();
+                else
+                    $data_new[$key] = $model->{$key};
             }
         }
 
@@ -84,8 +96,8 @@ class Log extends \yii\db\ActiveRecord
             'action' => $action,
             'model' => $model->className(),
             'model_id' => $model->id,
-            'data_old' => serialize(array_diff($data_old, $data_new)),
-            'data_new' => serialize(array_diff($data_new, $data_old)),
+            'data_old' => serialize(array_diff_assoc($data_old, $data_new)),
+            'data_new' => serialize(array_diff_assoc($data_new, $data_old)),
             'user_id' => Yii::$app->user->identity->getId()
         ]);
 

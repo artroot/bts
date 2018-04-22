@@ -24,13 +24,13 @@ $this->title = 'Update Issue';
         'formSelector' => '#issueForm',// this form is submitted on change
         'submitEvent' => 'change',
     ]);
-/*
+
     Pjax::widget([
         'id' => 'issueUpForm',  // response goes in this element
         'enablePushState' => false,
         'enableReplaceState' => false,
         'formSelector' => '#issueForm',// this form is submitted on change
         'submitEvent' => 'submit',
-    ]);*/
+    ]);
 
 ?>

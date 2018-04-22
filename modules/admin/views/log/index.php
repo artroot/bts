@@ -11,7 +11,6 @@ use yii\widgets\DetailView;
 /* @var $searchModel app\models\LogSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Logs';
 ?>
 <div class="log-index">
     <?php foreach ($logModels as $model): ?>
@@ -28,10 +27,17 @@ $this->title = 'Logs';
             <?php foreach (unserialize($model->data_old) as $key => $value): ?>
                 <div class="row">
                     <div class="col-xs-4">
-                        <?= $modelClass->attributeLabels()[$key] ?>
+                        <b><?= $modelClass->attributeLabels()[$key] ?></b>
                     </div>
                     <div class="col-xs-8">
-                        <p><?= $value ?> <span class="glyphicon glyphicon-arrow-right"></span> <?= @$data_new[$key] ?></p>
+                        <p>
+                        <?php if($key == 'description'): ?>
+                        <p><?= nl2br($value) ?></p>
+                        <p><mark><?= nl2br(@$data_new[$key]) ?></mark></p>
+                        <?php else: ?>
+                        <?= $value ?> <span class="glyphicon glyphicon-arrow-right"></span> <?= @$data_new[$key] ?>
+                        <?php endif; ?>
+                        </p>
                     </div>
                 </div>
             <?php endforeach; ?>
