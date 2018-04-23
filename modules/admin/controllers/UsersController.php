@@ -100,14 +100,10 @@ class UsersController extends DefaultController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        //$model = User::findOne(['id' => $id]);
         $old = $model->telegram_key;
 
         if ($model->load(Yii::$app->request->post())){
-            //$model->changePass();
-            //$model->setPassword($model->password);
-            //$model->generateAuthKey();
-            $model->password_hash = Yii::$app->security->generatePasswordHash($model->new_password);
+            if ($model->password && $model->new_password) $model->password_hash = Yii::$app->security->generatePasswordHash($model->new_password);
 
             if ($model->save()) {
                 if ($old != $model->telegram_key and !empty($model->telegram_key)){
