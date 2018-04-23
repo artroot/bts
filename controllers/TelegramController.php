@@ -58,16 +58,16 @@ class TelegramController extends Controller
         $chat_id = $output['message']['chat']['id'];
         $message = $output['message']['text'];
 
-
         if ($message == '/start'){
             $text = sprintf('<code>%s</code> Insert this key into your bug tracking system profile.', base64_encode($chat_id));
             Telegram::sendMessage($chat_id, $text);
         }elseif ($message == '/projectList'){
             $text = '';
+            
             if (Users::findOne(['telegram_key' => base64_encode($chat_id)])){
                 $i = 0;
                 foreach (Project::find()->all() as $project){
-                    $text .=  ++$i . '. <b>' . $project->name . ' - ' . $project->description . "</b>\r\n" . '<i>Show versions:</i> /versions' . $project->id  . "\r\n" . '--------------' . "\r\n";
+                    $text .=  ++$i . '. <b>' . @$project->name . ' - ' . @$project->description . "</b>\r\n" . '<i>Show versions:</i> /versions' . @$project->id  . "\r\n" . '--------------' . "\r\n";
                 }
                 Telegram::sendMessage($chat_id, $text);
             }

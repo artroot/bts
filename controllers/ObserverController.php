@@ -2,9 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\Users;
+use app\models\UsersSearch;
 use Yii;
 use app\models\Observer;
 use app\models\ObserverSearch;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -52,15 +56,34 @@ class ObserverController extends DefaultController
     {
         $model = new Observer();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post()) && $model->observers) {
+            foreach ($model->observers as $user_id){
+                $observer = clone $model;
+                $observer->user_id = $user_id;
+                $observer->save();
+            }
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return $this->redirect(Url::previous());
     }
 
+    public function actionSearch()
+    {
+        $searchModel = new UsersSearch();
+
+        $search['UsersSearch']['username'] = @Yii::$app->request->queryParams['UsersSearch']['username'];
+        $search['UsersSearch']['first_name'] = Yii::$app->request->queryParams['UsersSearch']['username'];
+        $search['UsersSearch']['last_name'] = Yii::$app->request->queryParams['UsersSearch']['username'];
+        $search['_pjax'] = @Yii::$app->request->queryParams['_pjax'];
+
+        $dataProvider = $searchModel->search($search, [
+            ['NOT IN', 'id', ArrayHelper::map(Observer::find()->where(['issue_id' => @Yii::$app->request->queryParams['issue_id']])->all(),'user_id', 'user_id')]
+        ]);
+
+        return $this->renderAjax('search_users_index', [
+            'dataProvider' => $dataProvider
+        ]);
+    }
+    
     /**
      * Updates an existing Observer model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -92,7 +115,7 @@ class ObserverController extends DefaultController
     {
         $this->findModel($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(Url::previous());
     }
 
     /**

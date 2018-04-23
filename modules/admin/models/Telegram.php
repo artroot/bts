@@ -63,6 +63,7 @@ class Telegram extends \yii\db\ActiveRecord
         ]);
     }
 
+
     public static function getWebhookInfo()
     {
         $webhookInfo = self::send('getWebhookInfo');

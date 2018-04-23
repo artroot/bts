@@ -267,4 +267,10 @@ class Issue extends ActiveRecord
 
         return $msg;
     }
+
+    public function getObservers()
+    {
+        return Observer::findAll(['issue_id' => $this->id]);
+    }
+
 }

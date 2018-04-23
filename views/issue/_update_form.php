@@ -3,7 +3,8 @@
 use app\models\Attachment;
 use app\models\Comment;
 use app\models\Issuepriority;
-    use app\modules\admin\models\Issuestatus;
+use app\models\Observer;
+use app\modules\admin\models\Issuestatus;
     use app\models\Issuetype;
     use app\models\Project;
 use app\models\Prototype;
@@ -129,6 +130,21 @@ $attachmentModel->issue_id = $model->id;
                 ['prompt' => 'Not set', 'class' => 'btn btn-link']) ?>
 
                 <?= $form->field($model, 'deadline', $template)->textInput() ?>
+
+                <tr>
+                    <td><label>Observers</label></td>
+                    <td>
+                    <?php foreach($model->getObservers() as $observer): ?>
+                        <span class="btn btn-xs btn-default"><?= $observer->getUser()->index() ?> <?= Html::a('<span class="glyphicon glyphicon-remove"></span>', ['observer/delete', 'id' => $observer->id],
+                                [ 'data' => [
+                                'confirm' => 'Are you sure you want to delete ' . $observer->getUser()->index() . ' observer?',
+                                'method' => 'post',
+                            ]]) ?></span>
+                    <?php endforeach; ?>
+                        <?= Html::a('<span class="glyphicon glyphicon-plus"></span>', '#', ['data-toggle' => 'modal', 'data-target' => '#observerModal', 'style' => 'margin-left: 10px;']) ?>
+                    </td>
+                </tr>
+                
             </table>
 
                 <script>
@@ -293,6 +309,40 @@ $attachmentModel->issue_id = $model->id;
         <div class="col-lg-offset-3 col-sm-offset-5 col-md-offset-3"></div>
     </div>
 
+    <?php Modal::begin([
+        'header' => '<h3>Add Observer</h3>',
+        'id' => 'observerModal',
+        'size' => 'modal-lg',
+        'clientOptions' => ['backdrop' => 'static', 'keyboard' => FALSE]
+    ]); ?>
+    <form id="searchObserver" action="<?= Url::to(['observer/search']) ?>" method="get">
+        <input type="hidden" name="issue_id" value="<?= $model->id ?>">
+        <input type="text" name="UsersSearch[username]" class="form-control" placeholder="Search User">
+    </form>
+    <div class="observer-create">
+        <div class="observer-form">
+            <form id="createObserverForm" action="<?= Url::to(['observer/create']) ?>" method="post">
+                <div id="searchObserverResult">
+                </div>
+                <input type="hidden" id="observer-issue_id" name="Observer[issue_id]" value="<?= $model->id ?>">
+            </form>
+        </div>
+    </div>
+    <?= Html::hiddenInput(\Yii::$app->getRequest()->csrfParam, \Yii::$app->getRequest()->getCsrfToken(), ['form' => 'createObserverForm']) ?>
+    <br>
+    <button type="submit" form="createObserverForm" class="btn btn-primary">Add Selected</button>
+
+    <?php Modal::end(); ?>
+    <?php
+    Pjax::widget([
+        'id' => 'searchObserverResult',  // response goes in this element
+        'enablePushState' => false,
+        'enableReplaceState' => false,
+        'formSelector' => '#searchObserver',// this form is submitted on change
+        'submitEvent' => 'keyup',
+    ]);
+
+    ?>
 
     <!-- Modal -->
     <div class="modal fade" id="associated" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">

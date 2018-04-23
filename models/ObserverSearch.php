@@ -38,7 +38,7 @@ class ObserverSearch extends Observer
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($params, $conditions = [])
     {
         $query = Observer::find();
 
@@ -62,6 +62,10 @@ class ObserverSearch extends Observer
             'issue_id' => $this->issue_id,
             'user_id' => $this->user_id,
         ]);
+
+        if (!empty($conditions)){
+            foreach ($conditions as $condition) $query->andFilterWhere($condition);
+        }
 
         return $dataProvider;
     }

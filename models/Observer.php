@@ -10,12 +10,15 @@ use Yii;
  * @property int $id
  * @property int $issue_id
  * @property int $user_id
+ * @property array $observers
  *
  * @property Issue $issue
  * @property User $user
  */
 class Observer extends \yii\db\ActiveRecord
 {
+    public $observers = [];
+
     /**
      * @inheritdoc
      */
@@ -31,6 +34,7 @@ class Observer extends \yii\db\ActiveRecord
     {
         return [
             [['issue_id', 'user_id'], 'integer'],
+            [['observers'], 'safe'],
             [['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
         ];
@@ -45,6 +49,7 @@ class Observer extends \yii\db\ActiveRecord
             'id' => 'ID',
             'issue_id' => 'Issue ID',
             'user_id' => 'User ID',
+            'observers' => 'Users',
         ];
     }
 
@@ -61,6 +66,6 @@ class Observer extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(Users::className(), ['id' => 'user_id'])->one();
     }
 }

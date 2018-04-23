@@ -145,18 +145,20 @@ class IssueController extends DefaultController
 
             if ($model->load(Yii::$app->request->post())) {
 
-                if($model->start_date == NULL && $model->issuestatus_id !== $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_to && $model->getStatus()->count_progress_from){
+                if ($model->issuestatus_id != $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_to && $model->getStatus()->count_progress_from) {
+                    if ($model->start_date == NULL) {
 
-                    $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i');
-                    return $this->renderPartial('_update_form', [
-                        'model' => $model,
-                        'action' => '/issue/update?id=' . $id
-                    ]);
-                }else{
-                    $diff = (new \DateTime())->diff((new \DateTime($model->start_date)));
-                    $hours = $diff->h;
-                    $hours = $hours + ($diff->days*24);
-                    $model->progress_time += $hours;
+                        $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i');
+                        return $this->renderPartial('_update_form', [
+                            'model' => $model,
+                            'action' => '/issue/update?id=' . $id
+                        ]);
+                    } else {
+                        $diff = (new \DateTime())->diff((new \DateTime($model->start_date)));
+                        $hours = $diff->h;
+                        $hours = $hours + ($diff->days * 24);
+                        $model->progress_time += $hours;
+                    }
                 }
 
                 if($model->save()) {
