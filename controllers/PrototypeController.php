@@ -118,7 +118,7 @@ class PrototypeController extends DefaultController
             $model->tree = explode('/', Yii::$app->request->queryParams['back_to']);
         }
 
-        return $this->renderAjax('_update_form', [
+        return $this->renderAjax('update', [
             'model' => $model,
             'action' => '/prototype/update?id=' . $model->id
         ]);

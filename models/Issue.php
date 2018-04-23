@@ -249,7 +249,7 @@ class Issue extends ActiveRecord
             ->where(['model_id' => $this->id])
             ->where(['like', 'data_new', '%issuestatus_id%', false])
             ->orderBy(['id' => SORT_DESC])->limit(1)->one();
-        return @$log->date;
+        return @$log->date ? (new \DateTime($log->date))->format('Y-m-d H:i') : false;
     }
 
     public function getProgressTime()
@@ -257,9 +257,9 @@ class Issue extends ActiveRecord
         if ($this->progress_time) {
             $diff = (new \DateTime())->diff((new \DateTime())->modify('-' . $this->progress_time . ' hour'));
             $msg = null;
-            if ($diff->format('%y')) $msg .= $diff->format('%y') . ' Years ';
-            if ($diff->format('%m')) $msg .= $diff->format('%m') . ' Months ';
-            if ($diff->format('%d')) $msg .= $diff->format('%d') . ' Days ';
+            if ($diff->format('%y')) $msg .= $diff->format('%y') . ' Year ';
+            if ($diff->format('%m')) $msg .= $diff->format('%m') . ' Month ';
+            if ($diff->format('%d')) $msg .= $diff->format('%d') . ' Day ';
             if ($diff->format('%h')) $msg .= $diff->format('%h') . ' Hour ';
         }else{
             $msg = '0 Days';

@@ -15,6 +15,7 @@ use app\models\State;
 use app\models\Users;
     use app\models\Version;
 use app\modules\admin\models\Log;
+use yii\bootstrap\Modal;
 use yii\helpers\ArrayHelper;
     use yii\helpers\Html;
 use yii\helpers\Url;
@@ -107,16 +108,8 @@ $attachmentModel->issue_id = $model->id;
             <?= $form->field($model, 'issuetype_id', $template)->dropDownList(ArrayHelper::map(Issuetype::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
             <?= $form->field($model, 'issuestatus_id', $template)->dropDownList(ArrayHelper::map(Issuestatus::find()->all(), 'id', 'name'), ['class' => 'btn btn-link']) ?>
 
-                <?php if($model->start_date): ?>
-
-                    <?= $form->field($model, 'start_date', [
-                        'template' => "<tr><td>{label}</td><td>{input}\n{hint}\n{error}\r\n<input type='submit' class='btn btn-success' value='OK'></td></tr>"
-                    ])->textInput() ?>
-
-                <?php endif; ?>
-
                 <?= $form->field($model, 'progress_time', [
-                    'template' => "<tr><td>{label}</td><td><span class='btn btn-link'>" . $model->getProgressTime() . "</span></td></tr>"
+                    'template' => "<tr><td>{label}</td><td><h5><span style='margin-left: 15px;' class='label label-primary'>" . $model->getProgressTime() . "</span></h5></td></tr>"
                 ]) ?>
 
                 <?= $form->field($model, 'performer_id', $template)->dropDownList(ArrayHelper::map(Users::find()->all(), 'id', function ($user) {
@@ -142,6 +135,7 @@ $attachmentModel->issue_id = $model->id;
                     $(document).ready(function () {
                         $(['#issue-deadline', '#issue-start_date']).datetimepicker({
                             datepicker:true,
+                            timepicker:true,
                             format:'Y-m-d H:i'
                         });
                     });
@@ -348,5 +342,27 @@ $attachmentModel->issue_id = $model->id;
         </div>
     </div>
 </div>
+
+<?php if($model->start_date): ?>
+
+    <?php
+    Modal::begin([
+        'id' => 'issueStartTimeModal',
+        'size' => 'modal-sm'
+    ]); ?>
+
+    <?= $form->field($model, 'start_date', [
+        'template' => "{label}{input}\n{hint}\n{error}\r\n<input type='submit' form='issueForm' data-dismiss='modal' data-pjax='issueUpForm' class='btn btn-success' value='OK'>"
+    ])->textInput(['data-pjax' => '0', 'form' => 'issueForm']) ?>
+
+    <?php Modal::end(); ?>
+
+    <script>
+        $('#issueStartTimeModal').modal('show');
+    </script>
+
+<?php endif; ?>
+
+
 <?php Pjax::begin(['enablePushState' => false,  'id' => 'prototypes', 'linkSelector'=>'.prototype-actions']); ?>
 <?php Pjax::end(); ?>

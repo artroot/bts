@@ -147,7 +147,7 @@ class IssueController extends DefaultController
 
                 if($model->start_date == NULL && $model->issuestatus_id !== $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_to && $model->getStatus()->count_progress_from){
 
-                    $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i:s');
+                    $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i');
                     return $this->renderPartial('_update_form', [
                         'model' => $model,
                         'action' => '/issue/update?id=' . $id

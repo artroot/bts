@@ -21,7 +21,7 @@ $urlPath = [];
         $urlPath[] = $folder;
         ?>
         <li class="<?= count($model->getTree())-1 == $key ? 'active' : '' ?>">
-            <?= count($model->getTree())-1 == $key ? ($key == 0 ? $model->index() : $folder) : sprintf('<a href="%s" data-pjax="prototypeMainForm">%s</a>',
+            <?= count($model->getTree())-1 == $key ? ($key == 0 ? $model->index() : $folder) : sprintf('<a class="prototype-actions" href="%s" data-pjax="prototypes">%s</a>',
                 Url::to(['prototype/filebrowser', 'id' => $model->id, 'back_to' => implode('/', $urlPath)]), $key == 0 ? $model->index() : $folder) ?>
         </li>
     <?php endforeach; ?>
@@ -38,7 +38,7 @@ $urlPath = [];
             }else{
                 array_push($valuePath, $label);
                 $return .= '<a href="' . Url::to(['prototype/filebrowser', 'id' => $model->id, 'browse_to' => implode('/', $valuePath)]) .
-                    '" data-pjax="prototypeMainForm"><span class="glyphicon glyphicon-folder-open"></span> &nbsp; <span>' . $label . '</span></a>';
+                    '" class="prototype-actions" data-pjax="prototypes"><span class="glyphicon glyphicon-folder-open"></span> &nbsp; <span>' . $label . '</span></a>';
             }
             $return .= '</label></p>';
 
