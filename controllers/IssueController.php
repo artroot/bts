@@ -145,7 +145,7 @@ class IssueController extends DefaultController
 
             if ($model->load(Yii::$app->request->post())) {
 
-                if ($model->issuestatus_id != $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_to && $model->getStatus()->count_progress_from) {
+                if ($model->issuestatus_id != $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_from && $model->getStatus()->count_progress_to) {
                     if ($model->start_date == NULL) {
 
                         $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i');
