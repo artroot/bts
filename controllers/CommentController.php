@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Project;
+use app\modules\admin\models\Log;
 use Yii;
 use app\models\Comment;
 use app\models\CommentSearch;
@@ -65,6 +66,7 @@ class CommentController extends DefaultController
         $model = new Comment();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Log::add($model, 'create', $model->issue_id);
             $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the new comment to issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                 Yii::$app->user->identity->username,
                 $model->getIssue()->one()->name,
@@ -109,6 +111,7 @@ class CommentController extends DefaultController
     public function actionDelete($id)
     {
         $model = $this->findModel($id);
+        Log::add($model, 'delete', $model->issue_id);
         $this->sendToTelegram(sprintf('User <b>%s</b> DELETED the comment from issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
             Yii::$app->user->identity->username,
             $model->getIssue()->one()->name,

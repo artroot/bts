@@ -144,7 +144,7 @@ $attachmentModel->issue_id = $model->id;
                         <?= Html::a('<span class="glyphicon glyphicon-plus"></span>', '#', ['data-toggle' => 'modal', 'data-target' => '#observerModal', 'style' => 'margin-left: 10px;']) ?>
                     </td>
                 </tr>
-                
+
             </table>
 
                 <script>
@@ -212,7 +212,7 @@ $attachmentModel->issue_id = $model->id;
                     </li>
                 <li role="presentation" class="dropdown">
                     <a class="dropdown-toggle btn-xs" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
-                        Additions 
+                        Additions
                         <?php if ($model->getPrototypes()->count()+$model->getAttachments()->count() > 0): ?>
                             <span class="badge"><?= $model->getPrototypes()->count()+$model->getAttachments()->count() ?></span>
                         <?php endif; ?>
@@ -269,7 +269,7 @@ $attachmentModel->issue_id = $model->id;
                 </div>
                 <div role="tabpanel" class="tab-pane" id="log">
                     <?= $this->render('@app/modules/admin/views/log/index', [
-                        'logModels' => Log::find()->where(['model' => $model->className()])->andWhere(['model_id' => $model->id])->orderBy(['date' => SORT_DESC])->all()
+                        'logModels' => Log::find()->where(['model' => $model->className()])->andWhere(['model_id' => $model->id])->orWhere(['issue_id' => $model->id])->orderBy(['date' => SORT_DESC])->all()
                     ]) ?>
                 </div>
                 <div role="tabpanel" class="tab-pane" id="related_for">
@@ -398,12 +398,15 @@ $attachmentModel->issue_id = $model->id;
     <?php
     Modal::begin([
         'id' => 'issueStartTimeModal',
-        'size' => 'modal-sm'
+        'size' => 'modal-sm',
+        'clientOptions' => ['backdrop' => 'static', 'keyboard' => FALSE]
     ]); ?>
 
     <?= $form->field($model, 'start_date', [
-        'template' => "{label}{input}\n{hint}\n{error}\r\n<input type='submit' form='issueForm' data-dismiss='modal' data-pjax='issueUpForm' class='btn btn-success' value='OK'>"
+        'template' => "{label}{input}\n{hint}\n{error}\r\n"
     ])->textInput(['data-pjax' => '0', 'form' => 'issueForm']) ?>
+
+    <input type="submit" form="issueForm" onclick="$('#issueStartTimeModal').modal('hide')" data-pjax="issueUpForm" class="btn btn-success" value="OK">
 
     <?php Modal::end(); ?>
 

@@ -16,6 +16,7 @@ use yii\db\ActiveRecord;
  * @property string $data_new
  * @property string $date
  * @property int $user_id
+ * @property int $issue_id
  */
 class Log extends \yii\db\ActiveRecord
 {
@@ -33,7 +34,7 @@ class Log extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['model_id', 'user_id'], 'integer'],
+            [['model_id', 'user_id', 'issue_id'], 'integer'],
             [['data_old', 'data_new'], 'string'],
             [['date'], 'safe'],
             [['action', 'model'], 'string', 'max' => 255],
@@ -54,6 +55,7 @@ class Log extends \yii\db\ActiveRecord
             'data_new' => 'Data New',
             'date' => 'Date',
             'user_id' => 'User ID',
+            'issue_id' => 'Issue ID',
         ];
     }
 
@@ -62,7 +64,7 @@ class Log extends \yii\db\ActiveRecord
      * @param string $action
      * @param boolean|ActiveRecord $oldModel
      */
-    public static function add($model, $action, $oldModel = false)
+    public static function add($model, $action, $issue_id = NULL, $oldModel = false)
     {
         $log = new self();
         $data_new = [];
@@ -75,7 +77,7 @@ class Log extends \yii\db\ActiveRecord
 
                 if(@$objectOld instanceof ActiveRecord && isset($objectOld->name))
                     $data_old[$key] = $objectOld->name;
-                elseif(@$objectOld instanceof ActiveRecord && method_exists($oldModel, 'index'))
+                elseif(@$objectOld instanceof ActiveRecord && method_exists($objectOld, 'index'))
                     $data_old[$key] = $objectOld->index();
                 else
                     $data_old[$key] = $oldModel->{$key};
@@ -85,12 +87,15 @@ class Log extends \yii\db\ActiveRecord
 
                 if(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
                     $data_new[$key] = $objectNew->name;
-                elseif(@$objectNew instanceof ActiveRecord && method_exists($model, 'index'))
+                elseif(@$objectNew instanceof ActiveRecord && method_exists($objectNew, 'index'))
                     $data_new[$key] = $objectNew->index();
                 else
                     $data_new[$key] = $model->{$key};
             }
         }
+
+        var_dump($data_old);
+        var_dump($data_new);
 
         $log->setAttributes([
             'action' => $action,
@@ -98,7 +103,8 @@ class Log extends \yii\db\ActiveRecord
             'model_id' => $model->id,
             'data_old' => serialize(array_diff_assoc($data_old, $data_new)),
             'data_new' => serialize(array_diff_assoc($data_new, $data_old)),
-            'user_id' => Yii::$app->user->identity->getId()
+            'user_id' => Yii::$app->user->identity->getId(),
+            'issue_id' => $issue_id
         ]);
 
         $log->save();

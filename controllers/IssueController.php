@@ -80,7 +80,7 @@ class IssueController extends DefaultController
                 $model->finish_date = date('Y-m-d H:i:s');
                 $model->save();
             }
-
+            Log::add($model, 'create');
             $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the new issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                 Yii::$app->user->identity->username,
                 $model->name,
@@ -178,7 +178,7 @@ class IssueController extends DefaultController
                         }
                     }
                     if (!empty($changes)) {
-                        Log::add($model, 'update', $oldModel);
+                        Log::add($model, 'update', null, $oldModel);
                         $this->sendToTelegram(sprintf('User <b>%s</b> UPDATED issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
                             Yii::$app->user->identity->username,
                             $model->name,

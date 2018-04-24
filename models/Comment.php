@@ -61,10 +61,10 @@ class Comment extends \yii\db\ActiveRecord
         return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
     }
     /**
-     * @return \yii\db\ActiveQuery
+     * @return Users
      */
     public function getUser()
     {
-        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+        return $this->hasOne(Users::className(), ['id' => 'user_id'])->one();
     }
 }

@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Users;
 use app\models\UsersSearch;
+use app\modules\admin\models\Log;
 use Yii;
 use app\models\Observer;
 use app\models\ObserverSearch;
@@ -61,6 +62,7 @@ class ObserverController extends DefaultController
                 $observer = clone $model;
                 $observer->user_id = $user_id;
                 $observer->save();
+                Log::add($observer, 'added', $observer->issue_id);
             }
         }
         return $this->redirect(Url::previous());
@@ -113,8 +115,9 @@ class ObserverController extends DefaultController
      */
     public function actionDelete($id)
     {
+        $oldModel = clone $this->findModel($id);
         $this->findModel($id)->delete();
-
+        Log::add($oldModel, 'delete', $oldModel->issue_id);
         return $this->redirect(Url::previous());
     }
 

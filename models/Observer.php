@@ -47,9 +47,8 @@ class Observer extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'issue_id' => 'Issue ID',
-            'user_id' => 'User ID',
-            'observers' => 'Users',
+            'issue_id' => 'Issue',
+            'user_id' => 'Observer',
         ];
     }
 
