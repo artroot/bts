@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\components\SVG;
 use app\models\IssueSearch;
+use app\modules\admin\models\Log;
 use app\modules\admin\models\Telegram;
 use app\models\Project;
 use app\models\Users;
@@ -69,10 +70,10 @@ class VersionController extends DefaultController
         $model->status = Version::RELEASED;
         $model->finish_date = date('Y-m-d H:i');
         if ($model->save(false)) {
-            $this->sendToTelegram(sprintf('User %s <b>RELEASED</b> version <b>%s</b> in project <b>%s</b>',
-                Yii::$app->user->identity->username,
+            $this->sendToTelegram(sprintf('<b>RELEASED</b> the version: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . '%s',
+                Project::findOne(['id' => $model->project_id])->name,
                 $model->name,
-                Project::findOne(['id' => $model->project_id])->name
+                Url::to(['version/view', 'id' => $model->id], true)
             ));
         }
         return $this->redirect(Url::previous());
@@ -84,10 +85,10 @@ class VersionController extends DefaultController
         $model->status = Version::UNRELEASED;
         $model->finish_date = null;
         if($model->save(false)) {
-            $this->sendToTelegram(sprintf('User %s <b>UNRELEASED</b> version <b>%s</b> in project <b>%s</b>',
-                Yii::$app->user->identity->username,
+            $this->sendToTelegram(sprintf('<b>UNRELEASED</b> the version: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . '%s',
+                Project::findOne(['id' => $model->project_id])->name,
                 $model->name,
-                Project::findOne(['id' => $model->project_id])->name
+                Url::to(['version/view', 'id' => $model->id], true)
             ));
         }
         return $this->redirect(Url::previous());
@@ -110,6 +111,13 @@ class VersionController extends DefaultController
                     Yii::$app->user->identity->username,
                     $model->name,
                     Project::findOne(['id' => $model->project_id])->name
+                ));
+                $changes = Log::getChanges($model);
+
+                $this->sendToTelegram(sprintf('created the new version: ' . "\r\n" . ' <b>%s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
+                    $model->index(),
+                    Url::to(['version/view', 'id' => $model->id], true),
+                    implode("\r\n", $changes)
                 ));
                 return $this->redirect(['project/view', 'id' => $model->project_id]);
             }else{
@@ -135,13 +143,26 @@ class VersionController extends DefaultController
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            $this->sendToTelegram(sprintf('User %s update version %s in project: %s',
-                Yii::$app->user->identity->username,
-                $model->name,
-                Project::findOne(['id' => $model->project_id])->name
-            ));
-            return $this->redirect(['project/view', 'id' => $model->project_id]);
+        $oldModel = clone $model;
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->save()) {
+                $changes = Log::getChanges($model, $oldModel);
+
+                if (!empty($changes)) {
+                    Log::add($model, 'update', null, $oldModel);
+                    $this->sendToTelegram(sprintf('updated the version: ' . "\r\n" . ' <b>%s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
+                        $model->index(),
+                        Url::to(['version/view', 'id' => $model->id], true),
+                        implode("\r\n", $changes)
+                    ));
+                }
+                return $this->redirect(['project/view', 'id' => $model->project_id]);
+            }else{
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                ]);
+            }
         }
 
         return $this->renderAjax('update', [

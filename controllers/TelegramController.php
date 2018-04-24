@@ -58,6 +58,8 @@ class TelegramController extends Controller
         $chat_id = $output['message']['chat']['id'];
         $message = $output['message']['text'];
 
+        Telegram::sendMessage($chat_id, sprintf('%s; %s; (%s)', $output['update_id'], @$model->update_id, $output['update_id'] <= @$model->update_id));
+
         if ($message == '/start'){
             $text = sprintf('<code>%s</code> Insert this key into your bug tracking system profile.', base64_encode($chat_id));
             Telegram::sendMessage($chat_id, $text);
@@ -76,8 +78,9 @@ class TelegramController extends Controller
 
             $text = '';
             if (Users::findOne(['telegram_key' => base64_encode($chat_id)])){
+
                 foreach (Version::findAll(['project_id' => $res[1]]) as $version){
-                    $text .=  $version->name . "\r\n" .  'Issues active(' . Issue::find()->where(['version_id' => $version->id])->count() . ')' .  "\r\n";
+                    $text .=  @$version->name . "\r\n" .  'Issues active(' . @Issue::find()->where(['resolved_version_id' => $version->id])->count() . ')' .  "\r\n";
                 }
                 Telegram::sendMessage($chat_id, $text);
             }

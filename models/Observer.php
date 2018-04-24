@@ -57,7 +57,7 @@ class Observer extends \yii\db\ActiveRecord
      */
     public function getIssue()
     {
-        return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
+        return $this->hasOne(Issue::className(), ['id' => 'issue_id'])->one();
     }
 
     /**

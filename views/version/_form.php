@@ -35,13 +35,13 @@ app\assets\AppAsset::register($this);
         $(document).ready(function () {
             $(['#version-start_date', '#version-plan_date']).datetimepicker({
                 datepicker:true,
-                format:'Y-m-d H:i'
+                format:'Y-m-d H:i:s'
             });
         });
     </script>
 
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success ']) ?>
     </div>
 
     <?php ActiveForm::end(); ?>

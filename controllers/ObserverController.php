@@ -63,6 +63,13 @@ class ObserverController extends DefaultController
                 $observer->user_id = $user_id;
                 $observer->save();
                 Log::add($observer, 'added', $observer->issue_id);
+
+                $this->sendToTelegram(sprintf('added the new observer <b>%s</b> to issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . '%s',
+                    $observer->getUser()->index(),
+                    $observer->getIssue()->index(),
+                    $observer->getIssue()->name,
+                    Url::to(['issue/update', 'id' => $observer->getIssue()->id], true)
+                ));
             }
         }
         return $this->redirect(Url::previous());
@@ -85,26 +92,6 @@ class ObserverController extends DefaultController
             'dataProvider' => $dataProvider
         ]);
     }
-    
-    /**
-     * Updates an existing Observer model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
 
     /**
      * Deletes an existing Observer model.
@@ -118,6 +105,11 @@ class ObserverController extends DefaultController
         $oldModel = clone $this->findModel($id);
         $this->findModel($id)->delete();
         Log::add($oldModel, 'delete', $oldModel->issue_id);
+        $this->sendToTelegram(sprintf('deleted the observer <b>%s</b> from issue: ' . "\r\n" . ' <b>%s %s</b>',
+            $oldModel->getUser()->index(),
+            $oldModel->getIssue()->index(),
+            $oldModel->getIssue()->name
+        ));
         return $this->redirect(Url::previous());
     }
 

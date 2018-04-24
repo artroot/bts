@@ -3,8 +3,10 @@
 /* @var $this yii\web\View */
 
 
+use app\models\Issue;
 use app\models\IssueSearch;
 use app\models\Project;
+use app\models\Version;
 use yii\helpers\Html;
 use yii\helpers\Url;
 

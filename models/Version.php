@@ -37,7 +37,7 @@ class Version extends \yii\db\ActiveRecord
         return [
             [['project_id', 'status'], 'integer'],
             [['description', 'finish_date'], 'string'],
-            [['start_date', 'plan_date'], 'datetime', 'format' => 'php:Y-m-d H:i'],
+            [['start_date', 'plan_date'], 'datetime', 'format' => 'php:Y-m-d H:i:s'],
             [['name'], 'string', 'max' => 255],
         ];
     }
@@ -97,6 +97,11 @@ class Version extends \yii\db\ActiveRecord
  </g>
 </svg></span>';
         }
+    }
+
+    public function index()
+    {
+        return sprintf('%s %s', $this->getProject()->name, $this->name);
     }
     
 }

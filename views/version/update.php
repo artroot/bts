@@ -4,6 +4,8 @@
     use yii\helpers\Html;
     use yii\widgets\Pjax;
 
+app\assets\AppAsset::register($this);
+
     Pjax::widget([
         'id' => 'versionFormContainer',  // response goes in this element
         'enablePushState' => false,

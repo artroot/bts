@@ -67,35 +67,9 @@ class Log extends \yii\db\ActiveRecord
     public static function add($model, $action, $issue_id = NULL, $oldModel = false)
     {
         $log = new self();
-        $data_new = [];
-        $data_old = [];
-        foreach (array_keys($model->attributeLabels()) as $key) {
-            unset($objectOld, $objectNew);
-            $fc = 'get' . ucfirst(str_replace('_id', '', $key));
-            if ($oldModel !== false && isset($oldModel->{$key})) {
-                if (method_exists($oldModel, $fc)) $objectOld = $oldModel->$fc();
+        $data_new = self::getNewValues($model);
+        $data_old = self::getOldValues($model, $oldModel);
 
-                if(@$objectOld instanceof ActiveRecord && isset($objectOld->name))
-                    $data_old[$key] = $objectOld->name;
-                elseif(@$objectOld instanceof ActiveRecord && method_exists($objectOld, 'index'))
-                    $data_old[$key] = $objectOld->index();
-                else
-                    $data_old[$key] = $oldModel->{$key};
-            }
-            if (isset($model->{$key})) {
-                if (method_exists($model, $fc)) $objectNew = $model->$fc();
-
-                if(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
-                    $data_new[$key] = $objectNew->name;
-                elseif(@$objectNew instanceof ActiveRecord && method_exists($objectNew, 'index'))
-                    $data_new[$key] = $objectNew->index();
-                else
-                    $data_new[$key] = $model->{$key};
-            }
-        }
-
-        var_dump($data_old);
-        var_dump($data_new);
 
         $log->setAttributes([
             'action' => $action,
@@ -108,5 +82,68 @@ class Log extends \yii\db\ActiveRecord
         ]);
 
         $log->save();
+    }
+
+    /**
+     * @param ActiveRecord $model
+     * @return array
+     */
+    public static function getNewValues($model)
+    {
+        $data_new = [];
+        foreach (array_keys($model->attributeLabels()) as $key) {
+            unset($objectNew);
+            $fc = 'get' . ucfirst(str_replace('_id', '', $key));
+            if (isset($model->{$key})) {
+                if (method_exists($model, $fc)) $objectNew = $model->$fc();
+
+                if(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
+                    $data_new[$key] = $objectNew->name;
+                elseif(@$objectNew instanceof ActiveRecord && method_exists($objectNew, 'index'))
+                    $data_new[$key] = $objectNew->index();
+                else
+                    $data_new[$key] = $model->{$key};
+            }
+        }
+        return $data_new;
+    }
+
+    /**
+     * @param ActiveRecord $model
+     * @param bool|ActiveRecord $oldModel
+     * @return array
+     */
+    public static function getOldValues($model, $oldModel = false)
+    {
+        $data_old = [];
+        if ($oldModel instanceof ActiveRecord) {
+            foreach (array_keys($model->attributeLabels()) as $key) {
+                unset($objectOld);
+                $fc = 'get' . ucfirst(str_replace('_id', '', $key));
+                if ($oldModel !== false && isset($oldModel->{$key})) {
+                    if (method_exists($oldModel, $fc)) $objectOld = $oldModel->$fc();
+
+                    if (@$objectOld instanceof ActiveRecord && isset($objectOld->name))
+                        $data_old[$key] = $objectOld->name;
+                    elseif (@$objectOld instanceof ActiveRecord && method_exists($objectOld, 'index'))
+                        $data_old[$key] = $objectOld->index();
+                    else
+                        $data_old[$key] = $oldModel->{$key};
+                }
+            }
+        }
+        return $data_old;
+    }
+
+    public static function getChanges($model, $oldModel = false)
+    {
+        $changes = [];
+
+        $data_new = self::getNewValues($model);
+        $data_old = self::getOldValues($model, $oldModel);
+        foreach (array_diff_assoc($data_new, $data_old) as $key => $value)
+            $changes[] = sprintf('%s: %s -> %s', $model->attributeLabels()[$key], @$data_old[$key], $value);
+
+        return $changes;
     }
 }

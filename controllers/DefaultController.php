@@ -52,7 +52,9 @@ class DefaultController extends Controller
     {
         if(Telegram::find()->one()->status) {
             foreach (Users::find()->where(['telegram_notify' => 1])->all() as $users) {
-                if (!empty($users->telegram_key)) Telegram::sendMessage(base64_decode($users->telegram_key), $message);
+                if (!empty($users->telegram_key)) {
+                    Telegram::sendMessage(base64_decode($users->telegram_key), ($users->id == Yii::$app->user->identity->getId() ? 'You' : Yii::$app->user->identity->index()) . ' ' . $message);
+                }
             }
         }
     }
