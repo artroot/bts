@@ -25,6 +25,7 @@
 	<div class="btn-group" role="group">
 		<a href="#mainSettings" class="btn btn-default">Main</a>
 		<a href="#notifySettings" class="btn btn-default">Notifications</a>
+		<a href="#notifyFilterRulesSettings" class="btn btn-default">Notification filter rules</a>
 	</div>
 </div>',
 		'id' => 'userSettingsModal',

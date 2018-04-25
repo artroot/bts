@@ -184,7 +184,7 @@ class IssueController extends DefaultController
                             $model->name,
                             Url::to(['issue/update', 'id' => $model->id], true) ,
                             implode("\r\n", $changes)
-                        ));
+                        ), 'update', $model);
                     }
                     $model->start_date = NULL;
                     return $this->renderPartial('_update_form', [

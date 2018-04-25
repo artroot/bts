@@ -1,7 +1,8 @@
 <?php
 
     use app\models\Usertype;
-    use yii\helpers\ArrayHelper;
+use app\modules\admin\models\Notifyrule;
+use yii\helpers\ArrayHelper;
     use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -43,14 +44,18 @@ use yii\widgets\ActiveForm;
 
     </div>
 
+    <?php ActiveForm::end(); ?>
+
+    <h4 id="notifyFilterRulesSettings">Notification filter rules</h4>
+    <?= $this->render('@app/modules/admin/views/notifyrule/index', [
+        'models' => Notifyrule::findAll(['user_id' => $model->id])
+    ]) ?>
 
     <?php if (@$msg): ?>
         <div class="alert alert-success" role="alert"><?= $msg ?></div>
     <?php endif; ?>
     <div class="form-group">
-        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Save', ['class' => 'btn btn-success', 'form' => 'userForm']) ?>
     </div>
-
-    <?php ActiveForm::end(); ?>
 
 </div>
