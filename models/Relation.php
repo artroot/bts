@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "relation".
@@ -52,18 +53,18 @@ class Relation extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return Issue
+     * @return ActiveRecord
      */
-    public function getFrom()
+    public function getFrom_issue()
     {
-        return $this->hasOne(Issue::className(), ['from_issue' => 'id'])->one();
+        return @$this->hasOne(Issue::className(), ['id' => 'from_issue'])->one();
     }
 
     /**
-     * @return Issue
+     * @return ActiveRecord
      */
-    public function getTo()
+    public function getTo_issue()
     {
-        return $this->hasOne(Issue::className(), ['to_issue' => 'id'])->one();
+        return @$this->hasOne(Issue::className(), ['id' => 'to_issue'])->one();
     }
 }

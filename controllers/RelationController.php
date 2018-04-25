@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Issue;
+use app\modules\admin\models\Log;
 use Yii;
 use app\models\Relation;
 use app\models\RelationSearch;
@@ -78,46 +79,24 @@ class RelationController extends DefaultController
                 $relation->save();
                 $to_issueModel = Issue::findOne(['id' => $relation->to_issue]);
                 $relations .= "\r\n" . ' <b>' . $to_issueModel->index() . '</b> <b>' . $to_issueModel->name . '</b>';
+                Log::add($relation, 'create', $model->from_issue);
+                $this->sendToTelegram(sprintf('added associated issue: ' . "\r\n" . '<b>%s %s</b>' . "\r\n" . '%s' . "\r\n" . ' with issue:' . "\r\n" . '<b>%s %s</b>' . "\r\n" . '%s' . "\r\n" . 'With comment: ' . "\r\n" . '<code>%s</code>',
+                    $from_issueModel->index(),
+                    $from_issueModel->name,
+                    Url::to(['issue/update', 'id' => $from_issueModel->id], true),
+                    $to_issueModel->index(),
+                    $to_issueModel->name,
+                    Url::to(['issue/update', 'id' => $to_issueModel->id], true),
+                    $model->comment
+                ));
             }
-            $this->sendToTelegram(sprintf('User <b>%s</b> ADDED the new relations in issue: <b>%s</b> ASSOCIATED WITH: %s ' . "\r\n" . 'With comment: <i>%s</i>',
-                Yii::$app->user->identity->username,
-                @$from_issueModel->index() . ' ' . @$from_issueModel->name,
-                @$relations,
-                @$model->comment
-            ));
 
             return $this->redirect(Url::previous());
         }
 
         return $this->redirect(Url::previous());
-        /*if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);*/
     }
 
-    /**
-     * Updates an existing Relation model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
 
     /**
      * Deletes an existing Relation model.
@@ -128,7 +107,19 @@ class RelationController extends DefaultController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
+        Log::add($model, 'delete', $model->from_issue);
+        $this->sendToTelegram(sprintf('deleted the relation issue: ' . "\r\n" . '<b>%s %s</b>' . "\r\n" . '%s' . "\r\n" . ' with issue:' . "\r\n" . '<b>%s %s</b>' . "\r\n" . '%s' . "\r\n" . 'With comment: ' . "\r\n" . '<code>%s</code>',
+            $model->getFrom_issue()->index(),
+            $model->getFrom_issue()->name,
+            Url::to(['issue/update', 'id' => $model->from_issue], true),
+            $model->getTo_issue()->index(),
+            $model->getTo_issue()->name,
+            Url::to(['issue/update', 'id' => $model->to_issue], true),
+            $model->comment
+        ));
+
+        $model->delete();
 
         return $this->redirect(Url::previous());
     }
