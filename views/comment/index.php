@@ -39,9 +39,17 @@ $model->user_id = Yii::$app->user->identity->getId();
                     'method' => 'post',
                 ],
             ]) ?>
+            <?= Html::a('<span class="glyphicon glyphicon-pencil"></span>', ['comment/update', 'id' => $comment->id], [
+                'style' => 'float: right;',
+                'class' => 'btn btn-link btn-xs ' . 'update-comment_id' . $comment->id,
+                'encodeLabels' => false,
+
+            ]) ?>
         </div>
         <div class="panel-body">
+            <?php Pjax::begin(['enablePushState' => false, 'linkSelector'=>'.update-comment_id' . $comment->id]); ?>
             <?= nl2br($comment->text) ?>
+            <?php Pjax::end(); ?>
         </div>
     </div>
     <?php endforeach; ?>

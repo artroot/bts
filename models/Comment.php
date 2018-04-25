@@ -54,11 +54,11 @@ class Comment extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return Issue
      */
     public function getIssue()
     {
-        return $this->hasOne(Issue::className(), ['id' => 'issue_id']);
+        return $this->hasOne(Issue::className(), ['id' => 'issue_id'])->one();
     }
     /**
      * @return Users

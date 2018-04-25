@@ -21,7 +21,7 @@ $this->title = 'Issues';
             [
                 'label' => '',
                 'content' => function($model){
-                    return '<span class="badge text-uppercase" title="<?= @$model->getPriority()->name ?>" style="background-color: '. @$model->getPriority()->color .';">'. substr(@$model->getPriority()->name, 0, 1) .'</span>';
+                    return '<span class="badge text-uppercase" title="'. @$model->getPriority()->name .'" style="background-color: '. @$model->getPriority()->color .';">'. substr(@$model->getPriority()->name, 0, 1) .'</span>';
                 }
             ],
             [
@@ -39,6 +39,12 @@ $this->title = 'Issues';
                 'contentOptions' => ['style' => 'min-width:150px;'],
             ],
             'name',
+            [
+                'label' => 'Owner',
+                'content' => function($model){
+                    return '<span class="btn btn-xs btn-default"><span class="glyphicon glyphicon-user" title="'. @$model->getOwner()->username .'"></span> '. @$model->getOwner()->index() .'</span>';
+                }
+            ],
             'create_date',
             'finish_date',
             'deadline',

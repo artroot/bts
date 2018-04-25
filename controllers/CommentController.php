@@ -34,13 +34,6 @@ class CommentController extends DefaultController
                 'model' => $model
             ])
         ]);
-        /*$searchModel = new CommentSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);*/
     }
 
     /**
@@ -67,10 +60,10 @@ class CommentController extends DefaultController
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             Log::add($model, 'create', $model->issue_id);
-            $this->sendToTelegram(sprintf('User <b>%s</b> CREATED the new comment to issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
-                Yii::$app->user->identity->username,
-                $model->getIssue()->one()->name,
-                Project::findOne(['id' => $model->getIssue()->one()->project_id])->name,
+            $this->sendToTelegram(sprintf('created the new comment to issue: ' . "\r\n" . '<b>%s %s</b>' . "\r\n" . '%s' . "\r\n" . '<code>%s</code>',
+                $model->getIssue()->index(),
+                $model->getIssue()->name,
+                Url::to(['issue/update', 'id' => $model->issue_id], true),
                 $model->text
             ));
             return $this->redirect(Url::previous());
@@ -91,12 +84,21 @@ class CommentController extends DefaultController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $oldModel = clone $model;
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post()) && ($model->create_date = date('Y-m-d H:i:s')) && $model->save()) {
+            $changes = Log::getChanges($model, $oldModel);
+            Log::add($model, 'update', $model->issue_id, $oldModel);
+            $this->sendToTelegram(sprintf('updated the comment in issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
+                            $model->getIssue()->index(),
+                            $model->getIssue()->name,
+                            Url::to(['issue/update', 'id' => $model->issue_id], true) ,
+                            implode("\r\n", $changes)
+                        ));
+            return $this->redirect(Url::previous());
         }
 
-        return $this->render('update', [
+        return $this->renderAjax('update', [
             'model' => $model,
         ]);
     }
@@ -112,10 +114,9 @@ class CommentController extends DefaultController
     {
         $model = $this->findModel($id);
         Log::add($model, 'delete', $model->issue_id);
-        $this->sendToTelegram(sprintf('User <b>%s</b> DELETED the comment from issue <b>%s</b> in project: <b>%s</b>' . "\r\n" . '<code>%s</code>',
-            Yii::$app->user->identity->username,
-            $model->getIssue()->one()->name,
-            Project::findOne(['id' => $model->getIssue()->one()->project_id])->name,
+        $this->sendToTelegram(sprintf('deleted the comment in issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . '<code>%s</code>',
+            $model->getIssue()->index(),
+            $model->getIssue()->name,
             $model->text
         ));
 
