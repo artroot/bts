@@ -15,6 +15,8 @@ use Yii;
  */
 class Project extends \yii\db\ActiveRecord
 {
+    public $logoFile;
+
     /**
      * @inheritdoc
      */
@@ -32,7 +34,8 @@ class Project extends \yii\db\ActiveRecord
             [['team_id'], 'integer'],
             [['name'], 'string', 'max' => 255],
             [['description'], 'string'],
-            [['logo'], 'file', 'extensions' => 'png, jpg'],
+            [['logoFile'], 'file', 'extensions' => 'png, jpg'],
+            [['name'], 'required']
         ];
     }
 

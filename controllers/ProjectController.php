@@ -101,11 +101,19 @@ class ProjectController extends DefaultController
     {
         $model = new Project();
 
-        if ($this->handlePostSave($model) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            if (UploadedFile::getInstance($model, 'logoFile')) {
+                $model->logo = base64_encode(file_get_contents(UploadedFile::getInstance($model, 'logoFile')->tempName));
+            }else{
+                $model->logo = null;
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['/project/view', 'id' => $model->id]);
+            }
         }
 
-        return $this->render('create', [
+        return $this->render('/project/create', [
             'model' => $model,
         ]);
     }
@@ -121,8 +129,14 @@ class ProjectController extends DefaultController
     {
         $model = $this->findModel($id);
 
-        if ($this->handlePostSave($model) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            if (UploadedFile::getInstance($model, 'logoFile')) {
+                $model->logo = base64_encode(file_get_contents(UploadedFile::getInstance($model, 'logoFile')->tempName));
+            }
+
+            if ($model->save()) {
+                return $this->redirect(['/project/view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [
@@ -143,20 +157,6 @@ class ProjectController extends DefaultController
 
         return $this->redirect(['index']);
     }
-
-    protected function handlePostSave(Project $model)
-    {
-        if ($model->load(Yii::$app->request->post())) {
-            if (UploadedFile::getInstance($model, 'logo')) {
-                $model->logo = base64_encode(file_get_contents(UploadedFile::getInstance($model, 'logo')->tempName));
-            }else{
-                $model->logo = $this->findModel($model->id)->logo;
-            }
-            return true;
-        }
-        return false;
-    }
-
 
     /**
      * Finds the Project model based on its primary key value.

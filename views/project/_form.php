@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea() ?>
 
-    <?= $form->field($model, 'logo')->fileInput() ?>
+    <?= $form->field($model, 'logoFile')->fileInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
