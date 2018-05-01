@@ -64,36 +64,13 @@ class IssueController extends DefaultController
      */
     public function actionCreate($project_id = false, $version_id = false)
     {
-        $model = new Issue();
-
-        $model->owner_id = Yii::$app->user->identity->id;
-        $model->create_date = date('Y-m-d H:i');
-
-        if ($project_id) $model->project_id = $project_id;
-        else $model->project_id = Project::find()->one()->id;
-
-        if ($version_id) $model->resolved_version_id = $version_id;
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-
-            if ($model->isDone()) {
-                $model->finish_date = date('Y-m-d H:i:s');
-                $model->save();
-            }
-            Log::add($model, 'create');
-
-            $changes = Log::getChanges($model);
-
-            $this->sendToTelegram(sprintf('created the new issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
-                $model->index(),
-                $model->name,
-                Url::to(['issue/update', 'id' => $model->id], true),
-                implode("\r\n", $changes)
-            ));
-
+        if ($model = Issue::create($project_id, $version_id) and $model) {
             return $this->redirect(['update', 'id' => $model->id]);
+        }else {
+            $model = new Issue();
         }
 
+        $model->owner_id = Yii::$app->user->identity->getId();
         $model->issuestatus_id = 2;
 
         return $this->render('create', [
@@ -145,65 +122,17 @@ class IssueController extends DefaultController
 
         $model = $this->findModel($id);
 
-            $oldModel = clone $model;
-
-            if ($model->load(Yii::$app->request->post())) {
-
-                if ($model->issuestatus_id != $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_from && $model->getStatus()->count_progress_to) {
-                    if ($model->start_date == NULL) {
-
-                        $model->start_date = @$model->getLastChangedStatusDate() ?: date('Y-m-d H:i');
-                        return $this->renderPartial('_update_form', [
-                            'model' => $model,
-                            'action' => '/issue/update?id=' . $id
-                        ]);
-                    } else {
-                        $diff = (new \DateTime())->diff((new \DateTime($model->start_date)));
-                        $hours = $diff->h;
-                        $hours = $hours + ($diff->days * 24);
-                        $model->progress_time += $hours;
-                    }
-                }
-
-                if($model->save()) {
-
-                    if ($model->issuestatus_id !== $oldModel->issuestatus_id && $model->isDone()) {
-                        $model->finish_date = date('Y-m-d H:i:s');
-                        $model->save(false);
-                    } elseif ($oldModel->isDone() && !$model->isDone()) {
-                        $model->finish_date = '0000-00-00 00:00:00';
-                        $model->save(false);
-                    }
-
-                    $changes = Log::getChanges($model, $oldModel);
-
-                    if (!empty($changes)) {
-                        Log::add($model, 'update', null, $oldModel);
-                        $this->sendToTelegram(sprintf('updated the issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
-                            $model->index(),
-                            $model->name,
-                            Url::to(['issue/update', 'id' => $model->id], true) ,
-                            implode("\r\n", $changes)
-                        ), 'update', $model);
-                    }
-                    $model->start_date = NULL;
-                    return $this->renderPartial('_update_form', [
-                        'model' => $model,
-                        'action' => '/issue/update?id=' . $id
-                    ]);
-                }else{
-                    $model->start_date = NULL;
-                    return $this->renderPartial('_update_form', [
-                        'model' => $model,
-                        'action' => '/issue/update?id=' . $id
-                    ]);
-                }
-            }
-
-            return $this->render('update', [
+        if($model->updateModel()){
+            return $this->renderPartial('_update_form', [
                 'model' => $model,
                 'action' => '/issue/update?id=' . $id
             ]);
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+            'action' => '/issue/update?id=' . $id
+        ]);
     }
 
     /**

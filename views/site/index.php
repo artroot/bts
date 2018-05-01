@@ -3,6 +3,7 @@
 /* @var $this yii\web\View */
 
 
+use app\models\Comment;
 use app\models\Issue;
 use app\models\IssueSearch;
 use app\models\Project;

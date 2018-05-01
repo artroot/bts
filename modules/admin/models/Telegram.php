@@ -54,13 +54,29 @@ class Telegram extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function sendMessage($chat_id, $message)
+    public static function sendMessage($chat_id, $message, $reply_msg_id = false, $reply_markup = false)
     {
-        self::send('sendMessage', [
+        $data = [
             'chat_id' => $chat_id,
             'text' => $message,
+            'reply_to_message_id' => $reply_msg_id,
             'parse_mode' => 'html',
-        ]);
+        ];
+        if ($reply_markup) $data['reply_markup'] = json_encode($reply_markup);
+        self::send('sendMessage', $data);
+    }
+
+    public static function editMessage($chat_id, $message_id, $message, $reply_msg_id = false, $reply_markup = false)
+    {
+        $data = [
+            'chat_id' => $chat_id,
+            'message_id' => $message_id,
+            'text' => $message,
+            'reply_to_message_id' => $reply_msg_id,
+            'parse_mode' => 'html',
+        ];
+        if ($reply_markup) $data['reply_markup'] = json_encode($reply_markup);
+        self::send('editMessageText', $data);
     }
 
 

@@ -2,6 +2,7 @@
 
 namespace app\modules\admin\models;
 
+use app\models\Users;
 use Yii;
 use yii\db\ActiveRecord;
 
@@ -63,8 +64,9 @@ class Log extends \yii\db\ActiveRecord
      * @param ActiveRecord $model
      * @param string $action
      * @param boolean|ActiveRecord $oldModel
+     * @param boolean|Users $owner
      */
-    public static function add($model, $action, $issue_id = NULL, $oldModel = false)
+    public static function add($model, $action, $issue_id = NULL, $oldModel = false, $owner = false)
     {
         $log = new self();
         $data_new = self::getNewValues($model);
@@ -77,7 +79,7 @@ class Log extends \yii\db\ActiveRecord
             'model_id' => $model->id,
             'data_old' => serialize(array_diff_assoc($data_old, $data_new)),
             'data_new' => serialize(array_diff_assoc($data_new, $data_old)),
-            'user_id' => Yii::$app->user->identity->getId(),
+            'user_id' => $owner ?: Yii::$app->user->identity->getId(),
             'issue_id' => $issue_id
         ]);
 
@@ -135,14 +137,22 @@ class Log extends \yii\db\ActiveRecord
         return $data_old;
     }
 
+    /**
+     * @param ActiveRecord $model
+     * @param bool|ActiveRecord $oldModel
+     * @return array
+     */
     public static function getChanges($model, $oldModel = false)
     {
         $changes = [];
 
         $data_new = self::getNewValues($model);
         $data_old = self::getOldValues($model, $oldModel);
-        foreach (array_diff_assoc($data_new, $data_old) as $key => $value)
-            $changes[] = sprintf('%s: %s -> %s', $model->attributeLabels()[$key], @$data_old[$key], $value);
+        foreach (array_diff_assoc($data_new, $data_old) as $key => $value) {
+            if (isset($model->attributeLabels()[$key]) and isset($data_old[$key])) {
+                $changes[] = sprintf('%s: %s -> %s', $model->attributeLabels()[$key], @$data_old[$key], $value);
+            }
+        }
 
         return $changes;
     }

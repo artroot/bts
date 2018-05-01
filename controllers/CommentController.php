@@ -2,11 +2,13 @@
 
 namespace app\controllers;
 
+use app\components\Owl;
 use app\models\Project;
 use app\modules\admin\models\Log;
 use Yii;
 use app\models\Comment;
 use app\models\CommentSearch;
+use yii\base\Exception;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -56,17 +58,10 @@ class CommentController extends DefaultController
      */
     public function actionCreate()
     {
-        $model = new Comment();
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Log::add($model, 'create', $model->issue_id);
-            $this->sendToTelegram(sprintf('created the new comment to issue: ' . "\r\n" . '<b>%s %s</b>' . "\r\n" . '%s' . "\r\n" . '<code>%s</code>',
-                $model->getIssue()->index(),
-                $model->getIssue()->name,
-                Url::to(['issue/update', 'id' => $model->issue_id], true),
-                $model->text
-            ));
+        if (Comment::create()) {
             return $this->redirect(Url::previous());
+        }else {
+            $model = new Comment();
         }
 
         return $this->renderPartial('create', [
@@ -83,24 +78,16 @@ class CommentController extends DefaultController
      */
     public function actionUpdate($id)
     {
-        $model = $this->findModel($id);
-        $oldModel = clone $model;
+            $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && ($model->create_date = date('Y-m-d H:i:s')) && $model->save()) {
-            $changes = Log::getChanges($model, $oldModel);
-            Log::add($model, 'update', $model->issue_id, $oldModel);
-            $this->sendToTelegram(sprintf('updated the comment in issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
-                            $model->getIssue()->index(),
-                            $model->getIssue()->name,
-                            Url::to(['issue/update', 'id' => $model->issue_id], true) ,
-                            implode("\r\n", $changes)
-                        ));
-            return $this->redirect(Url::previous());
-        }
+            if ($model->updateModel()) {
+                return $this->redirect(Url::previous());
+            }
 
-        return $this->renderAjax('update', [
-            'model' => $model,
-        ]);
+            return $this->renderAjax('update', [
+                'model' => $model,
+            ]);
+
     }
 
     /**
@@ -114,11 +101,13 @@ class CommentController extends DefaultController
     {
         $model = $this->findModel($id);
         Log::add($model, 'delete', $model->issue_id);
-        $this->sendToTelegram(sprintf('deleted the comment in issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . '<code>%s</code>',
+
+        $text = sprintf('deleted the comment in issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . '<code>%s</code>',
             $model->getIssue()->index(),
             $model->getIssue()->name,
             $model->text
-        ));
+        );
+        Owl::notify('delete', $model->getIssue(), $text);
 
         $model->delete();
 

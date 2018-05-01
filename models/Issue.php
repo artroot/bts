@@ -2,12 +2,15 @@
 
 namespace app\models;
 
+use app\components\Owl;
+use app\components\TelegramBot;
 use app\modules\admin\models\Issuestatus;
 use app\modules\admin\models\Log;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * This is the model class for table "issue".
@@ -64,7 +67,7 @@ class Issue extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            //'id' => 'ID',
             'name' => 'Subject',
             'description' => 'Description',
             'create_date' => 'Created',
@@ -83,6 +86,114 @@ class Issue extends ActiveRecord
             'progress_time' => 'Spent Time',
         ];
     }
+
+
+    /**
+     * @param bool $owner
+     * @param bool|array $data
+     * @return bool|self
+     */
+    public static function create($project_id, $version_id, $owner = false, $data = false)
+    {
+        $model = new self();
+
+        $model->owner_id = Yii::$app->user->identity->getId();
+        $model->create_date = date('Y-m-d H:i:s');
+
+        if ($project_id) $model->project_id = $project_id;
+        else $model->project_id = Project::find()->one()->id;
+
+        if ($version_id) $model->resolved_version_id = $version_id;
+
+        if ($data){
+            $model->setAttributes($data);
+        }else{
+            if (!$model->load(Yii::$app->request->post())) return false;
+        }
+
+        if ($model->isDone()) $model->finish_date = date('Y-m-d H:i:s');
+
+        if (!$model->save()) return false;
+
+        Log::add($model, 'create', false, false, $owner);
+        $changes = Log::getChanges($model);
+
+        $reply_markup = TelegramBot::inlineKeyboard([
+            'i_ed_' . $model->id => 'Edit',
+            'i_c_add_' . $model->id => 'Add Comment',
+        ], true);
+        $text = sprintf('created the new issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
+            $model->index(),
+            $model->name,
+            Url::to(['issue/update', 'id' => $model->id], true),
+            implode("\r\n", $changes)
+        );
+
+        Owl::notify('create', $model, $text, $reply_markup, $owner);
+        return $model;
+    }
+
+    /**
+     * @param bool $owner
+     * @param bool|array $data
+     * @return bool|self
+     */
+    public function updateModel($owner = false, $data = false)
+    {
+        $oldModel = clone $this;
+
+        if (is_array($data)){
+            $this->setAttributes($data);
+        }else{
+            if (!$this->load(Yii::$app->request->post())) return false;
+        }
+
+        if (!$data and $this->issuestatus_id != $oldModel->issuestatus_id && $oldModel->getStatus()->count_progress_from && $this->getStatus()->count_progress_to) {
+            if ($this->start_date == NULL) {
+
+                $this->start_date = @$this->getLastChangedStatusDate() ?: date('Y-m-d H:i');
+                return $this;
+            } else {
+                $diff = (new \DateTime())->diff((new \DateTime($this->start_date)));
+                $hours = $diff->h;
+                $hours = $hours + ($diff->days * 24);
+                $this->progress_time += $hours;
+            }
+        }
+
+        if ($this->issuestatus_id !== $oldModel->issuestatus_id && $this->isDone()) {
+            $this->finish_date = date('Y-m-d H:i:s');
+            $this->save(false);
+        } elseif ($oldModel->isDone() && !$this->isDone()) {
+            $this->finish_date = '0000-00-00 00:00:00';
+            $this->save(false);
+        }
+
+        if (!$this->save()) return false;
+
+       // $changes = Log::getChanges($this, $oldModel);
+
+        //if (!empty($changes)) {
+            $reply_markup = TelegramBot::inlineKeyboard([
+                'i_ed_' . $this->id => 'Edit',
+                'i_c_add_' . $this->id => 'Add Comment',
+            ], true);
+
+            Log::add($this, 'update', $this->id, $oldModel, $owner);
+            $text = sprintf('updated the issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" /*. '<code>%s</code>'*/,
+                $this->index(),
+                $this->name,
+                Url::to(['issue/update', 'id' => $this->id], true) //,
+                //implode("\r\n", $changes)
+            );
+
+            Owl::notify('update', $this, $text, $reply_markup, $owner);
+
+            $this->start_date = NULL;
+        //}
+        return $this;
+    }
+
 
     /**
      * @return \yii\db\ActiveQuery
@@ -117,6 +228,11 @@ class Issue extends ActiveRecord
     public static function getInProgress($condition):Query
     {
         return (new self())->find()->where($condition)->andWhere(['in', 'issuestatus_id', ArrayHelper::map(Issuestatus::findAll(['state_id' => State::getState(State::IN_PROGRESS)->id]), 'id', 'id')]);
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::className(), ['issue_id' => 'id'])->all();
     }
 
     /**

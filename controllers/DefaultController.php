@@ -52,7 +52,8 @@ class DefaultController extends Controller
         ];
     }
 
-    public function sendToTelegram($message, $action = false, $model = false)
+
+    public function sendToTelegram($message, $action = false, $model = false, $reply_markup = false)
     {
         if(Telegram::find()->one()->status && $action && $model) {
             $chapter = explode('\\', $model->className());
@@ -89,7 +90,7 @@ class DefaultController extends Controller
                 elseif(!$send && $model->performer_id == $user->id && $rule->performer) $send = true;
 
                 if($send) {
-                    Telegram::sendMessage(base64_decode($user->telegram_key), ($user->id == Yii::$app->user->identity->getId() ? 'You' : Yii::$app->user->identity->index()) . ' ' . $message);
+                    Telegram::sendMessage(base64_decode($user->telegram_key), ($user->id == Yii::$app->user->identity->getId() ? 'You' : Yii::$app->user->identity->index()) . ' ' . $message, false, $reply_markup);
                 }
 
             }
