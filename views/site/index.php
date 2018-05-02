@@ -12,6 +12,7 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 $this->title = 'My Yii Application';
+
 ?>
 <div class="site-index">
 

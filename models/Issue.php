@@ -171,26 +171,26 @@ class Issue extends ActiveRecord
 
         if (!$this->save()) return false;
 
-       // $changes = Log::getChanges($this, $oldModel);
+        $changes = Log::getChanges($this, $oldModel);
 
-        //if (!empty($changes)) {
+        if (!empty($changes)) {
             $reply_markup = TelegramBot::inlineKeyboard([
                 'i_ed_' . $this->id => 'Edit',
                 'i_c_add_' . $this->id => 'Add Comment',
             ], true);
 
             Log::add($this, 'update', $this->id, $oldModel, $owner);
-            $text = sprintf('updated the issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" /*. '<code>%s</code>'*/,
+            $text = sprintf('updated the issue: ' . "\r\n" . ' <b>%s %s</b>' . "\r\n" . ' %s ' . "\r\n" . '<code>%s</code>',
                 $this->index(),
                 $this->name,
-                Url::to(['issue/update', 'id' => $this->id], true) //,
-                //implode("\r\n", $changes)
+                Url::to(['issue/update', 'id' => $this->id], true) ,
+                implode("\r\n", $changes)
             );
 
             Owl::notify('update', $this, $text, $reply_markup, $owner);
 
             $this->start_date = NULL;
-        //}
+        }
         return $this;
     }
 
