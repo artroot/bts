@@ -15,6 +15,7 @@ use app\models\Issue;
 use app\models\Issuepriority;
 use app\models\Issuetype;
 use app\models\Project;
+use app\models\Sprint;
 use app\models\Users;
 use app\models\Version;
 use app\modules\admin\models\State;
@@ -106,8 +107,65 @@ class TelegramBot
                     'projects' . $id => '« Back',
                     'v_p_sw_' . $id => 'Versions',
                     's_p_sw_' . $id => 'Sprints',
-                    'i_p_sw_' . $id => 'Issues'
+                    'i_cr_p_' . $id => 'Create Issues'
                 ]));
+                break;
+            case 's_p_sw_':
+                $project = Project::findOne(['id' => $id]);
+                $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select sprint: ', $project->name);
+
+                $items = [];
+                $items['p_sw_' . $id] = '« Back';
+                foreach (Sprint::find()->where(['project_id' => $id])->all() as $sprint)
+                    $items[sprintf('s_sw_%d', @$sprint->id)] = @$sprint->name;
+
+                $this->editMessage($this->inlineKeyboard($items));
+                break;
+            case 's_sw_':
+                $sprint = Sprint::findOne(['id' => $id]);
+
+                $text = [];
+
+                $text[] = sprintf('Sprint: <b>%s</b>', $sprint->name);
+                $text[] = '----------------';
+
+                $text[] = sprintf('<b>Progress:</b> %s', round($sprint->getCompleteProgressPercent()) . '%');
+
+                $spentTimeAll = 0;
+
+                if ($all = Issue::find()->where(['sprint_id' => $id])->all() and $all){
+                    $text[] = sprintf('<b>Issues in sprint:</b> (%d)', count($all));
+                    foreach ($all as $issue) $spentTimeAll += $issue->progress_time;
+                }
+
+                if ($spentTimeAll) {
+                    $diff = (new \DateTime())->diff((new \DateTime())->modify('-' . $spentTimeAll . ' hour'));
+                    $msg = null;
+                    if ($diff->format('%y')) $msg .= $diff->format('%y') . ' Year ';
+                    if ($diff->format('%m')) $msg .= $diff->format('%m') . ' Month ';
+                    if ($diff->format('%d')) $msg .= $diff->format('%d') . ' Day ';
+                    if ($diff->format('%h')) $msg .= $diff->format('%h') . ' Hour ';
+                }else{
+                    $msg = '0 Days';
+                }
+
+                if ($todo = Issue::getTodo(['sprint_id' => $id])->all() and $todo){
+                    $text[] = sprintf('<b>TODO:</b> (%d)', count($todo));
+                }
+                if ($inProgress = Issue::getInProgress(['sprint_id' => $id])->all() and $inProgress){
+                    $text[] = sprintf('<b>In Progress:</b> (%d)', count($inProgress));
+                }
+                if ($done = Issue::getDone(['sprint_id' => $id])->all() and $done){
+                    $text[] = sprintf('<b>Done:</b> (%d)', count($done));
+                }
+
+                $text[] = sprintf('<b>Spent time on Sprint:</b> %s', $msg);
+
+                $text[] = sprintf('<b>Time left:</b> %s', $sprint->getState());
+
+                $this->out_text = implode("\r\n", $text);
+
+                $this->editMessage($this->inlineKeyboard(['s_p_sw_' . $sprint->project_id => '« Back']));
                 break;
             case 'v_p_sw_':
                 $project = Project::findOne(['id' => $id]);
