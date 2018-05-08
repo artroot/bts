@@ -38,11 +38,9 @@ class Prototype extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            //['index_file_name','match','pattern'=>'/[\d\w\.-_]\.[\w]/i'],
             [['issue_id'], 'integer'],
             [['resource'], 'file', 'extensions' => ['zip']],
-            [['name', 'path', 'index_file_name'], 'string', 'max' => 255],
-            //[['issue_id'], 'exist', 'skipOnError' => true, 'targetClass' => Issue::className(), 'targetAttribute' => ['issue_id' => 'id']],
+            [['name', 'path', 'index_file_name'], 'string', 'max' => 255]
         ];
     }
 
@@ -71,11 +69,6 @@ class Prototype extends \yii\db\ActiveRecord
 
     public function getPrototypeFiles()
     {
-        /*$fileList = [];
-        foreach (array_diff(scandir(Yii::$app->basePath . '/web' . $this->path), array('.','..')) as $file) {
-            if(!is_dir(Yii::$app->basePath . '/web' . $this->path . $file)) $fileList[$file] = $file;
-        }
-        return $fileList;*/
         return array_diff(scandir(Yii::$app->basePath . '/web/prototypes/' . implode('/', $this->getTree())), array('.','..'));
     }
 
@@ -101,7 +94,6 @@ class Prototype extends \yii\db\ActiveRecord
 
     public function setTree($folder)
     {
-        //$this->getTree();
         $folder = explode('/', $folder);
         foreach ($folder as $f) array_push($this->tree, $f);
         return $this->tree;

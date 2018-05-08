@@ -56,7 +56,7 @@ class Issue extends ActiveRecord
             [['description'], 'string'],
             [['create_date', 'finish_date', 'deadline', 'start_date'], 'safe'],
             [['issuetype_id', 'project_id', 'issuepriority_id', 'issuestatus_id', 'sprint_id', 'resolved_version_id', 'detected_version_id', 'performer_id', 'owner_id', 'progress_time'], 'integer'],
-            [['owner_id', 'project_id'], 'required'],
+            [['owner_id', 'project_id', 'resolved_version_id', 'name'], 'required'],
             [['name'], 'string', 'max' => 255]
         ];
     }
@@ -89,15 +89,15 @@ class Issue extends ActiveRecord
 
 
     /**
-     * @param bool $owner
+     * @param bool|User $owner
      * @param bool|array $data
      * @return bool|self
      */
-    public static function create($project_id, $version_id, $owner = false, $data = false)
+    public static function create($project_id = false, $version_id = false, $owner = false, $data = false)
     {
         $model = new self();
 
-        $model->owner_id = Yii::$app->user->identity->getId();
+        $model->owner_id = $owner ? $owner->id: Yii::$app->user->identity->getId();
         $model->create_date = date('Y-m-d H:i:s');
 
         if ($project_id) $model->project_id = $project_id;
@@ -105,10 +105,10 @@ class Issue extends ActiveRecord
 
         if ($version_id) $model->resolved_version_id = $version_id;
 
-        if ($data){
+        if (is_array($data)){
             $model->setAttributes($data);
         }else{
-            if (!$model->load(Yii::$app->request->post())) return false;
+            if (!$model->load(Yii::$app->request->post())) return $model;
         }
 
         if ($model->isDone()) $model->finish_date = date('Y-m-d H:i:s');
@@ -387,6 +387,36 @@ class Issue extends ActiveRecord
     public function getObservers()
     {
         return Observer::findAll(['issue_id' => $this->id]);
+    }
+
+    /**
+     * @param bool $telegram
+     * @return array
+     */
+    public function getAttributesLabelValues($telegram = false)
+    {
+        $attr = [];
+        foreach ($this->attributeLabels() as $key => $label) {
+            $value = false;
+            $fc = 'get' . ucfirst(str_replace('_id', '', $key));
+            if (isset($this->{$key})) {
+                if (method_exists($this, $fc))
+                    $objectNew = $this->$fc();
+                if(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
+                    $value = $objectNew->name;
+                elseif(@$objectNew instanceof ActiveRecord && method_exists($objectNew, 'index'))
+                    $value = $objectNew->index();
+                else
+                    $value = $this->{$key};
+            }
+            if (@$value) {
+                if ($telegram)
+                    $attr[] = sprintf('<b>%s</b>: %s', $label, $value);
+                else
+                    $attr[$label] = $value;
+            }
+        }
+        return $attr;
     }
 
 }

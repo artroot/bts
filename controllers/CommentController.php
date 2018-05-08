@@ -58,8 +58,8 @@ class CommentController extends DefaultController
      */
     public function actionCreate()
     {
-        if (Comment::create()) {
-            return $this->redirect(Url::previous());
+        if ($model = Comment::create() and $model) {
+            return $this->redirect(Url::to(['issue/update', 'id' => $model->issue_id]));
         }else {
             $model = new Comment();
         }
@@ -81,7 +81,7 @@ class CommentController extends DefaultController
             $model = $this->findModel($id);
 
             if ($model->updateModel()) {
-                return $this->redirect(Url::previous());
+                return $this->redirect(Url::to(['issue/update', 'id' => $model->issue_id]));
             }
 
             return $this->renderAjax('update', [
@@ -111,7 +111,7 @@ class CommentController extends DefaultController
 
         $model->delete();
 
-        return $this->redirect(Url::previous());
+        return $this->redirect(Url::to(['issue/update', 'id' => $model->issue_id]));
     }
 
     /**

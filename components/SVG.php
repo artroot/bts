@@ -105,7 +105,6 @@ final class SVG
 		do{
 			$max += $step;
 		}while($max <= $countMax);
-		//$max += $step;
 		return ['max' => $max, 'step' => $step];
 	}
 

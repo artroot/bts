@@ -64,19 +64,31 @@ class IssueController extends DefaultController
      */
     public function actionCreate($project_id = false, $version_id = false)
     {
-        if ($model = Issue::create($project_id, $version_id) and $model) {
-            return $this->redirect(['update', 'id' => $model->id]);
-        }else {
+        if(!Yii::$app->request->post()){
             $model = new Issue();
+
+            if ($project_id) $model->project_id = $project_id;
+            else $model->project_id = Project::find()->one()->id;
+
+            if ($version_id) $model->resolved_version_id = $version_id;
+        }elseif ($model = Issue::create() and $model and !$model->errors) {
+            return $this->redirect(['update', 'id' => $model->id]);
         }
 
         $model->owner_id = Yii::$app->user->identity->getId();
         $model->issuestatus_id = 2;
 
-        return $this->render('create', [
-            'model' => $model,
-            'action' => '/issue/draft'
-        ]);
+        if (Yii::$app->request->post()){
+            return $this->renderPartial('_form', [
+                'model' => $model,
+                'action' => '/issue/draft'
+            ]);
+        }else {
+            return $this->render('create', [
+                'model' => $model,
+                'action' => '/issue/draft'
+            ]);
+        }
     }
 
     /**
@@ -122,7 +134,7 @@ class IssueController extends DefaultController
 
         $model = $this->findModel($id);
 
-        if($model->updateModel()){
+        if($model->updateModel() or Yii::$app->request->isPjax){
             return $this->renderPartial('_update_form', [
                 'model' => $model,
                 'action' => '/issue/update?id=' . $id

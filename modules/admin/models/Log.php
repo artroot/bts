@@ -79,7 +79,7 @@ class Log extends \yii\db\ActiveRecord
             'model_id' => $model->id,
             'data_old' => serialize(array_diff_assoc($data_old, $data_new)),
             'data_new' => serialize(array_diff_assoc($data_new, $data_old)),
-            'user_id' => $owner ?: Yii::$app->user->identity->getId(),
+            'user_id' => $owner ? $owner->id: Yii::$app->user->identity->getId(),
             'issue_id' => $issue_id
         ]);
 

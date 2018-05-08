@@ -18,9 +18,11 @@ use app\models\Project;
 use app\models\Sprint;
 use app\models\Users;
 use app\models\Version;
+use app\modules\admin\models\Issuestatus;
 use app\modules\admin\models\State;
 use app\modules\admin\models\Telegram;
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\Url;
 
 /**
@@ -82,578 +84,931 @@ class TelegramBot
 
     private function parseCallback()
     {
-        if (preg_match('/([a-z_\+\-]+)+([0-9]+)/', $this->callback_data, $parsedData) and @$parsedData[1] and @$parsedData[2]) {
-            $action = $parsedData[1];
-            $id = $parsedData[2];
-        }else{
-            $action = $parsedData;
-            $id = false;
-        }
-
-        switch ($action){
-            case 'projects':
-                $this->out_text = 'Choose a project from the list below:';
-
-                $items = [];
-                foreach (Project::find()->all() as $project) $items[sprintf('p_sw_%d', @$project->id)] = @$project->name;
-
-                $this->editMessage($this->inlineKeyboard($items));
-                break;
-            case 'p_sw_':
-                $project = Project::findOne(['id' => $id]);
-                $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . '<code>%s</code>' . "\r\n" . 'Select a chapter:', $project->name, $project->description);
-
-                $this->editMessage($this->inlineKeyboard([
-                    'projects' . $id => '« Back',
-                    'v_p_sw_' . $id => 'Versions',
-                    's_p_sw_' . $id => 'Sprints',
-                    'i_cr_p_' . $id => 'Create Issues'
-                ]));
-                break;
-            case 's_p_sw_':
-                $project = Project::findOne(['id' => $id]);
-                $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select sprint: ', $project->name);
-
-                $items = [];
-                $items['p_sw_' . $id] = '« Back';
-                foreach (Sprint::find()->where(['project_id' => $id])->all() as $sprint)
-                    $items[sprintf('s_sw_%d', @$sprint->id)] = @$sprint->name;
-
-                $this->editMessage($this->inlineKeyboard($items));
-                break;
-            case 's_sw_':
-                $sprint = Sprint::findOne(['id' => $id]);
-
-                $text = [];
-
-                $text[] = sprintf('Sprint: <b>%s</b>', $sprint->name);
-                $text[] = '----------------';
-
-                $text[] = sprintf('<b>Progress:</b> %s', round($sprint->getCompleteProgressPercent()) . '%');
-
-                $spentTimeAll = 0;
-
-                if ($all = Issue::find()->where(['sprint_id' => $id])->all() and $all){
-                    $text[] = sprintf('<b>Issues in sprint:</b> (%d)', count($all));
-                    foreach ($all as $issue) $spentTimeAll += $issue->progress_time;
-                }
-
-                if ($spentTimeAll) {
-                    $diff = (new \DateTime())->diff((new \DateTime())->modify('-' . $spentTimeAll . ' hour'));
-                    $msg = null;
-                    if ($diff->format('%y')) $msg .= $diff->format('%y') . ' Year ';
-                    if ($diff->format('%m')) $msg .= $diff->format('%m') . ' Month ';
-                    if ($diff->format('%d')) $msg .= $diff->format('%d') . ' Day ';
-                    if ($diff->format('%h')) $msg .= $diff->format('%h') . ' Hour ';
-                }else{
-                    $msg = '0 Days';
-                }
-
-                if ($todo = Issue::getTodo(['sprint_id' => $id])->all() and $todo){
-                    $text[] = sprintf('<b>TODO:</b> (%d)', count($todo));
-                }
-                if ($inProgress = Issue::getInProgress(['sprint_id' => $id])->all() and $inProgress){
-                    $text[] = sprintf('<b>In Progress:</b> (%d)', count($inProgress));
-                }
-                if ($done = Issue::getDone(['sprint_id' => $id])->all() and $done){
-                    $text[] = sprintf('<b>Done:</b> (%d)', count($done));
-                }
-
-                $text[] = sprintf('<b>Spent time on Sprint:</b> %s', $msg);
-
-                $text[] = sprintf('<b>Time left:</b> %s', $sprint->getState());
-
-                $this->out_text = implode("\r\n", $text);
-
-                $this->editMessage($this->inlineKeyboard(['s_p_sw_' . $sprint->project_id => '« Back']));
-                break;
-            case 'v_p_sw_':
-                $project = Project::findOne(['id' => $id]);
-                $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select action:', $project->name);
-
-                $this->editMessage($this->inlineKeyboard([
-                    'p_sw_' . $id => '« Back',
-                    'v_r_p_sw_' . $id => 'Released',
-                    'v_u_p_sw_' . $id => 'Unreleased'
-                ]));
-                break;
-            case 'v_r_p_sw_':
-                $project = Project::findOne(['id' => $id]);
-                $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select Released version: ', $project->name);
-
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                    'prefix' => 'r'
-                ], 2000);
-
-                $items = [];
-                $items['v_p_sw_' . $id] = '« Back';
-                foreach (Version::find()->where(['project_id' => $id, 'status' => true])->all() as $version)
-                    $items[sprintf('v_sw_%d', @$version->id)] = @$version->name;
-
-                $this->editMessage($this->inlineKeyboard($items));
-                break;
-            case 'v_u_p_sw_':
-                $project = Project::findOne(['id' => $id]);
-                $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select Unreleased version: ', $project->name);
-
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                    'prefix' => 'u'
-                ], 2000);
-
-                $items = [];
-                $items['v_p_sw_' . $id] = '« Back';
-                foreach (Version::find()->where(['project_id' => $id, 'status' => false])->all() as $version)
-                    $items[sprintf('v_sw_%d', @$version->id)] = @$version->name;
-
-                $this->editMessage($this->inlineKeyboard($items));
-                break;
-            case 'v_sw_':
-                $version = Version::findOne(['id' => $id]);
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                $this->out_text = sprintf('<b>%s</b>' . "\r\n" . 'Version Dashboard: ', @$version->index());
-                
-                $this->editMessage($this->inlineKeyboard([
-                    'v_' . ($this->cached_data['prefix']) . '_p_sw_' . @$version->project_id => '« Back',
-                    'i_a_v_' . $id => sprintf('%s (%d)', 'Issues in version', Issue::find()->where(['resolved_version_id' => $id])->count()),
-                    'i_d_v_' . $id => sprintf('%s (%d)', @State::getState(State::DONE)->label, @Issue::getDone(['resolved_version_id' => $id])->count()),
-                    'i_t_v_' . $id => sprintf('%s (%d)', @State::getState(State::TODO)->label, @Issue::getTodo(['resolved_version_id' => $id])->count()),
-                    'i_i_v_' . $id => sprintf('%s (%d)', @State::getState(State::IN_PROGRESS)->label, @Issue::getInProgress(['resolved_version_id' => $id])->count()),
-                ]));
-                break;
-            case 'i_a_v_+_':
-            case 'i_a_v_-_':
-            case 'i_a_v_':
-                $data['v_sw_' . $id] = '« Back';
-                if (isset($this->cached_data['offset']))
-                    $offset = $action == 'i_a_v_+_' ? (@$this->cached_data['offset']+10) : (@$this->cached_data['offset']-10);
-                else
-                    $offset = 0;
-                
-                if ($offset > 0) {
-                    $data['i_a_v_-_' . $id] = '<';
-                }
-
-                if($offset+10 < Issue::find()->where(['resolved_version_id' => $id])->count()){
-                    $data['i_a_v_+_' . $id] = '>';
-                }
-
-                $issueList = [];
-                $i = $offset;
-
-                foreach (Issue::find()->where(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue){
-                    $data['i_ed_new_' . $issue->id] = $issue->name;
-                    $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
-                }
-
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                    'offset' => $offset
-                ], 2000);
-
-                $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'Issues in version:';
-
-                $this->editMessage($this->inlineKeyboard($data));
-                break;
-            case 'i_d_v_+_':
-            case 'i_d_v_-_':
-            case 'i_d_v_':
-                $data['v_sw_' . $id] = '« Back';
-                if (isset($this->cached_data['offset']))
-                    $offset = $action == 'i_d_v_+_' ? (@$this->cached_data['offset']+10) : (@$this->cached_data['offset']-10);
-                else
-                    $offset = 0;
-
-                if ($offset > 0) {
-                    $data['i_d_v_-_' . $id] = '<';
-                }
-
-                if($offset+10 < Issue::getDone(['resolved_version_id' => $id])->count()){
-                    $data['i_d_v_+_' . $id] = '>';
-                }
-                $issueList = [];
-                $i = $offset;
-
-                foreach (Issue::getDone(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue){
-                    $data['i_ed_new_' . $issue->id] = $issue->name;
-                    $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
-                }
-
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                    'offset' => $offset
-                ], 2000);
-
-                $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'Done Issues:';
-
-                $this->editMessage($this->inlineKeyboard($data));
-                break;
-            case 'i_t_v_+_':
-            case 'i_t_v_-_':
-            case 'i_t_v_':
-                $data['v_sw_' . $id] = '« Back';
-                if (isset($this->cached_data['offset']))
-                    $offset = $action == 'i_t_v_+_' ? (@$this->cached_data['offset']+10) : (@$this->cached_data['offset']-10);
-                else
-                    $offset = 0;
-
-                if ($offset > 0) {
-                    $data['i_t_v_-_' . $id] = '<';
-                }
-
-                if($offset+10 < Issue::getTodo(['resolved_version_id' => $id])->count()){
-                    $data['i_t_v_+_' . $id] = '>';
-                }
-
-                $issueList = [];
-                $i = $offset;
-
-                foreach (Issue::getTodo(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue){
-                    $data['i_ed_new_' . $issue->id] = $issue->name;
-                    $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
-                }
-
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                    'offset' => $offset
-                ], 2000);
-
-                $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'TODO Issues:';
-
-                $this->editMessage($this->inlineKeyboard($data));
-                break;
-            case 'i_i_v_+_':
-            case 'i_i_v_-_':
-            case 'i_i_v_':
-                $data['v_sw_' . $id] = '« Back';
-                if (isset($this->cached_data['offset']))
-                    $offset = $action == 'i_i_v_+_' ? (@$this->cached_data['offset']+10) : (@$this->cached_data['offset']-10);
-                else
-                    $offset = 0;
-
-                if ($offset > 0) {
-                    $data['i_i_v_-_' . $id] = '<';
-                }
-
-                if($offset+10 < Issue::getInProgress(['resolved_version_id' => $id])->count()){
-                    $data['i_i_v_+_' . $id] = '>';
-                }
-
-                $issueList = [];
-                $i = $offset;
-
-                foreach (Issue::getInProgress(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue){
-                    $data['i_ed_new_' . $issue->id] = $issue->name;
-                    $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
-                }
-
-                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                    'offset' => $offset
-                ], 2000);
-
-                $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'In Progress Issues:';
-
-                $this->editMessage($this->inlineKeyboard($data));
-                break;
-            case 'i_c_add_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'AddComment',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Write a comment message for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $this->sendReplyMessage();
-                }
-                break;
-            case 'i_ed_sb_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'EditSubject',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Write a new subject for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $this->sendReplyMessage();
-                }
-                break;
-            case 'i_ed_ds_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'EditDescription',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Write a new description for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $this->sendReplyMessage();
-                }
-                break;
-            case 'i_ed_pr_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'UpdatePriority',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Select the new priority for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $data['i_ed_' . $issue->id] = '« Back';
-
-                    foreach (Issuepriority::find()->where(['!=', 'id', $issue->issuepriority_id])->all() as $priority){
-                        $data['i_up_pr_' . $priority->id] = $priority->name;
-                    }
-
-                    $this->editMessage($this->inlineKeyboard($data));
-                }
-                break;
-            case 'i_up_pr_':
-                if ($id and $priority = Issuepriority::findOne(['id' => $id]) and $priority){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-
-                    $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
-                    $issue->updateModel($this->user, [
-                        'issuepriority_id' => $id
-                    ]);
-                }
-                break;
-            case 'i_ed_tp_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'UpdateType',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Select the new type for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $data['i_ed_' . $issue->id] = '« Back';
-
-                    foreach (Issuetype::find()->where(['!=', 'id', $issue->issuetype_id])->all() as $type){
-                        $data['i_up_tp_' . $type->id] = $type->name;
-                    }
-
-                    $this->editMessage($this->inlineKeyboard($data));
-                }
-                break;
-            case 'i_up_tp_':
-                if ($id and $type = Issuetype::findOne(['id' => $id]) and $type){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-
-                    $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
-                    $issue->updateModel($this->user, [
-                        'issuetype_id' => $id
-                    ]);
-                }
-                break;
-            case 'i_ed_per_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'UpdatePerformer',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Select the performer for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $data['i_ed_' . $issue->id] = '« Back';
-
-                    foreach (Users::find()->all() as $performer){
-                        $data['i_up_per_' . $performer->id] = sprintf('%s (%s)', $performer->index(), $performer->username);
-                    }
-
-                    $this->editMessage($this->inlineKeyboard($data));
-                }
-                break;
-            case 'i_up_per_':
-                if ($id and $performer = Users::findOne(['id' => $id]) and $performer){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-
-                    $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
-                    $issue->updateModel($this->user, [
-                        'performer_id' => $id
-                    ]);
-                }
-                break;
-            case 'i_ed_own_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'UpdateOwner',
-                        'issue' => $issue
-                    ], 2000);
-
-                    $this->out_text = 'Select the owner for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $data['i_ed_' . $issue->id] = '« Back';
-
-                    foreach (Users::find()->all() as $owner){
-                        $data['i_up_own_' . $owner->id] = sprintf('%s (%s)', $owner->index(), $owner->username);
-                    }
-
-                    $this->editMessage($this->inlineKeyboard($data));
-                }
-                break;
-            case 'i_up_own_':
-                if ($id and $owner = Users::findOne(['id' => $id]) and $owner){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-
-                    $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
-                    $issue->updateModel($this->user, [
-                        'owner_id' => $id
-                    ]);
-                }
-                break;
-            case 'i_ed_dv_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
-
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'UpdateDetectedVersion',
-                        'issue' => $issue,
-                        'prefix' => 'dv'
-                    ], 2000);
-
-                    $this->out_text = 'Select the detected version state for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+        try {
+            if (preg_match('/([a-z_\+\-]+)+([0-9]+)/', $this->callback_data, $parsedData) and isset($parsedData[1]) and isset($parsedData[2])) {
+                $action = $parsedData[1];
+                $id = $parsedData[2];
+            } else {
+                $action = $parsedData;
+                $id = false;
+            }
+
+            switch ($action) {
+                case 'projects':
+                    $this->out_text = 'Choose a project from the list below:';
+
+                    $items = [];
+                    foreach (Project::find()->all() as $project) $items[sprintf('p_sw_%d', @$project->id)] = @$project->name;
+
+                    $this->editMessage($this->inlineKeyboard($items));
+                    break;
+                case 'p_sw_':
+                    $project = Project::findOne(['id' => $id]);
+                    $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . '<code>%s</code>' . "\r\n" . 'Select a chapter:', $project->name, $project->description);
 
                     $this->editMessage($this->inlineKeyboard([
-                        'i_ed_' . $issue->id => '« Back',
-                        'i_up_v_r_' . $id => 'Released',
-                        'i_up_v_u_' . $id => 'Unreleased'
+                        'projects' . $id => '« Back',
+                        'v_p_sw_' . $id => 'Versions',
+                        's_p_sw_' . $id => 'Sprints',
+                        'i_cr_p_' . $id => 'Create Issue'
                     ]));
-                }
-                break;
-            case 'i_ed_rv_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
+                    break;
+                case 'i_cr_p_':
+                    $project = Project::findOne(['id' => $id]);
+                    $issueModel = new Issue();
+                    $issueModel->project_id = $project->id;
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                        'action' => 'newIssue',
+                        'issueModel' => $issueModel
+                    ], 2000);
+
+                    $this->out_text = 'Write a name for new issue';
+
+                    $this->sendReplyMessage();
+                    break;
+                case 's_p_sw_':
+                    $project = Project::findOne(['id' => $id]);
+                    $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select sprint: ', $project->name);
+
+                    $items = [];
+                    $items['p_sw_' . $id] = '« Back';
+                    foreach (Sprint::find()->where(['project_id' => $id])->all() as $sprint)
+                        $items[sprintf('s_sw_%d', @$sprint->id)] = @$sprint->name;
+
+                    $this->editMessage($this->inlineKeyboard($items));
+                    break;
+                case 's_sw_':
+                    $sprint = Sprint::findOne(['id' => $id]);
+
+                    $text = [];
+
+                    $text[] = sprintf('Sprint: <b>%s</b>', $sprint->name);
+                    $text[] = sprintf('%s' . "\r\n", Url::to(['sprint/view', 'id' => $sprint->id], true));
+
+                    $text[] = sprintf('<b>Progress:</b> %s' . "\r\n", round($sprint->getCompleteProgressPercent()) . '%');
+
+                    $spentTimeAll = 0;
+
+                    if ($all = Issue::find()->where(['sprint_id' => $id])->all() and $all) {
+                        $text[] = sprintf('<b>Issues in sprint:</b> (%d)', count($all));
+                        foreach ($all as $issue) $spentTimeAll += $issue->progress_time;
+                    }
+
+                    if ($spentTimeAll) {
+                        $diff = (new \DateTime())->diff((new \DateTime())->modify('-' . $spentTimeAll . ' hour'));
+                        $msg = null;
+                        if ($diff->format('%y')) $msg .= $diff->format('%y') . ' Year ';
+                        if ($diff->format('%m')) $msg .= $diff->format('%m') . ' Month ';
+                        if ($diff->format('%d')) $msg .= $diff->format('%d') . ' Day ';
+                        if ($diff->format('%h')) $msg .= $diff->format('%h') . ' Hour ';
+                    } else {
+                        $msg = '0 Days';
+                    }
+
+                    if ($todo = Issue::getTodo(['sprint_id' => $id])->all() and $todo) {
+                        $text[] = sprintf('<b>TODO:</b> (%d)', count($todo));
+                    }
+                    if ($inProgress = Issue::getInProgress(['sprint_id' => $id])->all() and $inProgress) {
+                        $text[] = sprintf('<b>In Progress:</b> (%d)', count($inProgress));
+                    }
+                    if ($done = Issue::getDone(['sprint_id' => $id])->all() and $done) {
+                        $text[] = sprintf('<b>Done:</b> (%d)', count($done));
+                    }
+
+                    $text[] = sprintf('<b>Spent time on Sprint:</b> %s', $msg);
+
+                    $text[] = sprintf('<b>Time left:</b> %s', $sprint->getState());
+
+                    $this->out_text = implode("\r\n", $text);
+
+                    $this->editMessage($this->inlineKeyboard(['s_p_sw_' . $sprint->project_id => '« Back']));
+                    break;
+                case 'v_p_sw_':
+                    $project = Project::findOne(['id' => $id]);
+                    $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select action:', $project->name);
+
+                    $this->editMessage($this->inlineKeyboard([
+                        'p_sw_' . $id => '« Back',
+                        'v_r_p_sw_' . $id => 'Released',
+                        'v_u_p_sw_' . $id => 'Unreleased'
+                    ]));
+                    break;
+                case 'v_r_p_sw_':
+                    $project = Project::findOne(['id' => $id]);
+                    $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select Released version: ', $project->name);
 
                     Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
                     Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
-                        'action' => 'UpdateDetectedVersion',
-                        'issue' => $issue,
-                        'prefix' => 'rv'
+                        'prefix' => 'r'
                     ], 2000);
 
-                    $this->out_text = 'Select the detected version state for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+                    $items = [];
+                    $items['v_p_sw_' . $id] = '« Back';
+                    foreach (Version::find()->where(['project_id' => $id, 'status' => true])->all() as $version)
+                        $items[sprintf('v_sw_%d', @$version->id)] = @$version->name;
+
+                    $this->editMessage($this->inlineKeyboard($items));
+                    break;
+                case 'v_u_p_sw_':
+                    $project = Project::findOne(['id' => $id]);
+                    $this->out_text = sprintf('Project <b>%s</b>' . "\r\n" . 'Select Unreleased version: ', $project->name);
+
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                        'prefix' => 'u'
+                    ], 2000);
+
+                    $items = [];
+                    $items['v_p_sw_' . $id] = '« Back';
+                    foreach (Version::find()->where(['project_id' => $id, 'status' => false])->all() as $version)
+                        $items[sprintf('v_sw_%d', @$version->id)] = @$version->name;
+
+                    $this->editMessage($this->inlineKeyboard($items));
+                    break;
+                case 'v_sw_':
+                    $version = Version::findOne(['id' => $id]);
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    $this->out_text = sprintf('<b>%s</b>' . "\r\n" . 'Version Dashboard: ', @$version->index());
 
                     $this->editMessage($this->inlineKeyboard([
-                        'i_ed_' . $issue->id => '« Back',
-                        'i_up_v_r_' . $id => 'Released',
-                        'i_up_v_u_' . $id => 'Unreleased'
+                        'v_' . (@$this->cached_data['prefix'] ? $this->cached_data['prefix'] . '_' : '') . 'p_sw_' . @$version->project_id => '« Back',
+                        'i_a_v_' . $id => sprintf('%s (%d)', 'Issues in version', Issue::find()->where(['resolved_version_id' => $id])->count()),
+                        'i_d_v_' . $id => sprintf('%s (%d)', @State::getState(State::DONE)->label, @Issue::getDone(['resolved_version_id' => $id])->count()),
+                        'i_t_v_' . $id => sprintf('%s (%d)', @State::getState(State::TODO)->label, @Issue::getTodo(['resolved_version_id' => $id])->count()),
+                        'i_i_v_' . $id => sprintf('%s (%d)', @State::getState(State::IN_PROGRESS)->label, @Issue::getInProgress(['resolved_version_id' => $id])->count()),
                     ]));
-                }
-                break;
-            case 'i_up_v_r_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
+                    break;
+                case 'i_a_v_+_':
+                case 'i_a_v_-_':
+                case 'i_a_v_':
+                    $data['v_sw_' . $id] = '« Back';
+                    if (isset($this->cached_data['offset']))
+                        $offset = $action == 'i_a_v_+_' ? (@$this->cached_data['offset'] + 10) : (@$this->cached_data['offset'] - 10);
+                    else
+                        $offset = 0;
 
-                    $this->out_text = 'Select the released detected version for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $data['i_ed_' . @$this->cached_data['prefix'] . '_' . $issue->id] = '« Back';
-
-                    foreach (Version::find()->where(['project_id' => $issue->project_id, 'status' => true])->all() as $version){
-                        $data['i_up_' . @$this->cached_data['prefix'] . '_' . $version->id] = $version->name;
+                    if ($offset > 0) {
+                        $data['i_a_v_-_' . $id] = '<';
                     }
+
+                    if ($offset + 10 < Issue::find()->where(['resolved_version_id' => $id])->count()) {
+                        $data['i_a_v_+_' . $id] = '>';
+                    }
+
+                    $issueList = [];
+                    $i = $offset;
+
+                    foreach (Issue::find()->where(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue) {
+                        $data['i_ed_new_' . $issue->id] = $issue->name;
+                        $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
+                    }
+
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                        'offset' => $offset
+                    ], 2000);
+
+                    $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'Issues in version:';
 
                     $this->editMessage($this->inlineKeyboard($data));
-                }
-                break;
-            case 'i_up_v_u_':
-                if ($id and $issue = Issue::findOne(['id' => $id]) and $issue){
+                    break;
+                case 'i_d_v_+_':
+                case 'i_d_v_-_':
+                case 'i_d_v_':
+                    $data['v_sw_' . $id] = '« Back';
+                    if (isset($this->cached_data['offset']))
+                        $offset = $action == 'i_d_v_+_' ? (@$this->cached_data['offset'] + 10) : (@$this->cached_data['offset'] - 10);
+                    else
+                        $offset = 0;
 
-                    $this->out_text = 'Select the unreleased detected version for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
-
-                    $data['i_ed_' . @$this->cached_data['prefix'] . '_' . $issue->id] = '« Back';
-
-                    foreach (Version::find()->where(['project_id' => $issue->project_id, 'status' => false])->all() as $version){
-                        $data['i_up_' . @$this->cached_data['prefix'] . '_' . $version->id] = $version->name;
+                    if ($offset > 0) {
+                        $data['i_d_v_-_' . $id] = '<';
                     }
+
+                    if ($offset + 10 < Issue::getDone(['resolved_version_id' => $id])->count()) {
+                        $data['i_d_v_+_' . $id] = '>';
+                    }
+                    $issueList = [];
+                    $i = $offset;
+
+                    foreach (Issue::getDone(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue) {
+                        $data['i_ed_new_' . $issue->id] = $issue->name;
+                        $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
+                    }
+
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                        'offset' => $offset
+                    ], 2000);
+
+                    $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'Done Issues:';
 
                     $this->editMessage($this->inlineKeyboard($data));
-                }
-                break;
-            case 'i_up_dv_':
-                if ($id and $version = Version::findOne(['id' => $id]) and $version){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    break;
+                case 'i_t_v_+_':
+                case 'i_t_v_-_':
+                case 'i_t_v_':
+                    $data['v_sw_' . $id] = '« Back';
+                    if (isset($this->cached_data['offset']))
+                        $offset = $action == 'i_t_v_+_' ? (@$this->cached_data['offset'] + 10) : (@$this->cached_data['offset'] - 10);
+                    else
+                        $offset = 0;
 
-                    $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
-                    $issue->updateModel($this->user, [
-                        'detected_version_id' => $id
-                    ]);
-                }
-                break;
-            case 'i_up_rv_':
-                if ($id and $version = Version::findOne(['id' => $id]) and $version){
-                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
-
-                    $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
-                    $issue->updateModel($this->user, [
-                        'resolved_version_id' => $id
-                    ]);
-                }
-                break;
-            case 'i_ed_new_':
-            case 'i_ed_':
-                $issue = Issue::findOne(['id' => $id]);
-
-                $params = [];
-                foreach ($issue->attributeLabels() as $key => $label) {
-                    $fc = 'get' . ucfirst(str_replace('_id', '', $key));
-                    if (isset($issue->{$key})) {
-                        if (method_exists($issue, $fc) and $object = $issue->$fc() and isset($object->name)) $params[] = sprintf('<b>%s</b>: <i>%s</i>', $label, @$object->name);
-                        elseif (method_exists($issue, $fc) and $object = $issue->$fc() and method_exists($object, 'index')) $params[] = sprintf('<b>%s</b>: <i>%s</i>', $label, @$object->index());
-                        else  $params[] = sprintf('<b>%s</b>: <i>%s</i>' . "\r\n", $label, @$issue->{$key});
+                    if ($offset > 0) {
+                        $data['i_t_v_-_' . $id] = '<';
                     }
-                }
 
-                $this->out_text = sprintf('<b>%s</b>' . "\r\n" . '%s' . "\r\n\r\n" . 'Select what do you want to edit:', @$issue->index(), implode("\r\n", $params));
+                    if ($offset + 10 < Issue::getTodo(['resolved_version_id' => $id])->count()) {
+                        $data['i_t_v_+_' . $id] = '>';
+                    }
 
-                if ($action == 'i_ed_new_'){
-                    $this->sendReplyMessage($this->inlineKeyboard([
-                        'i_ed_sb_' . $id => 'Subject',
-                        'i_ed_ds_' . $id => 'Description',
-                        'i_ed_pr_' . $id => 'Priority',
-                        'i_ed_tp_' . $id => 'Type',
-                        'i_ed_per_' . $id => 'Performer',
-                        'i_ed_own_' . $id => 'Owner',
-                        'i_ed_dv_' . $id => 'Detected Version',
-                        'i_ed_rv_' . $id => 'Resolved Version'
-                    ]));
-                }else {
-                    $this->editMessage($this->inlineKeyboard([
-                        'i_ed_sb_' . $id => 'Subject',
-                        'i_ed_ds_' . $id => 'Description',
-                        'i_ed_pr_' . $id => 'Priority',
-                        'i_ed_tp_' . $id => 'Type',
-                        'i_ed_per_' . $id => 'Performer',
-                        'i_ed_own_' . $id => 'Owner',
-                        'i_ed_dv_' . $id => 'Detected Version',
-                        'i_ed_rv_' . $id => 'Resolved Version'
-                    ]));
-                }
-                break;
+                    $issueList = [];
+                    $i = $offset;
+
+                    foreach (Issue::getTodo(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue) {
+                        $data['i_ed_new_' . $issue->id] = $issue->name;
+                        $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
+                    }
+
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                        'offset' => $offset
+                    ], 2000);
+
+                    $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'TODO Issues:';
+
+                    $this->editMessage($this->inlineKeyboard($data));
+                    break;
+                case 'i_i_v_+_':
+                case 'i_i_v_-_':
+                case 'i_i_v_':
+                    $data['v_sw_' . $id] = '« Back';
+                    if (isset($this->cached_data['offset']))
+                        $offset = $action == 'i_i_v_+_' ? (@$this->cached_data['offset'] + 10) : (@$this->cached_data['offset'] - 10);
+                    else
+                        $offset = 0;
+
+                    if ($offset > 0) {
+                        $data['i_i_v_-_' . $id] = '<';
+                    }
+
+                    if ($offset + 10 < Issue::getInProgress(['resolved_version_id' => $id])->count()) {
+                        $data['i_i_v_+_' . $id] = '>';
+                    }
+
+                    $issueList = [];
+                    $i = $offset;
+
+                    foreach (Issue::getInProgress(['resolved_version_id' => $id])->limit(10)->offset($offset)->all() as $issue) {
+                        $data['i_ed_new_' . $issue->id] = $issue->name;
+                        $issueList[] = sprintf('%d. [<b>%s</b>] [<b>%s</b>] <b>%s</b> %s', ++$i, substr(@$issue->getPriority()->name, 0, 1), $issue->getType()->name, $issue->index(), $issue->name);
+                    }
+
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                        'offset' => $offset
+                    ], 2000);
+
+                    $this->out_text = implode("\r\n", $issueList) . "\r\n" . 'In Progress Issues:';
+
+                    $this->editMessage($this->inlineKeyboard($data));
+                    break;
+                case 'i_c_add_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'AddComment',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Write a comment message for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $this->sendReplyMessage();
+                    }
+                    break;
+                case 'i_ed_sb_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'EditSubject',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Write a new subject for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $this->sendReplyMessage();
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        $issueModel->name = null;
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel
+                        ], 2000);
+
+                        $this->out_text = 'Write a new subject for issue:';
+
+                        $this->sendReplyMessage();
+                    }
+                    break;
+                case 'i_ed_ds_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'EditDescription',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Write a new description for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $this->sendReplyMessage();
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        $issueModel->description = null;
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel
+                        ], 2000);
+
+                        $this->out_text = 'Write a new description for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        $this->editMessage();
+                    }
+                    break;
+                case 'i_ed_pr_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'UpdatePriority',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Select the new priority for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $data['i_ed_' . $issue->id] = '« Back';
+
+                        foreach (Issuepriority::find()->where(['!=', 'id', $issue->issuepriority_id])->all() as $priority) {
+                            $data['i_up_pr_' . $priority->id] = $priority->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+
+                        $this->out_text = 'Select the new priority for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel
+                        ], 2000);
+
+                        $data['i_ed_0'] = '« Back';
+
+                        foreach (Issuepriority::find()->where(['!=', 'id', $issueModel->issuepriority_id])->all() as $priority) {
+                            $data['i_up_pr_' . $priority->id] = $priority->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }
+                    break;
+                case 'i_up_pr_':
+                    if ($id and $priority = Issuepriority::findOne(['id' => $id]) and $priority) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->issuepriority_id = $id;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                                'action' => 'newIssue',
+                                'issueModel' => $issueModel
+                            ], 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                            $this->editMessage($this->inlineKeyboard([
+                                'i_cr_0' => 'Finish',
+                                'i_ed_sb_0' => 'Subject',
+                                'i_ed_ds_0' => 'Description',
+                                'i_ed_pr_0' => 'Priority',
+                                'i_ed_tp_0' => 'Type',
+                                'i_ed_per_0' => 'Performer',
+                                'i_ed_own_0' => 'Owner',
+                                'i_ed_dv_0' => 'Detected Version',
+                                'i_ed_rv_0' => 'Resolved Version'
+                            ]));
+                        } else {
+                            $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
+                            $issue->updateModel($this->user, [
+                                'issuepriority_id' => $id
+                            ]);
+                        }
+                    }
+                    break;
+                case 'i_ed_tp_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'UpdateType',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Select the new type for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $data['i_ed_' . $issue->id] = '« Back';
+
+                        foreach (Issuetype::find()->where(['!=', 'id', $issue->issuetype_id])->all() as $type) {
+                            $data['i_up_tp_' . $type->id] = $type->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+
+                        $this->out_text = 'Select the new type for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel
+                        ], 2000);
+
+                        $data['i_ed_0'] = '« Back';
+
+                        foreach (Issuetype::find()->where(['!=', 'id', $issueModel->issuetype_id])->all() as $type) {
+                            $data['i_up_tp_' . $type->id] = $type->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }
+                    break;
+                case 'i_up_tp_':
+                    if ($id and $type = Issuetype::findOne(['id' => $id]) and $type) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->issuetype_id = $id;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                                'action' => 'newIssue',
+                                'issueModel' => $issueModel
+                            ], 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                            $this->editMessage($this->inlineKeyboard([
+                                'i_cr_0' => 'Finish',
+                                'i_ed_sb_0' => 'Subject',
+                                'i_ed_ds_0' => 'Description',
+                                'i_ed_pr_0' => 'Priority',
+                                'i_ed_tp_0' => 'Type',
+                                'i_ed_per_0' => 'Performer',
+                                'i_ed_own_0' => 'Owner',
+                                'i_ed_dv_0' => 'Detected Version',
+                                'i_ed_rv_0' => 'Resolved Version'
+                            ]));
+                        } else {
+                            $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
+                            $issue->updateModel($this->user, [
+                                'issuetype_id' => $id
+                            ]);
+                        }
+                    }
+                    break;
+                case 'i_ed_per_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'UpdatePerformer',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Select the performer for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $data['i_ed_' . $issue->id] = '« Back';
+
+                        foreach (Users::find()->all() as $performer) {
+                            $data['i_up_per_' . $performer->id] = sprintf('%s (%s)', $performer->index(), $performer->username);
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+
+                        $this->out_text = 'Select the performer for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel
+                        ], 2000);
+
+                        $data['i_ed_0'] = '« Back';
+
+                        foreach (Users::find()->all() as $performer) {
+                            $data['i_up_per_' . $performer->id] = sprintf('%s (%s)', $performer->index(), $performer->username);
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }
+                    break;
+                case 'i_up_per_':
+                    if ($id and $performer = Users::findOne(['id' => $id]) and $performer) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->performer_id = $id;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                                'action' => 'newIssue',
+                                'issueModel' => $issueModel
+                            ], 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                            $this->editMessage($this->inlineKeyboard([
+                                'i_cr_0' => 'Finish',
+                                'i_ed_sb_0' => 'Subject',
+                                'i_ed_ds_0' => 'Description',
+                                'i_ed_pr_0' => 'Priority',
+                                'i_ed_tp_0' => 'Type',
+                                'i_ed_per_0' => 'Performer',
+                                'i_ed_own_0' => 'Owner',
+                                'i_ed_dv_0' => 'Detected Version',
+                                'i_ed_rv_0' => 'Resolved Version'
+                            ]));
+                        } else {
+                            $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
+                            $issue->updateModel($this->user, [
+                                'performer_id' => $id
+                            ]);
+                        }
+                    }
+                    break;
+                case 'i_ed_own_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'UpdateOwner',
+                            'issue' => $issue
+                        ], 2000);
+
+                        $this->out_text = 'Select the owner for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $data['i_ed_' . $issue->id] = '« Back';
+
+                        foreach (Users::find()->all() as $owner) {
+                            $data['i_up_own_' . $owner->id] = sprintf('%s (%s)', $owner->index(), $owner->username);
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+
+                        $this->out_text = 'Select the owner for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel
+                        ], 2000);
+
+                        $data['i_ed_0'] = '« Back';
+
+                        foreach (Users::find()->all() as $owner) {
+                            $data['i_up_own_' . $owner->id] = sprintf('%s (%s)', $owner->index(), $owner->username);
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }
+                    break;
+                case 'i_up_own_':
+                    if ($id and $owner = Users::findOne(['id' => $id]) and $owner) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->owner_id = $id;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                                'action' => 'newIssue',
+                                'issueModel' => $issueModel
+                            ], 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                            $this->editMessage($this->inlineKeyboard([
+                                'i_cr_0' => 'Finish',
+                                'i_ed_sb_0' => 'Subject',
+                                'i_ed_ds_0' => 'Description',
+                                'i_ed_pr_0' => 'Priority',
+                                'i_ed_tp_0' => 'Type',
+                                'i_ed_per_0' => 'Performer',
+                                'i_ed_own_0' => 'Owner',
+                                'i_ed_dv_0' => 'Detected Version',
+                                'i_ed_rv_0' => 'Resolved Version'
+                            ]));
+                        } else {
+                            $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
+                            $issue->updateModel($this->user, [
+                                'owner_id' => $id
+                            ]);
+                        }
+                    }
+                    break;
+                case 'i_ed_dv_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'UpdateDetectedVersion',
+                            'issue' => $issue,
+                            'prefix' => 'dv'
+                        ], 2000);
+
+                        $this->out_text = 'Select the detected version state for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $this->editMessage($this->inlineKeyboard([
+                            'i_ed_' . $issue->id => '« Back',
+                            'i_up_v_r_' . $id => 'Released',
+                            'i_up_v_u_' . $id => 'Unreleased'
+                        ]));
+                    }elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+
+                        $this->out_text = 'Select the detected version state for issue: ' .  "\r\n" . '<b>' . $issueModel->name . '</b>';
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel,
+                            'prefix' => 'dv'
+                        ], 2000);
+
+                        $this->editMessage($this->inlineKeyboard([
+                            'i_ed_0' => '« Back',
+                            'i_up_v_r_0' => 'Released',
+                            'i_up_v_u_0' => 'Unreleased'
+                        ]));
+                    }
+                    break;
+                case 'i_ed_rv_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'UpdateDetectedVersion',
+                            'issue' => $issue,
+                            'prefix' => 'rv'
+                        ], 2000);
+
+                        $this->out_text = 'Select the detected version state for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $this->editMessage($this->inlineKeyboard([
+                            'i_ed_' . $issue->id => '« Back',
+                            'i_up_v_r_' . $id => 'Released',
+                            'i_up_v_u_' . $id => 'Unreleased'
+                        ]));
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        $this->out_text = 'Select the detected version state for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, [
+                            'action' => 'newIssue',
+                            'issueModel' => $issueModel,
+                            'prefix' => 'rv'
+                        ], 2000);
+
+                        $this->editMessage($this->inlineKeyboard([
+                            'i_up_v_r_0' => 'Released',
+                            'i_up_v_u_0' => 'Unreleased'
+                        ]));
+                    }
+                    break;
+                case 'i_up_v_r_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        $this->out_text = 'Select the released detected version for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $data['i_ed_' . @$this->cached_data['prefix'] . '_' . $issue->id] = '« Back';
+
+                        foreach (Version::find()->where(['project_id' => $issue->project_id, 'status' => true])->all() as $version) {
+                            $data['i_up_' . @$this->cached_data['prefix'] . '_' . $version->id] = $version->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        $this->out_text = 'Select the released detected version for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        $data['i_ed_' . (@$this->cached_data['prefix'] ?: 'rv') .'_0'] = '« Back';
+
+                        foreach (Version::find()->where(['project_id' => $issueModel->project_id, 'status' => true])->all() as $version) {
+                            $data['i_up_' . (@$this->cached_data['prefix'] ?: 'rv') .'_' . $version->id] = $version->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }
+                    break;
+                case 'i_up_v_u_':
+                    if ($id and $issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        $this->out_text = 'Select the unreleased detected version for issue: ' . "\r\n" . '<b>' . $issue->index() . '</b>';
+
+                        $data['i_ed_' . @$this->cached_data['prefix'] . '_' . $issue->id] = '« Back';
+
+                        foreach (Version::find()->where(['project_id' => $issue->project_id, 'status' => false])->all() as $version) {
+                            $data['i_up_' . @$this->cached_data['prefix'] . '_' . $version->id] = $version->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    } elseif ($id == 0 and isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        $this->out_text = 'Select the unreleased detected version for issue: ' . "\r\n" . '<b>' . $issueModel->name . '</b>';
+
+                        $data['i_ed_' . (@$this->cached_data['prefix'] ?: 'rv') .'_0'] = '« Back';
+
+                        foreach (Version::find()->where(['project_id' => $issueModel->project_id, 'status' => false])->all() as $version) {
+                            $data['i_up_' . (@$this->cached_data['prefix'] ?: 'rv') .'_' . $version->id] = $version->name;
+                        }
+
+                        $this->editMessage($this->inlineKeyboard($data));
+                    }
+                    break;
+                case 'i_up_dv_':
+                    if ($id and $version = Version::findOne(['id' => $id]) and $version) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->detected_version_id = $id;
+                            $this->cached_data['issueModel'] = $issueModel;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, $this->cached_data, 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select status: ';
+
+                                $this->editMessage($this->inlineKeyboard([
+                                    'i_cr_0' => 'Finish',
+                                    'i_ed_sb_0' => 'Subject',
+                                    'i_ed_ds_0' => 'Description',
+                                    'i_ed_pr_0' => 'Priority',
+                                    'i_ed_tp_0' => 'Type',
+                                    'i_ed_per_0' => 'Performer',
+                                    'i_ed_own_0' => 'Owner',
+                                    'i_ed_dv_0' => 'Detected Version',
+                                    'i_ed_rv_0' => 'Resolved Version'
+                                ]));
+                        } else {
+                            $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
+                            $issue->updateModel($this->user, [
+                                'detected_version_id' => $id
+                            ]);
+                        }
+                    }
+                    break;
+                case 'i_up_rv_':
+                    if ($id and $version = Version::findOne(['id' => $id]) and $version) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->resolved_version_id = $id;
+                            $this->cached_data['issueModel'] = $issueModel;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, $this->cached_data, 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select status: ';
+                            if ($issueModel->issuestatus_id){
+                                $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                                $this->editMessage($this->inlineKeyboard([
+                                    'i_cr_0' => 'Finish',
+                                    'i_ed_sb_0' => 'Subject',
+                                    'i_ed_ds_0' => 'Description',
+                                    'i_ed_pr_0' => 'Priority',
+                                    'i_ed_tp_0' => 'Type',
+                                    'i_ed_per_0' => 'Performer',
+                                    'i_ed_own_0' => 'Owner',
+                                    'i_ed_dv_0' => 'Detected Version',
+                                    'i_ed_rv_0' => 'Resolved Version'
+                                ]));
+                            }else {
+                                $data = [];
+                                foreach (Issuestatus::find()->all() as $status) $data['i_up_st_' . $status->id] = $status->name;
+
+                                $this->editMessage($this->inlineKeyboard($data));
+                            }
+
+                        } else {
+                            $issue = Issue::findOne(['id' => $this->cached_data['issue']->id]);
+                            $issue->updateModel($this->user, [
+                                'resolved_version_id' => $id
+                            ]);
+                        }
+                    }
+                    break;
+                case 'i_up_st_':
+                    if ($id and $status = Issuestatus::findOne(['id' => $id]) and $status) {
+                        Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                        if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                            $issueModel->issuestatus_id = $id;
+                            $issueModel->issuepriority_id = Issuepriority::find()->one()->id;
+                            $issueModel->issuetype_id = Issuetype::find()->one()->id;
+                            $issueModel->owner_id = $this->user->id;
+                            $this->cached_data['issueModel'] = $issueModel;
+                            Yii::$app->cache->add('telegram_action_user_' . $this->user->id, $this->cached_data, 2000);
+                            $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                            $this->editMessage($this->inlineKeyboard([
+                                'i_cr_0' => 'Finish',
+                                'i_ed_sb_0' => 'Subject',
+                                'i_ed_ds_0' => 'Description',
+                                'i_ed_pr_0' => 'Priority',
+                                'i_ed_tp_0' => 'Type',
+                                'i_ed_per_0' => 'Performer',
+                                'i_ed_own_0' => 'Owner',
+                                'i_ed_dv_0' => 'Detected Version',
+                                'i_ed_rv_0' => 'Resolved Version'
+                            ]));
+                        }
+                    }
+                    break;
+                case 'i_cr_':
+                    Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                    if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        $data = [];
+                        foreach ($issueModel->attributeLabels() as $key => $label) $data[$key] = $issueModel->{$key};
+
+                        try {
+                            if ($issue = Issue::create(false, false, $this->user, $data) and $issue instanceof Issue) {
+                                $this->out_text = 'Issue Created!' . "\r\n" . implode("\r\n", $issue->getAttributesLabelValues(true));
+                                $this->editMessage($this->inlineKeyboard([
+                                    'i_ed_sb_' . $issue->id => 'Subject',
+                                    'i_ed_ds_' . $issue->id => 'Description',
+                                    'i_ed_pr_' . $issue->id => 'Priority',
+                                    'i_ed_tp_' . $issue->id => 'Type',
+                                    'i_ed_per_' . $issue->id => 'Performer',
+                                    'i_ed_own_' . $issue->id => 'Owner',
+                                    'i_ed_dv_' . $issue->id => 'Detected Version',
+                                    'i_ed_rv_' . $issue->id => 'Resolved Version'
+                                ]));
+                            } else {
+                                $this->out_text = 'Some Error!';
+                                $this->editMessage();
+                            }
+                        } catch (\Exception $e) {
+                            $this->out_text = $e->getMessage() . ' ' . $e->getLine();
+                            $this->sendReplyMessage();
+                        }
+                    }
+                    break;
+                case 'i_ed_new_':
+                case 'i_ed_':
+                    if (isset($this->cached_data['issueModel']) and $issueModel = $this->cached_data['issueModel'] and $issueModel instanceof Issue) {
+                        $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                        $this->editMessage($this->inlineKeyboard([
+                            'i_cr_0' => 'Finish',
+                            'i_ed_sb_0' => 'Subject',
+                            'i_ed_ds_0' => 'Description',
+                            'i_ed_pr_0' => 'Priority',
+                            'i_ed_tp_0' => 'Type',
+                            'i_ed_per_0' => 'Performer',
+                            'i_ed_own_0' => 'Owner',
+                            'i_ed_dv_0' => 'Detected Version',
+                            'i_ed_rv_0' => 'Resolved Version'
+                        ]));
+                    } elseif ($issue = Issue::findOne(['id' => $id]) and $issue) {
+
+                        $params = [];
+                        foreach ($issue->attributeLabels() as $key => $label) {
+                            $fc = 'get' . ucfirst(str_replace('_id', '', $key));
+                            if (isset($issue->{$key})) {
+                                if (method_exists($issue, $fc) and $object = $issue->$fc() and isset($object->name)) $params[] = sprintf('<b>%s</b>: <i>%s</i>', $label, @$object->name);
+                                elseif (method_exists($issue, $fc) and $object = $issue->$fc() and method_exists($object, 'index')) $params[] = sprintf('<b>%s</b>: <i>%s</i>', $label, @$object->index());
+                                else  $params[] = sprintf('<b>%s</b>: <i>%s</i>' . "\r\n", $label, @$issue->{$key});
+                            }
+                        }
+
+                        $this->out_text = sprintf('<b>%s</b>' . "\r\n" . '%s' . "\r\n\r\n" . 'Select what do you want to edit:', @$issue->index(), implode("\r\n", $params));
+
+                        if ($action == 'i_ed_new_') {
+                            $this->sendReplyMessage($this->inlineKeyboard([
+                                'i_ed_sb_' . $id => 'Subject',
+                                'i_ed_ds_' . $id => 'Description',
+                                'i_ed_pr_' . $id => 'Priority',
+                                'i_ed_tp_' . $id => 'Type',
+                                'i_ed_per_' . $id => 'Performer',
+                                'i_ed_own_' . $id => 'Owner',
+                                'i_ed_dv_' . $id => 'Detected Version',
+                                'i_ed_rv_' . $id => 'Resolved Version'
+                            ]));
+                        } else {
+                            $this->editMessage($this->inlineKeyboard([
+                                'i_ed_sb_' . $id => 'Subject',
+                                'i_ed_ds_' . $id => 'Description',
+                                'i_ed_pr_' . $id => 'Priority',
+                                'i_ed_tp_' . $id => 'Type',
+                                'i_ed_per_' . $id => 'Performer',
+                                'i_ed_own_' . $id => 'Owner',
+                                'i_ed_dv_' . $id => 'Detected Version',
+                                'i_ed_rv_' . $id => 'Resolved Version'
+                            ]));
+                        }
+                    }
+                    break;
+            }
+        }catch (\Exception $e){
+            $this->out_text = sprintf('%s (%s) %s', $e->getMessage(), $e->getLine(), $e->getFile());
+            $this->sendReplyMessage();
         }
     }
 
     private function parseCommand()
     {
-        switch ($this->text){
+        switch ($this->text) {
             case '/start':
                 $this->out_text = sprintf('<code>%s</code> Insert this key into your bug tracking system profile.', base64_encode($this->chat_id));
                 $this->sendReplyMessage();
                 break;
             case '/help':
-                if(!$this->user) return false;
+                if (!$this->user) return false;
 
                 $this->out_text = implode("\r\n", [
                     'Get conjugation key - /start',
@@ -662,8 +1017,8 @@ class TelegramBot
                 $this->sendReplyMessage();
                 break;
             case '/projects':
-                if(!$this->user) return false;
-
+                if (!$this->user) return false;
+                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
                 $this->out_text = 'Choose a project from the list below:';
 
                 $items = [];
@@ -672,7 +1027,7 @@ class TelegramBot
                 $this->sendReplyMessage($this->inlineKeyboard($items));
                 break;
             default :
-                if (!$this->parseCachedActions()){
+                if (!$this->parseCachedActions()) {
                     $this->out_text = '<code>' . $this->text . '</code>' . "\r\n";
                     $this->out_text .= 'What do you want to do?';
 
@@ -712,6 +1067,45 @@ class TelegramBot
                 $issue->updateModel($this->user, [
                    'description' => $this->text
                 ]);
+                break;
+            case 'newIssue':
+                $cachedData = $this->cached_data;
+                if (isset($cachedData['issueModel']) and $issueModel = $cachedData['issueModel'] and $issueModel instanceof Issue){
+                    if(!$issueModel->name and !$issueModel->issuestatus_id){
+                        $issueModel->name = $this->text;
+                        $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Write a issue description';
+                        $this->sendReplyMessage();
+                    }elseif(!$issueModel->description and !$issueModel->issuestatus_id){
+                        $issueModel->description = $this->text;
+                        $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select resolved version';
+                        $this->sendReplyMessage($this->inlineKeyboard([
+                            'i_up_v_r_0' => 'Released',
+                            'i_up_v_u_0' => 'Unreleased'
+                        ]));
+                    }else{
+                        $this->cached_data['issueModel'] = $issueModel;
+                        if (!$issueModel->name) $issueModel->name = $this->text;
+                        if (!$issueModel->description) $issueModel->description = $this->text;
+                        Yii::$app->cache->add('telegram_action_user_' . $this->user->id, $this->cached_data, 2000);
+                        $this->out_text = implode("\r\n", $issueModel->getAttributesLabelValues(true)) . "\r\n" . 'Select next step: ';
+
+                        $this->sendReplyMessage($this->inlineKeyboard([
+                            'i_cr_0' => 'Finish',
+                            'i_ed_sb_0' => 'Subject',
+                            'i_ed_ds_0' => 'Description',
+                            'i_ed_pr_0' => 'Priority',
+                            'i_ed_tp_0' => 'Type',
+                            'i_ed_per_0' => 'Performer',
+                            'i_ed_own_0' => 'Owner',
+                            'i_ed_dv_0' => 'Detected Version',
+                            'i_ed_rv_0' => 'Resolved Version'
+                        ]));
+                    }
+                    $cachedData['issueModel'] = $issueModel;
+                }
+                Yii::$app->cache->delete('telegram_action_user_' . $this->user->id);
+                Yii::$app->cache->add('telegram_action_user_' . $this->user->id, $cachedData, 2000);
+
                 break;
             default:
                 return false;
