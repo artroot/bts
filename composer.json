@@ -6,7 +6,7 @@
     "homepage": "https://github.com/artroot/koala",
     "type": "project",
     "license": "MIT",
-    "minimum-stability": "stable",
+    //"minimum-stability": "stable",
     "authors": [
         {
             "name": "Yevheniia Opanasenko",
