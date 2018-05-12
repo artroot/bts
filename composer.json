@@ -24,23 +24,20 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "yiisoft/yii2-app-basic": "~2.0.14"
+        "yiisoft/yii2": "~2.0.5",
+        "yiisoft/yii2-bootstrap": "~2.0.0",
+        "yiisoft/yii2-swiftmailer": "~2.0.0",
+        "yiisoft/yii2-jui": "^2.0"
     },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://asset-packagist.org"
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "yiisoft/yii2-app-basic",
-                "version": "2.0.14",
-                "dist": {
-                    "url": "https://github.com/yiisoft/yii2-app-basic/archive/master.zip",
-                    "type": "zip"
-                }
-            }
-        }
-    ]
+    "require-dev": {
+         "yiisoft/yii2-debug": "~2.0.0",
+         "yiisoft/yii2-gii": "~2.0.0",
+         "yiisoft/yii2-faker": "~2.0.0",
+         "codeception/base": "^2.2.3",
+         "codeception/verify": "~0.3.1",
+         "codeception/specify": "~0.4.3"
+     },
+     "config": {
+         "process-timeout": 1800
+     }
 }
