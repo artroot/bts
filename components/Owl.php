@@ -13,7 +13,9 @@ use app\models\Observer;
 use app\models\Users;
 use app\modules\admin\models\Notifyrule;
 use app\modules\admin\models\Telegram;
+use app\modules\messengers\Messenger;
 use Yii;
+use yii\caching\Cache;
 use yii\db\ActiveRecord;
 
 /**
@@ -29,6 +31,8 @@ use yii\db\ActiveRecord;
 class Owl
 {
     private static $instance;
+
+    const MESSENGER_DIR = __DIR__ . '/../modules/messengers';
 
     private $action;
     private $text;
@@ -98,5 +102,31 @@ class Owl
             }
         }
     }
+
+
+    public static function getMessengers()
+    {
+        if ($messengerClasses = Yii::$app->cache->get('messengerClasses') and is_array($messengerClasses) and !empty($messengerClasses)) return $messengerClasses;
+        $messengerClasses = [];
+        if (is_dir(self::MESSENGER_DIR) and $messengersDirs = scandir(self::MESSENGER_DIR) and !empty($messengersDirs)){
+            foreach ($messengersDirs as $messengersDir){
+                if ($messengersDir != '.' and $messengersDir != '..' and is_dir(self::MESSENGER_DIR . '/' . $messengersDir)
+                    and $messengers = scandir(self::MESSENGER_DIR . '/' . $messengersDir) and !empty($messengers)){
+                    foreach ($messengers as $messengerClass){
+                        $pathToClass = self::MESSENGER_DIR . '/' . $messengersDir . '/' . $messengerClass;
+                        $className = str_replace('.php', '', 'app\modules\messengers\\' . $messengersDir . '\\' . $messengerClass);
+                        if ($messengerClass != '.' and $messengerClass != '..' and is_file($pathToClass) and class_exists($className)
+                            and is_subclass_of($className, Messenger::class, true)){
+                            $messengerClasses[] = $className;
+                        }
+                    }
+                }
+            }
+        }
+        Yii::$app->cache->delete('messengerClasses');
+        Yii::$app->cache->add('messengerClasses', $messengerClasses, 90000);
+        return $messengerClasses;
+    }
+    
 
 }

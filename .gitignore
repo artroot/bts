@@ -31,17 +31,11 @@ tests/_support/_generated
 
 .bowerrc
 .sass-cache/
-assets/
 codeception.yml
 commands/
 composer.lock
 config/db.php
 mail/
 requirements.php
-runtime/
 tests/
-widgets/
-yii
 yii.bat
-
-web/prototypes/*
