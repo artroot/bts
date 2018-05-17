@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use app\models\User;
+use app\modules\admin\models\Notifyrule;
 use app\modules\admin\models\Telegram;
 use Yii;
 use app\models\Users;
@@ -65,6 +66,25 @@ class UsersController extends DefaultController
             $model->auth_key = Yii::$app->security->generateRandomString();
 
             if ($model->save()) {
+
+                foreach ([3, 1, 2, 0] as $chapter) {
+                    $rule = new Notifyrule();
+                    $rule->setAttributes([
+                        'user_id' => $model->id,
+                        'chapter' => $chapter,
+                        'mail' => 0,
+                        'telegram' => 0,
+                        'owner' => 0,
+                        'performer' => 0,
+                        'all' => 0,
+                        'create' => 0,
+                        'update' => 0,
+                        'delete' => 0,
+                        'done' => 0
+                    ]);
+                    $rule->save();
+                }
+
                 if ($old != $model->telegram_key and !empty($model->telegram_key)){
                     Telegram::sendMessage(base64_decode($model->telegram_key), 'Your bot has been successfully activated!');
                     Telegram::sendMessage(base64_decode($model->telegram_key),
@@ -133,9 +153,13 @@ class UsersController extends DefaultController
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        $model = $this->findModel($id);
 
-        return $this->redirect(['index']);
+        $model->status = $model->status == User::STATUS_DELETED ? User::STATUS_ACTIVE : User::STATUS_DELETED;
+
+        $model->save(false);
+
+        return $this->redirect(['/admin/settings/users']);
     }
 
     /**

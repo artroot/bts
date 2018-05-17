@@ -18,6 +18,7 @@ $this->title = 'My Yii Application';
 
     <!--<h2><center>Dashboard</center></h2>-->
 
+    <?php if (Project::find()->count() > 0): ?>
     <div class="row">
         <div class="col-md-4">
             <h3>Project List</h3>
@@ -50,4 +51,12 @@ $this->title = 'My Yii Application';
             ?>
         </div>
     </div>
+    <?php else: ?>
+    <div class="jumbotron">
+        <h1>Welcome to sweet bug tracking system!</h1>
+
+        <p>Let`s create your first project: </p>
+        <?= Html::a('Create project', ['project/create'],['class' => 'btn btn-success btn-lg']) ?>
+    </div>
+    <?php endif; ?>
 </div>

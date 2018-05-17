@@ -159,7 +159,7 @@ app\assets\AppAsset::register($this);
             'items' => $leftMenuItems,
         ]);
 
-        echo '<div class="navbar-form navbar-left">' . Html::a('Create issue', ['issue/create'], ['class' => 'btn btn-default']) . '</div>';
+    if (Project::find()->count() > 0) echo '<div class="navbar-form navbar-left">' . Html::a('Create issue', ['issue/create'], ['class' => 'btn btn-default']) . '</div>';
 
         echo Nav::widget([
             'encodeLabels' => false,
