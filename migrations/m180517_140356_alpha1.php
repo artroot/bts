@@ -15,18 +15,18 @@ class m180517_140356_alpha1 extends Migration
         $this->createTable('user', [
            'id' => $this->primaryKey(),
            'usertype_id' => $this->integer(),
-           'username' => $this->string(255)->unique()->notNull(),
+           'username' => $this->string(100)->unique()->notNull(),
            'password' => $this->string(255)->notNull(),
            'password_hash' => $this->text(),
            'password_reset_token' => $this->text(),
-           'email' => $this->string(255),
+           'email' => $this->string(100),
            'auth_key' => $this->text(),
            'status' => $this->integer(),
            'telegram_key' => $this->string(255),
            'telegram_notify' => $this->boolean(),
            'mail_notify' => $this->boolean(),
-           'first_name' => $this->string(255),
-           'last_name' => $this->string(255)
+           'first_name' => $this->string(100),
+           'last_name' => $this->string(100)
         ], 'ENGINE InnoDB');
 
         $this->createTable('issue', [
