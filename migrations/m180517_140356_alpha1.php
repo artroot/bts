@@ -27,7 +27,7 @@ class m180517_140356_alpha1 extends Migration
            'mail_notify' => $this->boolean(),
            'first_name' => $this->string(255),
            'last_name' => $this->string(255)
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('issue', [
            'id' => $this->primaryKey(),
@@ -46,7 +46,7 @@ class m180517_140356_alpha1 extends Migration
            'performer_id' => $this->integer(),
            'project_id' => $this->integer(),
            'progress_time' => $this->integer()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('notifyrule', [
            'id' => $this->primaryKey(),
@@ -61,7 +61,7 @@ class m180517_140356_alpha1 extends Migration
            'update' => $this->boolean(),
            'delete' => $this->boolean(),
            'done' => $this->boolean()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('sprint', [
            'id' => $this->primaryKey(),
@@ -71,14 +71,14 @@ class m180517_140356_alpha1 extends Migration
            'start_date' => $this->dateTime(),
            'finish_date' => $this->dateTime(),
            'status' => $this->boolean()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('issuepriority', [
            'id' => $this->primaryKey(),
            'name' => $this->string(255),
            'level' => $this->integer(),
            'color' => $this->string(8)
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('version', [
            'id' => $this->primaryKey(),
@@ -89,7 +89,7 @@ class m180517_140356_alpha1 extends Migration
            'finish_date' => $this->dateTime(),
            'plan_date' => $this->dateTime(),
            'status' => $this->boolean(),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('log', [
            'id' => $this->primaryKey(),
@@ -101,7 +101,7 @@ class m180517_140356_alpha1 extends Migration
            'date' => $this->timestamp(),
            'user_id' => $this->integer(),
            'issue_id' => $this->integer()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('comment', [
            'id' => $this->primaryKey(),
@@ -109,7 +109,7 @@ class m180517_140356_alpha1 extends Migration
            'user_id' => $this->integer(),
            'text' => $this->text(),
            'create_date' => $this->timestamp(),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('project', [
            'id' => $this->primaryKey(),
@@ -117,7 +117,7 @@ class m180517_140356_alpha1 extends Migration
            'team_id' => $this->integer(),
            'description' => $this->text(),
            'logo' => $this->text()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('issuestatus', [
            'id' => $this->primaryKey(),
@@ -125,7 +125,7 @@ class m180517_140356_alpha1 extends Migration
            'state_id' => $this->integer(),
            'count_progress_from' => $this->boolean(),
            'count_progress_to' => $this->boolean()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('prototype', [
            'id' => $this->primaryKey(),
@@ -133,7 +133,7 @@ class m180517_140356_alpha1 extends Migration
            'path' => $this->string(255),
            'issue_id' => $this->integer(),
            'index_file_name' => $this->string(255)
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('attachment', [
            'id' => $this->primaryKey(),
@@ -141,57 +141,57 @@ class m180517_140356_alpha1 extends Migration
            'file' => $this->text(),
            'type' => $this->string(255),
            'base_name' => $this->string(255)
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('telegram', [
            'token' => $this->string(255),
            'base_url' => $this->string(255),
            'update_id' => $this->integer(20),
            'status' => $this->boolean()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('relation', [
            'id' => $this->primaryKey(),
            'from_issue' => $this->integer(),
            'to_issue' => $this->integer(),
            'comment' => $this->text()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('teamusers', [
            'id' => $this->primaryKey(),
            'team_id' => $this->integer(),
            'user_id' => $this->integer(),
            'teamrole_id' => $this->integer(),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('teamrole', [
            'id' => $this->primaryKey(),
            'rolename' => $this->string(255),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('observer', [
            'id' => $this->primaryKey(),
            'issue_id' => $this->integer(),
            'user_id' => $this->integer(),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('telegramupdate', [
            'update_id' => $this->bigInteger(20)
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('issuetype', [
            'id' => $this->primaryKey(),
            'name' => $this->string(255)->notNull(),
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('team', [
            'id' => $this->primaryKey()
-        ]);
+        ], 'ENGINE InnoDB');
 
         $this->createTable('usertype', [
            'id' => $this->primaryKey(),
            'name' => $this->string(255)->notNull(),
-        ]);
+        ], 'ENGINE InnoDB');
 
         /*$this->createTable('migration', [
            'version' => $this->primaryKey(),
