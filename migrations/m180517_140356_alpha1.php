@@ -51,7 +51,7 @@ class m180517_140356_alpha1 extends Migration
         $this->createTable('notifyrule', [
            'id' => $this->primaryKey(),
            'user_id' => $this->integer(),
-           'chapter_id' => $this->integer(),
+           'chapter' => $this->integer(),
            'mail' => $this->boolean(),
            'telegram' => $this->boolean(),
            'owner' => $this->boolean(),
