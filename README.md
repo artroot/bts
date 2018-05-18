@@ -5,7 +5,7 @@ The Koala bug tracking system supported telegram notification and telegram bot m
 # Usage via Docker
 
 ```
-docker run -p 80:80 artroot/koala:lts
+docker run -p 80:80 artroot/koala:lst
 ```
 NOTE: default login parameters for web is `user - admin`, `pass - koala`; And you must change default password after loginned;
 
