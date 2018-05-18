@@ -1,6 +1,6 @@
 {
     "name": "artroot/koala",
-    "version": "1.0.0-alpha1",
+    "version": "1.0.0-alpha2",
     "description": "Bug Tracker System supporting prototypes and telegram bot management",
     "keywords": ["bts", "bug tracking system", "telegram bot", "prototype"],
     "homepage": "https://github.com/artroot/koala",
