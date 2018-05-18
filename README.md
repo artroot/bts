@@ -5,28 +5,26 @@ The Koala bug tracking system supported telegram notification and telegram bot m
 # Usage via Docker
 
 ```
-docker run -p 80:80 artroot/koala:lts
+docker run -p 80:80 artroot/koala:lst
 ```
 NOTE: default login parameters for web is `user - admin`, `pass - koala`; And you must change default password after loginned;
 
 # Install via composer
 
-1/ Clone repository
+1. Clone repository
 ```
 git clone https://github.com/artroot/koala.git
 ```
 
-2/ Install requairments
+2. Install requairments
 ```
 cd ./koala && composer install
 ```
 
-3/ Run the sh script or create DB & user manualy and do point 3.1 
-```
-database-filler.sh
-```
+3. Create a DataBase and User. 
+Enter details for connecting to the database into configuration file `config/db.php` 
 
-3.1/ Complete migrations
+4. Complete migrations
 ```
 php yii migrate --interactive=0
 ```
