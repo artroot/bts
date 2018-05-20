@@ -95,11 +95,14 @@ class Log extends \yii\db\ActiveRecord
         $data_new = [];
         foreach (array_keys($model->attributeLabels()) as $key) {
             unset($objectNew);
-            $fc = 'get' . ucfirst(str_replace('_id', '', $key));
+            $fc = 'get' . ucfirst(strpos($key, '_id') !== false ? str_replace('_id', '', $key) : $key);
             if (isset($model->{$key})) {
                 if (method_exists($model, $fc)) $objectNew = $model->$fc();
 
-                if(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
+                if(@$objectNew and is_string($objectNew) and !empty($objectNew)){
+                    $data_new[$key] = $objectNew;
+                }
+                elseif(@$objectNew instanceof ActiveRecord && isset($objectNew->name))
                     $data_new[$key] = $objectNew->name;
                 elseif(@$objectNew instanceof ActiveRecord && method_exists($objectNew, 'index'))
                     $data_new[$key] = $objectNew->index();
@@ -121,11 +124,15 @@ class Log extends \yii\db\ActiveRecord
         if ($oldModel instanceof ActiveRecord) {
             foreach (array_keys($model->attributeLabels()) as $key) {
                 unset($objectOld);
-                $fc = 'get' . ucfirst(str_replace('_id', '', $key));
+                $fc = 'get' . ucfirst(strpos($key, '_id') !== false ? str_replace('_id', '', $key) : $key);
                 if ($oldModel !== false && isset($oldModel->{$key})) {
                     if (method_exists($oldModel, $fc)) $objectOld = $oldModel->$fc();
 
-                    if (@$objectOld instanceof ActiveRecord && isset($objectOld->name))
+
+                    if(@$objectOld and is_string($objectOld) and !empty($objectOld)){
+                        $data_old[$key] = $objectOld;
+                    }
+                    elseif (@$objectOld instanceof ActiveRecord && isset($objectOld->name))
                         $data_old[$key] = $objectOld->name;
                     elseif (@$objectOld instanceof ActiveRecord && method_exists($objectOld, 'index'))
                         $data_old[$key] = $objectOld->index();

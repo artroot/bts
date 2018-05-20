@@ -384,6 +384,11 @@ class Issue extends ActiveRecord
         return $msg;
     }
 
+    public function getProgress_time()
+    {
+        return $this->getProgressTime();
+    }
+
     public function getObservers()
     {
         return Observer::findAll(['issue_id' => $this->id]);
